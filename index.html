@@ -1572,6 +1572,7 @@ const instruments = [
   { id: 'va', type: 'beneficio', name: 'VA', icon: '🛒', recharge: 400, day: 1, start: 120, color: '#0A6CFF' },
 ];
 const instById = id => instruments.find(i => i.id === id);
+const accounts = () => instruments.filter(i => i.type === 'conta');
 const credits = () => instruments.filter(i => i.type === 'credito');
 const benefits = () => instruments.filter(i => i.type === 'beneficio');
 
@@ -1718,7 +1719,7 @@ function contaMonth(m) { // month view of the account: income − reserves − a
   const list = monthEntries(m);
   const income = list.filter(e => e.type === 'income').reduce((s, e) => s + e.amount, 0);
   const outConta = list.filter(e => !e.type && instById(e.pay).type === 'conta')
-    .reduce((s, e) => s + myOutlay(e), 0);
+    .reduce((s, e) => s + myOutlay(e), 0);   // every account, not one privileged row
   const prev = mAdd(m, -1);
   const billsDue = prev ? credits().reduce((s, c) => s + faturaOpen(c.id, prev), 0) : 0;
   const settle = settlements.filter(x => x.m === m)
@@ -2928,9 +2929,14 @@ function settingsPage() {
   }
 
   if (setPage === 'insts') return `
-    ${group('Conta', instruments.filter(i => i.type === 'conta').map(i =>
-      row({ id: 'i:' + i.id, icon: i.icon, title: i.name, sub: 'consolidada', go: 1 })).join(''),
-      'Várias contas separadas entram numa fase futura.')}
+    ${group('Conta', accounts().map(i =>
+      row({ id: 'i:' + i.id, icon: i.icon, title: i.name, sub: 'onde o dinheiro fica', go: 1 })).join('')
+      + (accounts().length ? '' : row({ id: 'i-new-account', icon: '＋', title: 'Adicionar conta', go: 1 })),
+      accounts().length
+        ? 'Uma conta por agora, consolidada. Separar em várias precisa de duas coisas que ainda não '
+          + 'existem: dizer em qual conta a renda cai e transferência entre elas — sem isso o saldo '
+          + 'por conta não existe e as conciliações acusariam diferença sem explicação.'
+        : 'Cadastre a conta onde a renda cai e de onde as fixas saem.')}
     ${group('Cartões de crédito', credits().map(i =>
       row({ id: 'i:' + i.id, icon: i.icon, title: i.name,
         sub: `fecha dia ${i.close} · vence dia ${i.due}`, go: 1 })).join('')
@@ -3025,6 +3031,7 @@ function settingsGo(id) {
   if (id === 'c-slack') { openSlackEditor(); return; }
   if (id === 'i-new-card') { newInst('credito'); return; }
   if (id === 'i-new-benefit') { newInst('beneficio'); return; }
+  if (id === 'i-new-account') { newInst('conta'); return; }
   if (id === 'r-new') { openRsvEdit(null); return; }
   if (id === 'c-new-personal') { openCatEdit(null, 'personal', 'settings'); return; }
   if (id === 'c-new-couple') { openCatEdit(null, 'couple', 'settings'); return; }
@@ -3086,11 +3093,13 @@ function openInstEdit(id) {
 }
 function newInst(type) {
   instEdit = { newType: type };
-  $('ie-title').textContent = type === 'credito' ? '＋ Novo cartão' : '＋ Novo benefício (VR/VA)';
+  $('ie-title').textContent = type === 'credito' ? '＋ Novo cartão'
+    : type === 'conta' ? '＋ Nova conta' : '＋ Novo benefício (VR/VA)';
   $('ie-name').value = ''; $('ie-close').value = ''; $('ie-due').value = '';
   $('ie-recharge').value = ''; $('ie-day').value = '';
   $('ie-credit').style.display = type === 'credito' ? 'flex' : 'none';
   $('ie-benefit').style.display = type === 'beneficio' ? 'flex' : 'none';
+  $('ie-name').placeholder = type === 'conta' ? 'nome (ex: Itaú, Nubank conta)' : 'nome (ex: Nubank)';
   $('instedit-backdrop').classList.add('show');
 }
 $('instedit-backdrop').onclick = e => { if (e.target === $('instedit-backdrop')) $('instedit-backdrop').classList.remove('show'); };
@@ -3102,7 +3111,7 @@ $('ie-save').onclick = () => {
     const type = instEdit.newType;
     instruments.push({
       id: 'i' + nextId++, type, name,
-      icon: type === 'credito' ? '💳' : '🎫',
+      icon: type === 'credito' ? '💳' : type === 'conta' ? '🏦' : '🎫',
       color: INST_COLORS[instruments.length % INST_COLORS.length],
       ...(type === 'credito' ? { close: +$('ie-close').value || 25, due: +$('ie-due').value || 5 } : {}),
       ...(type === 'beneficio' ? { recharge: parseAmount($('ie-recharge').value), day: +$('ie-day').value || 1, start: 0 } : {}),
