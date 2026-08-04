@@ -335,8 +335,8 @@ const LANES = {
           </div>
           <div class="chips2"><span class="chip2 on">50/50</span><span class="chip2">60/40</span><span class="chip2">por renda</span></div>
           <div class="prim">Concluir ✓</div>`) },
-      { t: 'Convida a Rayra', p: 'Ela não cria um casal novo: entra no que já existe. O link é o único caminho — evita duas pessoas com dois casais e nenhum dado em comum.',
-        saves: 'Cria um <b>convite</b> com código e status pendente.',
+      { t: 'Convida a Rayra — quando quiser', p: 'Ela não cria um casal novo: assume o lugar que já existe. O link é o único caminho — evita duas pessoas com dois casais e nenhum dado em comum. E é opcional: dá pra mandar hoje ou em três meses.',
+        saves: 'Cria um <b>convite</b> com código e status pendente. <b>Não muda nada</b> do que já foi lançado.',
         ph: phone(`<div class="lbl">Casal</div>
           <div style="font-size:19px;font-weight:600">💌 Convidar a Rayra</div>
           <div class="note">Ela entra com o Google dela e vira parte do casal.</div>
@@ -344,9 +344,9 @@ const LANES = {
           <div class="fld ph-txt">juno.app/convite/4K7Q</div>
           <div class="prim">Compartilhar convite</div>
           <div class="note">no WhatsApp, como qualquer link</div>`) },
-      { t: 'Enquanto ela não entra', p: 'O app é seu e já funciona: você lança, concilia, vê o disponível. O que espera é só o lado dela — e isso fica dito, não escondido.',
-        saves: 'Nada. Lançamentos de casal feitos agora já congelam o rateio 50/50 e esperam a metade dela.',
-        gap: 'Lacuna fechada agora: não existia o estado “esperando o outro”.',
+      { t: 'Sozinho o app é inteiro', p: 'Este é o caso normal, não uma sala de espera. A Rayra existe como <b>nome</b>: você lança contas do casal, escolhe “Rayra pagou”, a gangorra mostra a vez dela e você registra o acerto quando ela te manda o dinheiro. Nada fica desabilitado e o app não cobra o convite.',
+        saves: 'Nada de especial: o assento B é um nome. Quando ela aceitar, a conta dela <b>gruda nesse assento</b> — nenhum lançamento é reescrito, nenhum número muda.',
+        gap: 'Decisão de 2026-08-04: usar o app individualmente é normal; o convite é ação, nunca pré-requisito.',
         ph: phone(`<div class="wait">💛 Convite enviado<br>Aguardando a Rayra entrar</div>
           <div class="card2">
             <div class="lbl">Disponível para uso</div>
@@ -376,8 +376,8 @@ const LANES = {
           </div>
           <div class="gbtn">${G} Entrar com o Google</div>
           <div class="note">o convite expira em 7 dias</div>`, true) },
-      { t: 'Entra no casal que já existe', p: 'Ao aceitar, ela herda tudo que é compartilhado — nada pra recriar, nada pra combinar duas vezes. É o ganho concreto do modelo.',
-        saves: 'Adiciona o <b>segundo membro</b> ao casal e marca o convite como aceito.',
+      { t: 'Assume o lugar que já existe', p: 'Ao aceitar, ela herda tudo que é compartilhado — nada pra recriar, nada pra combinar duas vezes. O histórico continua idêntico; o que começa é a interação: a parte dela dos lançamentos, os instrumentos dela e a conciliação dela.',
+        saves: 'A conta dela é <b>ligada ao assento B</b> que já existia (update, não insert) e o convite vira aceito.',
         ph: phone(`<div style="font-size:19px;font-weight:600">Pronto, Rayra 🧡</div>
           <div class="note">O que é do casal já está montado.</div>
           <div class="rows">

@@ -1287,8 +1287,10 @@
   <div class="sheet-backdrop" id="invite-backdrop">
     <div class="sheet">
       <h3>💌 Convidar pro Juno</h3>
-      <p>Manda o link pra ela. Ao abrir, ela entra com o Google dela e vira parte do casal —
-         cada um vê o próprio pessoal, os dois veem o do casal.</p>
+      <p>Manda o link pra ela. Ao abrir, ela entra com o Google dela e assume o lugar que já
+         existe — cada um vê o próprio pessoal, os dois veem o do casal.</p>
+      <p style="color:var(--txt3)">Sem pressa: o app funciona inteiro com você só. Nada do que
+         você lançar agora muda quando ela entrar.</p>
       <div class="invite-code" id="invite-code">JUNO-4K7Q</div>
       <input class="desc-input" id="invite-link" readonly value="juno.app/convite/4K7Q">
       <button class="btn-primary" id="invite-share">Compartilhar convite</button>
@@ -2896,10 +2898,15 @@ function settingsPage() {
 
   if (setPage === 'couple') return `
     ${group('Quem participa',
-      row({ icon: 'F', title: 'Fernando', sub: 'você · criou o casal' })
+      row({ icon: 'F', title: profile.name, sub: 'você · criou o casal' })
       + row({ id: 'c-invite', icon: 'R', title: 'Rayra',
-        sub: inviteSent ? 'convite enviado, aguardando ela entrar' : 'ainda não convidada',
-        value: inviteSent ? 'reenviar' : 'convidar', go: 1 }))}
+        sub: partnerBound ? 'no app, com a conta dela'
+          : inviteSent ? 'convite enviado · o app já funciona sem ela'
+          : 'só o nome · tudo do casal já funciona assim',
+        value: partnerBound ? 'no app' : inviteSent ? 'reenviar' : 'convidar', go: 1 }),
+      partnerBound ? '' : 'Nada aqui espera ela aceitar: lançamentos, rateio, gangorra e acertos já '
+        + 'funcionam com o nome. Quando ela entrar, começa a interação — a parte dela dos '
+        + 'lançamentos, os instrumentos e a conciliação dela.')}
     ${group('Como vocês dividem',
       row({ id: 'c-split', icon: '⚖', title: 'Rateio padrão', value: `${SPLIT_F}/${100 - SPLIT_F}`, go: 1 })
       + row({ id: 'c-slack', icon: '🪶', title: 'Zona de folga', value: fmt(SLACK), go: 1 }),
@@ -3411,6 +3418,7 @@ applyTheme();
 // ============ Login + invite ============
 let me = 'F';          // whose app this is (prototype: F = Fernando, R = invited Rayra)
 let inviteSent = false;
+let partnerBound = false;   // seat B is a name until an account binds to it
 function renderWhoPill() {
   $('desk-av').textContent = (me === 'F' ? profile.name : 'Rayra')[0];
   $('desk-av').style.background = me === 'F' ? 'rgba(10,108,255,.92)' : 'rgba(255,149,0,.92)';
@@ -3428,6 +3436,7 @@ $('google-in').onclick = () => {
 // Invited-partner path: joins an existing couple, so her wizard skips everything shared
 $('login-as-rayra').onclick = () => {
   me = 'R';
+  partnerBound = true;      // accepting the invite binds seat B — no history changes
   renderWhoPill();
   $('login').classList.add('hide');
   startPartnerWizard();
