@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Juno — Estúdio de ícones</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --wall: radial-gradient(120% 90% at 12% 4%, #BFE0FF 0%, rgba(191,224,255,0) 55%),
+            radial-gradient(100% 80% at 92% 12%, #FFD9B0 0%, rgba(255,217,176,0) 58%),
+            radial-gradient(120% 100% at 78% 96%, #C9C3FF 0%, rgba(201,195,255,0) 60%),
+            radial-gradient(90% 80% at 20% 92%, #A9F0DC 0%, rgba(169,240,220,0) 62%),
+            linear-gradient(160deg, #EAF2FF 0%, #F6F1FF 50%, #FFF3E8 100%);
+    --glass: rgba(255,255,255,.5); --stroke: rgba(255,255,255,.6);
+    --txt: #0B1B2E; --txt2: #4A5B70; --txt3: #5A6B80; --blue: #0A6CFF;
+    --shadow: rgba(12,30,60,.28);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --wall: radial-gradient(120% 90% at 12% 4%, #10305C 0%, rgba(16,48,92,0) 56%),
+              radial-gradient(100% 80% at 92% 10%, #4A2A10 0%, rgba(74,42,16,0) 58%),
+              radial-gradient(120% 100% at 78% 96%, #2C2350 0%, rgba(44,35,80,0) 60%),
+              radial-gradient(90% 80% at 18% 92%, #0C3A34 0%, rgba(12,58,52,0) 62%),
+              linear-gradient(160deg, #080C14 0%, #0B0E18 52%, #120E12 100%);
+      --glass: rgba(38,44,58,.55); --stroke: rgba(255,255,255,.14);
+      --txt: #EEF2F8; --txt2: #A3B0C2; --txt3: #94A2B4; --blue: #5AA2FF;
+      --shadow: rgba(0,0,0,.6);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 40px 24px 80px; background: var(--wall); background-attachment: fixed;
+    color: var(--txt); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 940px; margin: 0 auto; display: flex; flex-direction: column; gap: 34px; }
+  h1 { font-size: 34px; font-weight: 700; letter-spacing: -.022em; margin: 0; }
+  .lead { font-size: 15px; color: var(--txt2); line-height: 1.5; margin: 0; max-width: 62ch; }
+  h2 { font-size: 12.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+       color: var(--txt2); margin: 0 0 12px; }
+  .card {
+    border-radius: 26px; padding: 22px; background: var(--glass);
+    backdrop-filter: blur(28px) saturate(190%); -webkit-backdrop-filter: blur(28px) saturate(190%);
+    border: 1px solid var(--stroke); box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 10px 30px -12px var(--shadow);
+  }
+  .cand { display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; }
+  .cand + .cand { margin-top: 26px; padding-top: 26px; border-top: 1px solid var(--stroke); }
+  .big { flex-shrink: 0; }
+  .sizes { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+  .sizes figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .sizes figcaption { font-size: 10.5px; color: var(--txt3); font-variant-numeric: tabular-nums; }
+  .about { flex: 1; min-width: 240px; }
+  .about .nm { font-size: 19px; font-weight: 600; letter-spacing: -.01em; }
+  .about p { font-size: 13.5px; color: var(--txt2); line-height: 1.5; margin: 6px 0 0; }
+  .about .verdict { font-size: 12.5px; color: var(--txt3); margin-top: 8px; }
+  .ico { display: block; border-radius: 22.37%; overflow: hidden; }   /* iOS squircle ≈ 22.37% */
+  .ico.sm { border-radius: 24%; }
+  .home {
+    background: var(--wall); background-size: cover; border-radius: 30px; padding: 22px 18px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px 14px; max-width: 320px;
+  }
+  .home figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .home figcaption { font-size: 10px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.5); }
+  .ph { width: 56px; height: 56px; border-radius: 24%; background: rgba(255,255,255,.28);
+        border: 1px solid rgba(255,255,255,.3); }
+  .glyphs { display: flex; gap: 26px; flex-wrap: wrap; align-items: flex-end; }
+  .glyphs figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 7px; }
+  .glyphs figcaption { font-size: 11px; color: var(--txt3); }
+  .note { font-size: 12.5px; color: var(--txt3); line-height: 1.45; margin: 14px 0 0; }
+</style>
+
+<div class="wrap">
+  <div>
+    <h1>Ícones do Juno</h1>
+    <p class="lead">Quatro candidatos autorais, cada um desenhado em SVG e mostrado nos tamanhos
+      que importam de verdade — 180px (Retina), 120, 60 e 40px, onde quase todo ícone bonito
+      desmancha. Azul = Fernando, laranja = Rayra, como no app.</p>
+  </div>
+
+  <div class="card">
+    <h2>Candidatos</h2>
+
+    <!-- ============ A. Gangorra ============ -->
+    <div class="cand">
+      <div class="big">
+        <svg class="ico" width="132" height="132" viewBox="0 0 128 128">
+          <defs>
+            <linearGradient id="bgA" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#0B2C6B"/><stop offset=".55" stop-color="#0A6CFF"/>
+              <stop offset="1" stop-color="#4FA3FF"/>
+            </linearGradient>
+          </defs>
+          <rect width="128" height="128" fill="url(#bgA)"/>
+          <g transform="rotate(-9 64 70)">
+            <rect x="22" y="66" width="84" height="9" rx="4.5" fill="#fff"/>
+            <circle cx="34" cy="52" r="13" fill="#EAF2FF"/>
+            <circle cx="94" cy="52" r="13" fill="#FF9500"/>
+          </g>
+          <path d="M64 74 L54 100 h20 Z" fill="#fff" opacity=".9"/>
+        </svg>
+      </div>
+      <div class="sizes">
+        <figure>
+          <svg class="ico sm" width="60" height="60" viewBox="0 0 128 128">
+            <rect width="128" height="128" fill="#0A6CFF"/>
+            <g transform="rotate(-9 64 70)">
+              <rect x="22" y="66" width="84" height="9" rx="4.5" fill="#fff"/>
+              <circle cx="34" cy="52" r="13" fill="#EAF2FF"/><circle cx="94" cy="52" r="13" fill="#FF9500"/>
+            </g>
+            <path d="M64 74 L54 100 h20 Z" fill="#fff" opacity=".9"/>
+          </svg><figcaption>60</figcaption>
+        </figure>
+        <figure>
+          <svg class="ico sm" width="40" height="40" viewBox="0 0 128 128">
+            <rect width="128" height="128" fill="#0A6CFF"/>
+            <g transform="rotate(-9 64 70)">
+              <rect x="22" y="66" width="84" height="9" rx="4.5" fill="#fff"/>
+              <circle cx="34" cy="52" r="13" fill="#EAF2FF"/><circle cx="94" cy="52" r="13" fill="#FF9500"/>
+            </g>
+            <path d="M64 74 L54 100 h20 Z" fill="#fff" opacity=".9"/>
+          </svg><figcaption>40</figcaption>
+        </figure>
+      </div>
+      <div class="about">
+        <div class="nm">A · Gangorra</div>
+        <p>A metáfora que vocês já usam no app: a viga inclinada mostra quem está à frente.
+          É o desenho mais “explicativo” dos quatro.</p>
+        <p class="verdict">Risco: a viga vira um fio em 40px e o fulcro some — o ícone perde a leitura
+          justo no tamanho da tela de início.</p>
+      </div>
+    </div>
+
+    <!-- ============ B. Dois círculos (o modelo do app) ============ -->
+    <div class="cand">
+      <div class="big">
+        <svg class="ico" width="132" height="132" viewBox="0 0 128 128">
+          <defs>
+            <linearGradient id="bgB" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#F7FAFF"/><stop offset="1" stop-color="#E3ECFA"/>
+            </linearGradient>
+          </defs>
+          <rect width="128" height="128" fill="url(#bgB)"/>
+          <g>
+            <circle cx="50" cy="64" r="29" fill="#0A6CFF" opacity=".92"/>
+            <circle cx="78" cy="64" r="29" fill="#FF9500" opacity=".82"/>
+            <path d="M64 37.5a29 29 0 000 53 29 29 0 000-53z" fill="#12A150" opacity=".22"/>
+          </g>
+        </svg>
+      </div>
+      <div class="sizes">
+        <figure>
+          <svg class="ico sm" width="60" height="60" viewBox="0 0 128 128">
+            <rect width="128" height="128" fill="#F2F7FF"/>
+            <circle cx="50" cy="64" r="29" fill="#0A6CFF" opacity=".92"/>
+            <circle cx="78" cy="64" r="29" fill="#FF9500" opacity=".82"/>
+          </svg><figcaption>60</figcaption>
+        </figure>
+        <figure>
+          <svg class="ico sm" width="40" height="40" viewBox="0 0 128 128">
+            <rect width="128" height="128" fill="#F2F7FF"/>
+            <circle cx="50" cy="64" r="29" fill="#0A6CFF" opacity=".92"/>
+            <circle cx="78" cy="64" r="29" fill="#FF9500" opacity=".82"/>
+          </svg><figcaption>40</figcaption>
+        </figure>
+      </div>
+      <div class="about">
+        <div class="nm">B · Dois círculos</div>
+        <p>É literalmente o modelo do Juno: o que é seu, o que é dela, e a interseção que vocês
+          dividem. Sem metáfora emprestada, sem texto.</p>
+        <p class="verdict">Aguenta qualquer tamanho — em 40px continua sendo duas formas e um meio.
+          O risco é parecer genérico demais (dois círculos é um desenho comum).</p>
+      </div>
+    </div>
+
+    <!-- ============ C. Moneta ============ -->
+    <div class="cand">
+      <div class="big">
+        <svg class="ico" width="132" height="132" viewBox="0 0 128 128">
+          <defs>
+            <linearGradient id="bgC" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#0E1A33"/><stop offset="1" stop-color="#12305F"/>
+            </linearGradient>
+            <linearGradient id="coin" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#FFD79A"/><stop offset=".5" stop-color="#FF9500"/>
+              <stop offset="1" stop-color="#C56A00"/>
+            </linearGradient>
+          </defs>
+          <rect width="128" height="128" fill="url(#bgC)"/>
+          <circle cx="64" cy="64" r="38" fill="url(#coin)"/>
+          <circle cx="64" cy="64" r="31" fill="none" stroke="rgba(0,0,0,.16)" stroke-width="2"/>
+          <path d="M76 44v28a14 14 0 01-14 14 14 14 0 01-14-14" fill="none" stroke="#0E1A33"
+                stroke-width="9" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="sizes">
+        <figure>
+          <svg class="ico sm" width="60" height="60" viewBox="0 0 128 128">
+            <rect width="128" height="128" fill="#101E3A"/>
+            <circle cx="64" cy="64" r="38" fill="#FF9500"/>
+            <path d="M76 44v28a14 14 0 01-14 14 14 14 0 01-14-14" fill="none" stroke="#0E1A33" stroke-width="9" stroke-linecap="round"/>
+          </svg><figcaption>60</figcaption>
+        </figure>
+        <figure>
+          <svg class="ico sm" width="40" height="40" viewBox="0 0 128 128">
+            <rect width="128" height="128" fill="#101E3A"/>
+            <circle cx="64" cy="64" r="38" fill="#FF9500"/>
+            <path d="M76 44v28a14 14 0 01-14 14 14 14 0 01-14-14" fill="none" stroke="#0E1A33" stroke-width="9" stroke-linecap="round"/>
+          </svg><figcaption>40</figcaption>
+        </figure>
+      </div>
+      <div class="about">
+        <div class="nm">C · Moneta</div>
+        <p>A moeda de Juno Moneta com o <strong>J</strong> vazado — a origem da palavra “moeda”
+          virando a marca. É o mais “app de finanças” dos quatro.</p>
+        <p class="verdict">Lê bem pequeno (círculo cheio + uma letra). Mas conta a história do
+          dinheiro, não a do casal.</p>
+      </div>
+    </div>
+
+    <!-- ============ D. J partido ============ -->
+    <div class="cand">
+      <div class="big">
+        <svg class="ico" width="132" height="132" viewBox="0 0 128 128">
+          <defs>
+            <linearGradient id="bgD" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#EEF3FB"/>
+            </linearGradient>
+            <clipPath id="leftHalf"><rect x="0" y="0" width="64" height="128"/></clipPath>
+            <clipPath id="rightHalf"><rect x="64" y="0" width="64" height="128"/></clipPath>
+          </defs>
+          <rect width="128" height="128" fill="url(#bgD)"/>
+          <g stroke-width="15" stroke-linecap="round" fill="none">
+            <path d="M84 32v44a22 22 0 01-22 22 22 22 0 01-22-22" stroke="#0A6CFF" clip-path="url(#leftHalf)"/>
+            <path d="M84 32v44a22 22 0 01-22 22 22 22 0 01-22-22" stroke="#FF9500" clip-path="url(#rightHalf)"/>
+          </g>
+          <circle cx="84" cy="32" r="7.5" fill="#12A150"/>
+        </svg>
+      </div>
+      <div class="sizes">
+        <figure>
+          <svg class="ico sm" width="60" height="60" viewBox="0 0 128 128">
+            <rect width="128" height="128" fill="#F4F8FF"/>
+            <g stroke-width="15" stroke-linecap="round" fill="none">
+              <path d="M84 32v44a22 22 0 01-22 22 22 22 0 01-22-22" stroke="#0A6CFF" clip-path="url(#leftHalf)"/>
+              <path d="M84 32v44a22 22 0 01-22 22 22 22 0 01-22-22" stroke="#FF9500" clip-path="url(#rightHalf)"/>
+            </g>
+          </svg><figcaption>60</figcaption>
+        </figure>
+        <figure>
+          <svg class="ico sm" width="40" height="40" viewBox="0 0 128 128">
+            <rect width="128" height="128" fill="#F4F8FF"/>
+            <g stroke-width="15" stroke-linecap="round" fill="none">
+              <path d="M84 32v44a22 22 0 01-22 22 22 22 0 01-22-22" stroke="#0A6CFF" clip-path="url(#leftHalf)"/>
+              <path d="M84 32v44a22 22 0 01-22 22 22 22 0 01-22-22" stroke="#FF9500" clip-path="url(#rightHalf)"/>
+            </g>
+          </svg><figcaption>40</figcaption>
+        </figure>
+      </div>
+      <div class="about">
+        <div class="nm">D · J partido</div>
+        <p>Um <strong>J</strong> único, metade azul e metade laranja: uma letra, duas pessoas.
+          O ponto verde é o dinheiro que vocês guardam junto.</p>
+        <p class="verdict">Distintivo e legível pequeno. É o que mais parece “marca” — e o único que
+          funciona também como favicon e como avatar.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Na tela de início (o teste que vale)</h2>
+    <div class="home">
+      <figure>
+        <svg width="56" height="56" viewBox="0 0 128 128" style="border-radius:24%">
+          <rect width="128" height="128" fill="#0A6CFF"/>
+          <g transform="rotate(-9 64 70)">
+            <rect x="22" y="66" width="84" height="9" rx="4.5" fill="#fff"/>
+            <circle cx="34" cy="52" r="13" fill="#EAF2FF"/><circle cx="94" cy="52" r="13" fill="#FF9500"/>
+          </g>
+        </svg><figcaption>A</figcaption>
+      </figure>
+      <figure>
+        <svg width="56" height="56" viewBox="0 0 128 128" style="border-radius:24%">
+          <rect width="128" height="128" fill="#F2F7FF"/>
+          <circle cx="50" cy="64" r="29" fill="#0A6CFF" opacity=".92"/>
+          <circle cx="78" cy="64" r="29" fill="#FF9500" opacity=".82"/>
+        </svg><figcaption>B</figcaption>
+      </figure>
+      <figure>
+        <svg width="56" height="56" viewBox="0 0 128 128" style="border-radius:24%">
+          <rect width="128" height="128" fill="#101E3A"/>
+          <circle cx="64" cy="64" r="38" fill="#FF9500"/>
+          <path d="M76 44v28a14 14 0 01-14 14 14 14 0 01-14-14" fill="none" stroke="#0E1A33" stroke-width="9" stroke-linecap="round"/>
+        </svg><figcaption>C</figcaption>
+      </figure>
+      <figure>
+        <svg width="56" height="56" viewBox="0 0 128 128" style="border-radius:24%">
+          <rect width="128" height="128" fill="#F4F8FF"/>
+          <g stroke-width="15" stroke-linecap="round" fill="none">
+            <path d="M84 32v44a22 22 0 01-22 22 22 22 0 01-22-22" stroke="#0A6CFF" clip-path="url(#leftHalf)"/>
+            <path d="M84 32v44a22 22 0 01-22 22 22 22 0 01-22-22" stroke="#FF9500" clip-path="url(#rightHalf)"/>
+          </g>
+        </svg><figcaption>D</figcaption>
+      </figure>
+      <figure><div class="ph"></div><figcaption>Fotos</figcaption></figure>
+      <figure><div class="ph"></div><figcaption>Banco</figcaption></figure>
+      <figure><div class="ph"></div><figcaption>Mensagens</figcaption></figure>
+      <figure><div class="ph"></div><figcaption>Notas</figcaption></figure>
+    </div>
+    <p class="note">Ícone claro (B, D) desaparece em papel de parede claro; escuro (A, C) some em
+      papel escuro. O jeito Apple é escolher um fundo com contraste próprio — por isso A e C usam
+      fundo saturado.</p>
+  </div>
+
+  <div class="card">
+    <h2>Ícones de dentro do app — hoje emoji, proposta em glyph</h2>
+    <div class="glyphs">
+      <figure>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 10.5 12 4l9 6.5"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5h4v5"/>
+        </svg><figcaption>casa</figcaption>
+      </figure>
+      <figure>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round">
+          <rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19"/>
+        </svg><figcaption>cartão</figcaption>
+      </figure>
+      <figure>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 7h16l-1.5 12.5h-13z"/><path d="M8.5 7a3.5 3.5 0 017 0"/>
+        </svg><figcaption>mercado</figcaption>
+      </figure>
+      <figure>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v9M9.5 10.5h5M9.5 13.5h5"/>
+        </svg><figcaption>reserva</figcaption>
+      </figure>
+      <figure>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 4v16"/><path d="M4 8.5h16"/><path d="M4 8.5 6.5 15h-5z"/><path d="M20 8.5 22.5 15h-5z"/>
+        </svg><figcaption>gangorra</figcaption>
+      </figure>
+      <figure>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20s-7-4.3-7-9a4 4 0 017-2.6A4 4 0 0119 11c0 4.7-7 9-7 9z"/>
+        </svg><figcaption>casal</figcaption>
+      </figure>
+    </div>
+    <p class="note">Emoji não aceita cor: na tab bar o ícone selecionado não consegue ficar azul, e
+      cada plataforma desenha o seu (o 🏠 do Android não é o do iPhone). Glyph de traço 1.8 herda
+      a cor do estado, fica consistente nos dois celulares e combina com o vidro.
+      Trocar as categorias é uma tarefa maior — ~20 ícones — então ficou como proposta.</p>
+  </div>
+</div>
+
+</html>

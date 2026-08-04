@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Juno mark: what is yours, what is hers, and the middle you share.
+       Geometry mirrors scripts/make-icons.py — change both together. -->
+  <defs>
+    <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F6FAFF"/><stop offset="1" stop-color="#E3ECFA"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" fill="url(#plate)"/>
+  <circle cx="48" cy="64" r="30" fill="#0A6CFF"/>
+  <circle cx="80" cy="64" r="30" fill="#FF9500"/>
+  <path d="M64 38.62A30 30 0 0164 89.38 30 30 0 0164 38.62z" fill="#108F6A"/>
+</svg>
