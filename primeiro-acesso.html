@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Juno — Primeiro acesso</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%23F1F6FF'/%3E%3Ccircle cx='48' cy='64' r='30' fill='%230A6CFF'/%3E%3Ccircle cx='80' cy='64' r='30' fill='%23FF9500'/%3E%3Cpath d='M64 38.62A30 30 0 0164 89.38 30 30 0 0164 38.62z' fill='%23108F6A'/%3E%3C/svg%3E">
+<style>
+
+  /* ============ Liquid glass — design language from docs/juno-liquid-glass.html ============ */
+  :root {
+    --wall: radial-gradient(120% 90% at 12% 4%, #BFE0FF 0%, rgba(191,224,255,0) 55%),
+            radial-gradient(100% 80% at 92% 12%, #FFD9B0 0%, rgba(255,217,176,0) 58%),
+            radial-gradient(120% 100% at 78% 96%, #C9C3FF 0%, rgba(201,195,255,0) 60%),
+            radial-gradient(90% 80% at 20% 92%, #A9F0DC 0%, rgba(169,240,220,0) 62%),
+            linear-gradient(160deg, #EAF2FF 0%, #F6F1FF 50%, #FFF3E8 100%);
+    --glass: rgba(255,255,255,.46); --glass2: rgba(255,255,255,.34);
+    --stroke: rgba(255,255,255,.55); --stroke2: rgba(255,255,255,.5);
+    --hl: rgba(255,255,255,.7); --sep: rgba(255,255,255,.42); --shadow: rgba(12,30,60,.28);
+    --txt: #0B1B2E; --txt2: #4A5B70; --txt3: #5A6B80; --txt4: #8A9AB0;
+    --blue: #0A6CFF; --orange: #FF9500; --green: #12A150; --red: #FF3B30; --amber: #B3722A;
+    --pill: rgba(255,255,255,.5); --track: rgba(11,27,46,.1); --grab: rgba(11,27,46,.22);
+    --sheet: rgba(255,255,255,.62); --shellStroke: rgba(255,255,255,.6);
+    --dragBg: rgba(255,255,255,.94); --fulcrum: rgba(255,255,255,.7);
+    --segSel: #fff; --segShadow: 0 1px 3px rgba(16,34,31,.12);
+    /* aliases kept so existing markup keeps working */
+    --ink: var(--txt); --ink-soft: var(--txt2); --accent: var(--blue); --accent-ink: #fff;
+    --gold: var(--orange); --good: var(--green); --warn: var(--amber); --crit: var(--red);
+    --line: var(--sep); --surface: var(--glass); --surface-2: var(--glass2);
+    --accent-soft: rgba(10,108,255,.14); --gold-soft: rgba(255,149,0,.18);
+  }
+  .jdark {
+    --wall: radial-gradient(120% 90% at 12% 4%, #10305C 0%, rgba(16,48,92,0) 56%),
+            radial-gradient(100% 80% at 92% 10%, #4A2A10 0%, rgba(74,42,16,0) 58%),
+            radial-gradient(120% 100% at 78% 96%, #2C2350 0%, rgba(44,35,80,0) 60%),
+            radial-gradient(90% 80% at 18% 92%, #0C3A34 0%, rgba(12,58,52,0) 62%),
+            linear-gradient(160deg, #080C14 0%, #0B0E18 52%, #120E12 100%);
+    --glass: rgba(38,44,58,.52); --glass2: rgba(255,255,255,.08);
+    --stroke: rgba(255,255,255,.16); --stroke2: rgba(255,255,255,.13);
+    --hl: rgba(255,255,255,.16); --sep: rgba(255,255,255,.1); --shadow: rgba(0,0,0,.6);
+    --txt: #EEF2F8; --txt2: #A3B0C2; --txt3: #94A2B4; --txt4: #6E7C8E;
+    --blue: #5AA2FF; --orange: #FFB04A; --green: #4FD07A; --red: #FF6B60; --amber: #D99A55;
+    --pill: rgba(255,255,255,.12); --track: rgba(255,255,255,.14); --grab: rgba(255,255,255,.28);
+    --sheet: rgba(26,31,42,.7); --shellStroke: rgba(255,255,255,.14);
+    --dragBg: rgba(24,29,40,.96); --fulcrum: rgba(255,255,255,.22);
+    --segSel: rgba(255,255,255,.2); --segShadow: 0 1px 3px rgba(0,0,0,.4);
+    --accent-ink: #0A1420;
+    --accent-soft: rgba(90,162,255,.2); --gold-soft: rgba(255,176,74,.2);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not(.jlight) {
+      --wall: radial-gradient(120% 90% at 12% 4%, #10305C 0%, rgba(16,48,92,0) 56%),
+              radial-gradient(100% 80% at 92% 10%, #4A2A10 0%, rgba(74,42,16,0) 58%),
+              radial-gradient(120% 100% at 78% 96%, #2C2350 0%, rgba(44,35,80,0) 60%),
+              radial-gradient(90% 80% at 18% 92%, #0C3A34 0%, rgba(12,58,52,0) 62%),
+              linear-gradient(160deg, #080C14 0%, #0B0E18 52%, #120E12 100%);
+      --glass: rgba(38,44,58,.52); --glass2: rgba(255,255,255,.08);
+      --stroke: rgba(255,255,255,.16); --stroke2: rgba(255,255,255,.13);
+      --hl: rgba(255,255,255,.16); --sep: rgba(255,255,255,.1); --shadow: rgba(0,0,0,.6);
+      --txt: #EEF2F8; --txt2: #A3B0C2; --txt3: #94A2B4; --txt4: #6E7C8E;
+      --blue: #5AA2FF; --orange: #FFB04A; --green: #4FD07A; --red: #FF6B60; --amber: #D99A55;
+      --pill: rgba(255,255,255,.12); --track: rgba(255,255,255,.14); --grab: rgba(255,255,255,.28);
+      --sheet: rgba(26,31,42,.7); --shellStroke: rgba(255,255,255,.14);
+      --dragBg: rgba(24,29,40,.96); --fulcrum: rgba(255,255,255,.22);
+      --segSel: rgba(255,255,255,.2); --segShadow: 0 1px 3px rgba(0,0,0,.4);
+      --accent-ink: #0A1420;
+      --accent-soft: rgba(90,162,255,.2); --gold-soft: rgba(255,176,74,.2);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--wall); background-attachment: fixed;
+    color: var(--txt);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font-family: inherit; -webkit-tap-highlight-color: transparent; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+
+  /* Glass recipe — the one visual rule the whole app is built from */
+  .glass, .card, .sheet, .tabbar, .topbar {
+    background: var(--glass);
+    backdrop-filter: blur(28px) saturate(190%);
+    -webkit-backdrop-filter: blur(28px) saturate(190%);
+    border: 1px solid var(--stroke);
+    box-shadow: 0 1px 0 var(--hl) inset, 0 10px 30px -12px var(--shadow);
+  }
+  .glass2, .mini, .seg, .split-preview, .btn-ghost, .btn-mini, .chip, .desc-input,
+  .recon-track input, .sheet input, .amount-field {
+    background: var(--glass2);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--stroke2);
+    box-shadow: 0 1px 0 var(--hl) inset;
+  }
+
+  
+  /* ============ Walkthrough page ============ */
+  .page { max-width: 1180px; margin: 0 auto; padding: 40px 22px 90px; }
+  .head { display: flex; flex-direction: column; gap: 10px; margin-bottom: 26px; }
+  .head h1 { margin: 0; font-size: 34px; font-weight: 700; letter-spacing: -.022em; }
+  .head p { margin: 0; font-size: 15px; color: var(--txt2); line-height: 1.5; max-width: 66ch; }
+  .lane-tabs { display: flex; gap: 8px; margin: 4px 0 0; flex-wrap: wrap; }
+  .lane-tabs button {
+    border-radius: 999px; padding: 9px 16px; font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: inherit; color: var(--txt); background: var(--glass2);
+    border: 1px solid var(--stroke2); box-shadow: 0 1px 0 var(--hl) inset;
+  }
+  .lane-tabs button.sel { background: rgba(10,108,255,.92); color: #fff; border-color: transparent; }
+
+  .steps { display: flex; flex-direction: column; gap: 26px; }
+  .step {
+    display: grid; grid-template-columns: 300px 1fr; gap: 26px; align-items: start;
+    border-radius: 26px; padding: 20px;
+    background: var(--glass); backdrop-filter: blur(28px) saturate(190%);
+    -webkit-backdrop-filter: blur(28px) saturate(190%);
+    border: 1px solid var(--stroke); box-shadow: 0 1px 0 var(--hl) inset, 0 10px 30px -12px var(--shadow);
+  }
+  @media (max-width: 820px) { .step { grid-template-columns: 1fr; } }
+  .step .about h3 { margin: 0; font-size: 19px; font-weight: 600; letter-spacing: -.01em; }
+  .step .about .n {
+    font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--blue); margin-bottom: 5px;
+  }
+  .step .about p { margin: 8px 0 0; font-size: 14px; color: var(--txt2); line-height: 1.55; }
+  .step .about .saves {
+    margin-top: 12px; border-radius: 16px; padding: 11px 13px; font-size: 12.5px; line-height: 1.5;
+    background: var(--glass2); border: 1px solid var(--stroke2); color: var(--txt3);
+  }
+  .step .about .saves b { color: var(--txt); font-weight: 600; }
+  .step .about .gap {
+    margin-top: 10px; font-size: 12.5px; color: var(--orange); line-height: 1.45;
+  }
+
+  /* a real phone, at walkthrough scale */
+  .ph {
+    width: 300px; height: 620px; border-radius: 40px; position: relative; overflow: hidden;
+    background: var(--wall); flex-shrink: 0;
+    border: 1px solid var(--shellStroke);
+    box-shadow: 0 1px 2px rgba(12,30,60,.14), 0 24px 50px -18px rgba(12,30,60,.4);
+  }
+  .ph::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: 40px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.7), inset 0 0 0 1px rgba(255,255,255,.2);
+  }
+  .ph .sb {
+    height: 34px; display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 20px 5px; font-size: 11px; font-weight: 600; color: var(--txt);
+  }
+  .ph .body { padding: 8px 14px 14px; display: flex; flex-direction: column; gap: 11px; height: calc(100% - 34px); overflow: hidden; }
+  .ph .center { justify-content: center; align-items: center; text-align: center; gap: 9px; }
+
+  .wm { font-size: 34px; font-weight: 700; letter-spacing: -.035em; display: flex; align-items: baseline; justify-content: center; }
+  .wm .o { height: .72em; margin-left: .03em; }
+  .tag { font-size: 12px; color: var(--txt2); }
+  .gbtn {
+    width: 100%; border-radius: 999px; padding: 11px; font-size: 13.5px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--txt);
+    background: var(--glass); border: 1px solid var(--stroke); box-shadow: 0 1px 0 var(--hl) inset;
+  }
+  .gbtn svg { width: 16px; height: 16px; }
+  .note { font-size: 10.5px; color: var(--txt3); }
+
+  .card2 {
+    border-radius: 18px; padding: 13px; background: var(--glass);
+    border: 1px solid var(--stroke); box-shadow: 0 1px 0 var(--hl) inset;
+  }
+  .lbl { font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--txt2); }
+  .fld {
+    border-radius: 12px; padding: 9px 11px; font-size: 13px; color: var(--txt);
+    background: var(--glass2); border: 1px solid var(--stroke2);
+  }
+  .fld.ph-txt { color: var(--txt4); }
+  .big { font-size: 30px; font-weight: 700; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+  .prim {
+    border-radius: 999px; padding: 11px; font-size: 14px; font-weight: 600; text-align: center;
+    background: rgba(10,108,255,.94); color: #fff; box-shadow: 0 8px 20px -10px rgba(10,108,255,.9);
+  }
+  .chips2 { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip2 {
+    border-radius: 999px; padding: 6px 11px; font-size: 12px; color: var(--txt);
+    background: var(--glass2); border: 1px solid var(--stroke2);
+  }
+  .chip2.on { background: rgba(10,108,255,.92); color: #fff; border-color: transparent; font-weight: 600; }
+  .rows { border-radius: 16px; overflow: hidden; background: var(--glass2); border: 1px solid var(--stroke2); }
+  .r {
+    display: flex; align-items: center; gap: 9px; padding: 9px 11px;
+    border-bottom: 1px solid var(--sep); font-size: 12.5px;
+  }
+  .r:last-child { border-bottom: none; }
+  .r .ic {
+    width: 24px; height: 24px; border-radius: 7px; background: var(--pill); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 12px;
+  }
+  .r .g { flex: 1; min-width: 0; }
+  .r .t, .r .s { display: block; }
+  .r .t { font-weight: 500; color: var(--txt); }
+  .r .s { font-size: 11px; color: var(--txt3); }
+  .r .v { font-size: 12.5px; font-weight: 600; color: var(--txt); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .r .v.owe { color: var(--orange); }
+  .code {
+    font-size: 19px; font-weight: 700; letter-spacing: .12em; text-align: center;
+    border-radius: 14px; padding: 12px; background: var(--glass2); border: 1px solid var(--stroke2);
+  }
+  .wait {
+    border-radius: 16px; padding: 13px; text-align: center; font-size: 12.5px; color: var(--txt2);
+    background: var(--glass2); border: 1px solid var(--stroke2); line-height: 1.5;
+  }
+  .tabbar2 {
+    margin-top: auto; display: flex; justify-content: space-around; align-items: center;
+    border-radius: 22px; padding: 7px 4px; background: var(--glass);
+    border: 1px solid var(--stroke); box-shadow: 0 1px 0 var(--hl) inset;
+  }
+  .tabbar2 span { font-size: 9px; color: var(--txt4); display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .tabbar2 span.on { color: var(--blue); }
+  .tabbar2 .plus {
+    width: 30px; height: 30px; border-radius: 50%; background: rgba(10,108,255,.92); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 17px; margin-top: -12px;
+  }
+  .share-sheet {
+    position: absolute; left: 8px; right: 8px; bottom: 8px; border-radius: 22px; padding: 14px;
+    background: var(--sheet); backdrop-filter: blur(30px) saturate(190%);
+    -webkit-backdrop-filter: blur(30px) saturate(190%);
+    border: 1px solid var(--shellStroke); display: flex; flex-direction: column; gap: 10px;
+  }
+  .ios-menu { display: flex; flex-direction: column; gap: 1px; border-radius: 14px; overflow: hidden; }
+  .ios-menu div {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 10px 12px; font-size: 12.5px; background: var(--glass2); color: var(--txt);
+  }
+  .ios-menu div.hl { background: rgba(10,108,255,.92); color: #fff; font-weight: 600; }
+  .foot { margin-top: 40px; font-size: 12.5px; color: var(--txt3); text-align: center; line-height: 1.6; }
+</style>
+<div class="page">
+  <div class="head">
+    <h1>Primeiro acesso</h1>
+    <p>O caminho inteiro, do ícone na tela até os dois usando o app: o que aparece, o que o Juno
+      grava e o que fica pendente. Duas trilhas — quem cria o casal e quem é convidado.
+      Referência de implementação e roteiro pra validar a ordem com a Rayra.</p>
+    <div class="lane-tabs" id="lanes"></div>
+  </div>
+  <div class="steps" id="steps"></div>
+  <div class="foot">
+    Protótipo de fluxo · a tela do app está em
+    <a href="index.html">index.html</a> · dados de exemplo
+  </div>
+</div>
+
+<script>
+const G = `<svg viewBox="0 0 48 48" aria-hidden="true">
+  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/>
+  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>`;
+const MARK = `<svg class="o" viewBox="0 0 44 30"><circle cx="14" cy="15" r="13" fill="#0A6CFF"/><circle cx="30" cy="15" r="13" fill="#FF9500"/><path d="M22 4.75A13 13 0 0122 25.25 13 13 0 0122 4.75z" fill="#108F6A"/></svg>`;
+const sb = '<div class="sb"><span>9:41</span><span>▮▮▮ ◗ ▰</span></div>';
+const phone = (inner, center) => `<div class="ph">${sb}<div class="body${center ? ' center' : ''}">${inner}</div></div>`;
+const tabbar = on => `<div class="tabbar2">
+  ${['⌂ Início','◫ Orçamento','','⚖ Casal','F Ajustes'].map((l, i) => i === 2
+    ? '<span><span class="plus">+</span>Lançar</span>'
+    : `<span class="${on === i ? 'on' : ''}">${l.split(' ')[0]}<br>${l.split(' ')[1] || ''}</span>`).join('')}
+</div>`;
+
+// ============ The two lanes ============
+const LANES = {
+  F: {
+    label: '💙 Fernando — cria o casal',
+    steps: [
+      { t: 'Instala o app', p: 'Não tem loja: o Juno é um PWA. No Android o Chrome oferece “Instalar”; no iPhone é Compartilhar → Adicionar à Tela de Início. É o passo que a gente nunca tinha desenhado.',
+        saves: 'Nada ainda. <b>Importa porque</b>: sem instalar na tela de início, o iPhone não dá notificação nem abre em tela cheia.',
+        gap: 'Lacuna fechada agora: o app deve mostrar essa dica sozinho na primeira visita pelo Safari.',
+        ph: phone(`<div style="flex:1;display:flex;align-items:center;justify-content:center">
+            <div class="wm" style="opacity:.35">jun${MARK}</div></div>
+          <div class="share-sheet">
+            <div style="font-size:12px;color:var(--txt2)">juno.app</div>
+            <div class="ios-menu">
+              <div>Copiar<span>⧉</span></div>
+              <div class="hl">Adicionar à Tela de Início<span>＋</span></div>
+              <div>Favoritos<span>★</span></div>
+            </div>
+          </div>`) },
+      { t: 'Abre e entra', p: 'Uma tela, uma decisão. O login é a conta Google — nenhuma senha nova pra decorar, e é o que identifica cada um dentro do casal.',
+        saves: 'Cria o <b>profile</b> (nome e e-mail vêm do Google) e um <b>casal</b> com um membro só.',
+        ph: phone(`<div class="wm">jun${MARK}</div>
+          <div class="tag">o financeiro de vocês dois</div>
+          <div style="height:16px"></div>
+          <div class="gbtn">${G} Entrar com o Google</div>
+          <div class="note">um login por pessoa · o que é pessoal só você vê</div>`, true) },
+      { t: 'Estado zero', p: 'Antes de qualquer configuração o app não finge ter dados: ele mostra o que falta e um único caminho pra frente. É a tela que faltava no protótipo.',
+        saves: 'Nada. <b>Regra</b>: sem renda e sem instrumento, o disponível não é exibido — número inventado destrói confiança no primeiro minuto.',
+        gap: 'Lacuna fechada agora: o app sempre nascia com dados semeados.',
+        ph: phone(`<div class="card2" style="text-align:center">
+            <div class="lbl">Disponível para uso</div>
+            <div class="big" style="color:var(--txt4);margin-top:4px">—</div>
+            <div class="note" style="margin-top:6px">falta dizer quanto entra e de onde sai</div>
+          </div>
+          <div class="prim">Configurar em 4 passos</div>
+          <div class="note">leva menos de dois minutos</div>
+          ${tabbar(0)}`) },
+      { t: 'Wizard · 1 de 4 — quem são vocês', p: 'Os nomes aparecem na gangorra e nos lançamentos, então vêm primeiro. O nome dela já é pedido aqui pra que o convite depois seja pessoal.',
+        saves: 'Grava <b>seu nome</b> e o <b>nome do par</b> no casal.',
+        ph: phone(`<div class="lbl">passo 1 de 4</div>
+          <div style="font-size:19px;font-weight:600">Bem-vindos ao Juno 💛</div>
+          <div class="note">Só o essencial agora — o resto fica engatilhado.</div>
+          <div class="fld">Fernando</div>
+          <div class="fld">Rayra</div>
+          <div class="prim">Começar</div>`) },
+      { t: 'Wizard · 2 de 4 — sua renda', p: 'Uma pergunta por tela. A renda alimenta o disponível e as projeções dos meses futuros — e só você vê a sua.',
+        saves: 'Grava a <b>renda mensal</b> no seu profile (privada).',
+        ph: phone(`<div class="lbl">passo 2 de 4</div>
+          <div style="font-size:19px;font-weight:600">Sua renda mensal</div>
+          <div class="note">Serve pro disponível e pras projeções.</div>
+          <div class="card2" style="text-align:center"><div class="big">R$ 22.500,00</div></div>
+          <div class="prim">Continuar</div>`) },
+      { t: 'Wizard · 3 de 4 — seu cartão', p: 'Fechamento e vencimento são o que fazem a fatura do app bater com a do banco. Sem isso a conciliação nasce errada.',
+        saves: 'Cria o <b>instrumento</b> conta + o primeiro <b>cartão</b> com ciclo (fecha/vence).',
+        ph: phone(`<div class="lbl">passo 3 de 4</div>
+          <div style="font-size:19px;font-weight:600">Seu cartão principal</div>
+          <div class="note">Pra fatura bater com o app do banco.</div>
+          <div class="fld">Nubank</div>
+          <div style="display:flex;gap:8px"><div class="fld" style="flex:1">fecha dia 25</div><div class="fld" style="flex:1">vence dia 3</div></div>
+          <div class="prim">Continuar</div>`) },
+      { t: 'Wizard · 4 de 4 — o compartilhado do casal', p: 'Aqui nasce o que os dois veem: as fixas do mês e o rateio padrão. É mais do que o protótipo pedia (três orçamentos) — sem as fixas, a checklist e a reserva de emergência não têm base.',
+        saves: 'Cria as <b>categorias do casal</b> marcadas como fixas e essenciais, e a <b>regra de rateio 50/50</b> com vigência de hoje.',
+        gap: 'Lacuna fechada agora: o wizard só criava 3 orçamentos, sem fixas nem rateio.',
+        ph: phone(`<div class="lbl">passo 4 de 4</div>
+          <div style="font-size:19px;font-weight:600">As contas do casal</div>
+          <div class="note">Marque o que vocês dividem todo mês.</div>
+          <div class="rows">
+            <div class="r"><span class="ic">🏢</span><span class="g"><span class="t">Condomínio</span></span><span class="v">1.125,00</span></div>
+            <div class="r"><span class="ic">💡</span><span class="g"><span class="t">Luz</span></span><span class="v">250,00</span></div>
+            <div class="r"><span class="ic">🛒</span><span class="g"><span class="t">Mercado</span></span><span class="v">2.500,00</span></div>
+          </div>
+          <div class="chips2"><span class="chip2 on">50/50</span><span class="chip2">60/40</span><span class="chip2">por renda</span></div>
+          <div class="prim">Concluir ✓</div>`) },
+      { t: 'Convida a Rayra', p: 'Ela não cria um casal novo: entra no que já existe. O link é o único caminho — evita duas pessoas com dois casais e nenhum dado em comum.',
+        saves: 'Cria um <b>convite</b> com código e status pendente.',
+        ph: phone(`<div class="lbl">Casal</div>
+          <div style="font-size:19px;font-weight:600">💌 Convidar a Rayra</div>
+          <div class="note">Ela entra com o Google dela e vira parte do casal.</div>
+          <div class="code">JUNO-4K7Q</div>
+          <div class="fld ph-txt">juno.app/convite/4K7Q</div>
+          <div class="prim">Compartilhar convite</div>
+          <div class="note">no WhatsApp, como qualquer link</div>`) },
+      { t: 'Enquanto ela não entra', p: 'O app é seu e já funciona: você lança, concilia, vê o disponível. O que espera é só o lado dela — e isso fica dito, não escondido.',
+        saves: 'Nada. Lançamentos de casal feitos agora já congelam o rateio 50/50 e esperam a metade dela.',
+        gap: 'Lacuna fechada agora: não existia o estado “esperando o outro”.',
+        ph: phone(`<div class="wait">💛 Convite enviado<br>Aguardando a Rayra entrar</div>
+          <div class="card2">
+            <div class="lbl">Disponível para uso</div>
+            <div class="big">R$ 18.100,00</div>
+            <div class="note" style="margin-top:4px">livre, sem destino</div>
+          </div>
+          <div class="lbl">Precisa de você</div>
+          <div class="rows">
+            <div class="r"><span class="ic">🎫</span><span class="g"><span class="t">Cadastrar VR/VA</span><span class="s">saldo e recarga</span></span><span>›</span></div>
+            <div class="r"><span class="ic">🐷</span><span class="g"><span class="t">Criar as caixinhas</span><span class="s">reservas com aporte</span></span><span>›</span></div>
+          </div>
+          ${tabbar(0)}`) },
+    ],
+  },
+  R: {
+    label: '🧡 Rayra — recebe o convite',
+    steps: [
+      { t: 'Recebe o link', p: 'Ela abre o link antes de saber o que é o Juno. Essa tela tem uma função só: dizer quem convidou, o que ela vai ver e o que continua privado.',
+        saves: 'Nada ainda. <b>Regra</b>: nunca mostrar valores do casal antes do login.',
+        gap: 'Lacuna fechada agora: o lado de quem recebe não existia.',
+        ph: phone(`<div class="wm">jun${MARK}</div>
+          <div class="tag" style="margin-top:2px"><b>Fernando</b> te convidou</div>
+          <div style="height:10px"></div>
+          <div class="rows" style="text-align:left">
+            <div class="r"><span class="ic">💛</span><span class="g"><span class="t">Vocês dividem</span><span class="s">contas do casal, caixinhas e a gangorra</span></span></div>
+            <div class="r"><span class="ic">🔒</span><span class="g"><span class="t">Fica só seu</span><span class="s">sua renda e seus gastos pessoais</span></span></div>
+          </div>
+          <div class="gbtn">${G} Entrar com o Google</div>
+          <div class="note">o convite expira em 7 dias</div>`, true) },
+      { t: 'Entra no casal que já existe', p: 'Ao aceitar, ela herda tudo que é compartilhado — nada pra recriar, nada pra combinar duas vezes. É o ganho concreto do modelo.',
+        saves: 'Adiciona o <b>segundo membro</b> ao casal e marca o convite como aceito.',
+        ph: phone(`<div style="font-size:19px;font-weight:600">Pronto, Rayra 🧡</div>
+          <div class="note">O que é do casal já está montado.</div>
+          <div class="rows">
+            <div class="r"><span class="ic">✓</span><span class="g"><span class="t">4 contas fixas</span><span class="s">condomínio, luz, internet, streaming</span></span></div>
+            <div class="r"><span class="ic">✓</span><span class="g"><span class="t">3 orçamentos</span><span class="s">mercado, transporte, lazer</span></span></div>
+            <div class="r"><span class="ic">✓</span><span class="g"><span class="t">Rateio 50/50</span><span class="s">dá pra mudar quando quiserem</span></span></div>
+          </div>
+          <div class="prim">Vamos</div>`) },
+      { t: 'Wizard curto · 1 de 2 — a renda dela', p: 'A trilha dela é menor de propósito: só o que é dela. Duas perguntas em vez de quatro.',
+        saves: 'Grava a <b>renda dela</b> (privada) e o idioma do app dela.',
+        ph: phone(`<div class="lbl">passo 1 de 2 · convidada</div>
+          <div style="font-size:19px;font-weight:600">Sua renda mensal</div>
+          <div class="note">Só você vê. Serve pro seu disponível.</div>
+          <div class="card2" style="text-align:center"><div class="big">R$ 16.359,86</div></div>
+          <div class="prim">Continuar</div>`) },
+      { t: 'Wizard curto · 2 de 2 — o cartão dela', p: 'Instrumento é por pessoa: o cartão dela nunca aparece na fatura dele. É o que permite “cada um paga a sua” funcionar de verdade.',
+        saves: 'Cria a <b>conta</b> e o <b>cartão dela</b>, com o ciclo do banco dela.',
+        ph: phone(`<div class="lbl">passo 2 de 2 · convidada</div>
+          <div style="font-size:19px;font-weight:600">Seu cartão</div>
+          <div class="note">Pra sua fatura bater com o seu banco.</div>
+          <div class="fld">Itaú</div>
+          <div style="display:flex;gap:8px"><div class="fld" style="flex:1">fecha dia 20</div><div class="fld" style="flex:1">vence dia 28</div></div>
+          <div class="prim">Concluir ✓</div>`) },
+      { t: 'Os dois dentro', p: 'A partir daqui é o app normal — mas cada um vê o seu disponível e o mesmo casal. Ela cai com duas pendências em vez de quatro, porque herdou o resto.',
+        saves: 'Nada novo: o ciclo do mês começa.',
+        ph: phone(`<div class="wait">🧡 Vocês dois estão no Juno</div>
+          <div class="card2">
+            <div class="lbl">Disponível para uso — Rayra</div>
+            <div class="big">R$ 11.377,07</div>
+            <div class="note" style="margin-top:4px">livre, sem destino</div>
+          </div>
+          <div class="lbl">Precisa de você</div>
+          <div class="rows">
+            <div class="r"><span class="ic">🎫</span><span class="g"><span class="t">Cadastrar VR/VA</span></span><span>›</span></div>
+            <div class="r"><span class="ic">🏷️</span><span class="g"><span class="t">Suas categorias pessoais</span></span><span>›</span></div>
+          </div>
+          ${tabbar(0)}`) },
+    ],
+  },
+};
+
+let lane = 'F';
+function render() {
+  document.getElementById('lanes').innerHTML = Object.entries(LANES).map(([k, v]) =>
+    `<button class="${k === lane ? 'sel' : ''}" data-lane="${k}">${v.label}</button>`).join('')
+    + `<button data-lane="ALL" class="${lane === 'ALL' ? 'sel' : ''}">Ver as duas</button>`;
+  document.querySelectorAll('[data-lane]').forEach(b => b.onclick = () => { lane = b.dataset.lane; render(); scrollTo({ top: 0, behavior: 'smooth' }); });
+
+  const keys = lane === 'ALL' ? ['F', 'R'] : [lane];
+  document.getElementById('steps').innerHTML = keys.map(k => LANES[k].steps.map((s, i) => `
+    <div class="step">
+      ${s.ph}
+      <div class="about">
+        <div class="n">${LANES[k].label.replace(/^\S+\s/, '').split(' —')[0]} · passo ${i + 1} de ${LANES[k].steps.length}</div>
+        <h3>${s.t}</h3>
+        <p>${s.p}</p>
+        <div class="saves">${s.saves}</div>
+        ${s.gap ? `<div class="gap">⚑ ${s.gap}</div>` : ''}
+      </div>
+    </div>`).join('')).join('');
+}
+render();
+</script>
+
+</html>
