@@ -754,6 +754,10 @@
   /* ============ Desktop: same screens, a window instead of a phone ============ */
   .desk-side, .desk-toolbar { display: none; }   /* desktop-only chrome */
   .row-actions { display: none; }               /* pointer-only: phones swipe */
+  /* A single person can use Juno: with no seat B, the couple scope disappears
+     instead of sitting there disabled. */
+  .solo .tab[data-scr="couple"], .solo #scope-seg, .solo #paidby-block,
+  .solo #couple-card, .solo #settled-wrap { display: none !important; }
   /* on phones the wrapper must not exist for layout: .screens stays a flex child of .phone */
   .desk-main { display: contents; }
   @media (min-width: 1080px) {
@@ -1168,7 +1172,7 @@
       <div id="bt-var" class="bt on">
         <div class="card"><div class="label">Pessoal</div><div id="budget-personal"></div>
           <div class="tap-note">toca pra ver os lançamentos · ＋ pra lançar</div></div>
-        <div class="card" style="margin-top:16px"><div class="label">Casal — sua parte</div><div id="budget-couple"></div></div>
+        <div class="card" id="couple-card" style="margin-top:16px"><div class="label">Casal — sua parte</div><div id="budget-couple"></div></div>
         <button class="btn-ghost" style="width:100%;margin-top:12px" id="var-add">＋ nova categoria</button>
       </div>
       <div id="bt-fix" class="bt">
@@ -1954,7 +1958,7 @@ function todoItems() {
     }
   });
   const s = seesaw(CUR);
-  if (Math.abs(s) > SLACK) out.push({ icon: '⚖️', scope: 'couple',
+  if (hasPartner && Math.abs(s) > SLACK) out.push({ icon: '⚖️', scope: 'couple',
     title: s > 0 ? 'Vez da Rayra' : 'Sua vez de pagar',
     sub: `${fmt(Math.abs(s))} de diferença · próxima conta equilibra`,
     go: () => document.querySelector('.tab[data-scr="couple"]').click() });
@@ -2896,9 +2900,17 @@ function settingsPage() {
         control: `<button class="switch${profile.notify ? ' on' : ''}" data-sw="notify"><i></i></button>` }))}
     ${group('', row({ id: 'p-out', icon: '⏏', title: 'Sair desta conta', danger: 1, go: 1 }))}`;
 
-  if (setPage === 'couple') return `
+  if (setPage === 'couple') {
+    if (!hasPartner) return `
+    ${group('Só você por aqui',
+      row({ icon: profile.name[0], title: profile.name, sub: 'sem par no momento' })
+      + row({ id: 'c-add-partner', icon: '＋', title: 'Adicionar um par',
+          sub: 'divide contas com alguém? liga o escopo do casal', go: 1 }),
+      'Sem par, o Juno é só seu: nada de escopo casal, gangorra ou rateio. Ligar depois não mexe '
+      + 'em nada do que você já lançou — tudo que existe continua pessoal.')}`;
+    return `
     ${group('Quem participa',
-      row({ icon: 'F', title: profile.name, sub: 'você · criou o casal' })
+      row({ icon: profile.name[0], title: profile.name, sub: 'você · criou o casal' })
       + row({ id: 'c-invite', icon: 'R', title: 'Rayra',
         sub: partnerBound ? 'no app, com a conta dela'
           : inviteSent ? 'convite enviado · o app já funciona sem ela'
@@ -2910,7 +2922,10 @@ function settingsPage() {
     ${group('Como vocês dividem',
       row({ id: 'c-split', icon: '⚖', title: 'Rateio padrão', value: `${SPLIT_F}/${100 - SPLIT_F}`, go: 1 })
       + row({ id: 'c-slack', icon: '🪶', title: 'Zona de folga', value: fmt(SLACK), go: 1 }),
-      'Mudar o rateio vale dos próximos lançamentos em diante — os antigos guardam a regra da época. Diferenças abaixo da folga aparecem como "equilibrado ✓".')}`;
+      'Mudar o rateio vale dos próximos lançamentos em diante — os antigos guardam a regra da época. Diferenças abaixo da folga aparecem como "equilibrado ✓".')}
+    ${partnerBound ? '' : group('', row({ id: 'c-no-partner', icon: '⊘',
+        title: 'Usar sem par', sub: 'esconde o escopo do casal · o histórico fica', danger: 1, go: 1 }))}`;
+  }
 
   if (setPage === 'insts') return `
     ${group('Conta', instruments.filter(i => i.type === 'conta').map(i =>
@@ -2994,6 +3009,18 @@ function settingsGo(id) {
   }
   if (id === 'wizard') { $('settings-backdrop').classList.remove('show'); wizStep = 0; renderWizard(); $('wizard-backdrop').classList.add('show'); return; }
   if (id === 'c-invite') { openInvite(); return; }
+  if (id === 'c-add-partner') {
+    hasPartner = true; inviteSent = false; partnerBound = false;
+    applyPartnerMode(); renderSettings();
+    showToast('Escopo do casal ligado 💛');
+    return;
+  }
+  if (id === 'c-no-partner') {
+    hasPartner = false; inviteSent = false; partnerBound = false;
+    applyPartnerMode(); renderSettings();
+    showToast('Agora é só seu — o histórico fica');
+    return;
+  }
   if (id === 'c-split') { openSplitEditor(); return; }
   if (id === 'c-slack') { openSlackEditor(); return; }
   if (id === 'i-new-card') { newInst('credito'); return; }
@@ -3109,7 +3136,8 @@ function openCatEdit(id, scope, ret) {
     $('ce-title').textContent = '＋ Nova categoria';
     $('ce-icon').value = ''; $('ce-name').value = ''; $('ce-budget').value = '';
   }
-  syncCatEdit();
+  if (!hasPartner) ceScope = 'personal';
+  syncCatEdit(); syncScopePickers();
   $('catedit-backdrop').classList.add('show');
 }
 function syncCatEdit() {
@@ -3118,6 +3146,10 @@ function syncCatEdit() {
   $('ce-essential').classList.toggle('sel', ceEssential);
 }
 $('ce-scope').querySelectorAll('button').forEach(b => b.onclick = () => { ceScope = b.dataset.sc; syncCatEdit(); });
+function syncScopePickers() {
+  $('ce-scope').style.display = hasPartner ? 'flex' : 'none';
+  $('re-scope').style.display = hasPartner ? 'flex' : 'none';
+}
 $('ce-fixed').onclick = () => { ceFixed = !ceFixed; syncCatEdit(); };
 $('ce-essential').onclick = () => { ceEssential = !ceEssential; syncCatEdit(); };
 $('catedit-backdrop').onclick = e => { if (e.target === $('catedit-backdrop')) $('catedit-backdrop').classList.remove('show'); };
@@ -3185,7 +3217,9 @@ function openRsvEdit(id) {
     reTarget = 0;
   }
   renderReTarget();
+  if (!hasPartner) reScope = 'personal';
   $('re-scope').querySelectorAll('button').forEach(x => x.classList.toggle('sel', x.dataset.sc === reScope));
+  syncScopePickers();
   $('rsvedit-backdrop').classList.add('show');
 }
 $('re-scope').querySelectorAll('button').forEach(b => b.onclick = () => {
@@ -3419,6 +3453,12 @@ applyTheme();
 let me = 'F';          // whose app this is (prototype: F = Fernando, R = invited Rayra)
 let inviteSent = false;
 let partnerBound = false;   // seat B is a name until an account binds to it
+let hasPartner = true;      // no seat B at all → the couple scope is hidden entirely
+function applyPartnerMode() {
+  document.documentElement.classList.toggle('solo', !hasPartner);
+  if (!hasPartner) { entryScope = 'personal'; entryPaid = 'F'; entrySettled = false; }
+  syncEntryForm(); renderAll(); syncChrome();
+}
 function renderWhoPill() {
   $('desk-av').textContent = (me === 'F' ? profile.name : 'Rayra')[0];
   $('desk-av').style.background = me === 'F' ? 'rgba(10,108,255,.92)' : 'rgba(255,149,0,.92)';
