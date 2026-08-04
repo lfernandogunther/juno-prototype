@@ -718,6 +718,39 @@
   }
   .tab.sel .tab-av { box-shadow: 0 0 0 2px var(--blue), 0 0 0 4px var(--pill); }
 
+  /* ============ Tablet portrait: the phone shell, but using the width ============ */
+  @media (min-width: 700px) and (max-width: 1079px) {
+    .stage { padding: 28px 20px 36px; }
+    .phone {
+      max-width: 760px; height: min(1024px, calc(100dvh - 64px));
+      border-radius: 34px; border: 1px solid var(--shellStroke);
+      box-shadow: 0 1px 2px rgba(12,30,60,.14), 0 30px 64px -20px rgba(12,30,60,.38);
+    }
+    .phone::after { border-radius: 34px; }
+    .screens { padding-left: 20px; padding-right: 20px; }
+
+    /* two columns of cards when they fit — the same rule the desktop uses */
+    #scr-home.active, #scr-budget.active, #scr-couple.active {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px; align-items: start;
+    }
+    #scr-home.active > .app-head, #scr-budget.active > .app-head, #scr-couple.active > .app-head,
+    #scr-budget.active > .seg, #scr-home.active > #setup-cards { grid-column: 1 / -1; }
+    #scr-budget .bt.on { display: contents; }
+    #bt-var > .card, #bt-fix > .card, #bt-rsv > .card { margin-top: 0 !important; }
+    #bt-var > .btn-ghost, #bt-fix > .btn-ghost, #bt-rsv > .btn-ghost { margin-top: 0 !important; }
+    #scr-couple.active .seesaw-wrap { grid-row: span 2; }
+
+    /* one-hand controls stay reachable: centred at phone width instead of stretched */
+    #scr-entry.active { max-width: 560px; margin: 0 auto; }
+    .sheet { max-width: 620px; margin: 0 auto; }
+    .save-bar, .keypad, .toast, .snack {
+      left: 50%; right: auto; transform: translateX(-50%);
+      width: min(520px, calc(100% - 40px));
+    }
+    .toast { text-align: center; }
+  }
+
   /* ============ Desktop: same screens, a window instead of a phone ============ */
   .desk-side, .desk-toolbar { display: none; }   /* desktop-only chrome */
   .row-actions { display: none; }               /* pointer-only: phones swipe */
@@ -745,7 +778,12 @@
     .traffic { display: flex; gap: 8px; padding: 0 6px 2px; }
     .traffic i { width: 12px; height: 12px; border-radius: 50%; }
     .traffic .r { background: #FF5F57; } .traffic .y { background: #FEBC2E; } .traffic .g { background: #28C840; }
-    .desk-brand { font-size: 26px; font-weight: 700; letter-spacing: -.03em; color: var(--txt); padding: 0 6px; }
+    .desk-brand {
+      display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 4px 6px 2px;
+      filter: drop-shadow(0 8px 20px rgba(10,108,255,.22));
+    }
+    .desk-brand .wordmark { width: 132px; height: auto; display: block; }
+    .desk-brand .brand-dots { width: 52px; height: auto; display: block; }
     .desk-nav { display: flex; flex-direction: column; gap: 3px; }
     .desk-nav button {
       border: none; background: none; color: var(--txt2); border-radius: 999px;
@@ -940,7 +978,24 @@
   <!-- desktop only: the same app in a window, driven by the same handlers -->
   <aside class="desk-side">
     <div class="traffic"><i class="r"></i><i class="y"></i><i class="g"></i></div>
-    <div class="desk-brand">jun<svg class="brand-o" viewBox="0 0 44 30" aria-hidden="true"><circle cx="14" cy="15" r="13" fill="#0A6CFF"/><circle cx="30" cy="15" r="13" fill="#FF9500"/><path d="M22 4.75A13 13 0 0122 25.25 13 13 0 0122 4.75z" fill="#108F6A"/></svg></div>
+    <div class="desk-brand">
+      <svg class="wordmark" viewBox="0 0 194 104" aria-label="juno">
+        <defs>
+          <clipPath id="dm-ju"><text x="0" y="78" class="wm">Ju</text></clipPath>
+          <clipPath id="dm-no"><text x="86.1" y="78" class="wm">no</text></clipPath>
+        </defs>
+        <text x="86.1" y="78" class="wm" fill="#FF9500">no</text>
+        <text x="0" y="78" class="wm" fill="#0A6CFF">Ju</text>
+        <g clip-path="url(#dm-ju)"><g clip-path="url(#dm-no)">
+          <rect width="194" height="104" fill="#108F6A"/>
+        </g></g>
+      </svg>
+      <svg class="brand-dots" viewBox="14 30 100 68" aria-hidden="true">
+        <circle cx="48" cy="64" r="30" fill="#0A6CFF"/>
+        <circle cx="80" cy="64" r="30" fill="#FF9500"/>
+        <path d="M64 38.62A30 30 0 0164 89.38 30 30 0 0164 38.62z" fill="#108F6A"/>
+      </svg>
+    </div>
     <nav class="desk-nav" id="desk-nav"></nav>
     <div class="desk-kpis" id="desk-kpis"></div>
     <div class="desk-foot">
