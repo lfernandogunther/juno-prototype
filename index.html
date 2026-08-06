@@ -775,34 +775,81 @@
   .desk-side, .desk-toolbar { display: none; }   /* desktop-only chrome */
   .row-end { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 
-  /* ---- first-run wizard: rows the user can add to and delete ---- */
-  .wiz-body { max-height: 46vh; overflow-y: auto; margin-top: 4px; padding-right: 2px; }
+  /* ---- first-run wizard ----
+     Every field owns a full-width line with its label above it. Two inputs side by
+     side on a 375px screen is where the labels started clipping. */
+  .wiz-body { max-height: 52vh; overflow-y: auto; margin-top: 6px; padding: 2px; margin-inline: -2px; }
   .wiz-row {
-    border-radius: 18px; padding: 12px; background: var(--glass2);
-    border: 1px solid var(--stroke2); box-shadow: 0 1px 0 var(--hl) inset;
+    position: relative; border-radius: 20px; padding: 14px;
+    background: var(--glass2); border: 1px solid var(--stroke2);
+    box-shadow: 0 1px 0 var(--hl) inset;
   }
-  .wiz-row + .wiz-row { margin-top: 10px; }
-  .wiz-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--txt2); cursor: pointer; }
-  .wiz-check input { width: 17px; height: 17px; accent-color: var(--blue); }
-  .wiz-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-  .wiz-field > span { font-size: 11.5px; color: var(--txt3); }
-  .day-field {
-    display: flex; align-items: center; gap: 6px; min-width: 0;
-    border-radius: 14px; padding: 0 10px; height: 46px;
-    background: var(--glass); border: 1px solid var(--stroke);
+  .wiz-row + .wiz-row { margin-top: 12px; }
+  .wiz-rowhead {
+    font-size: 11.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--txt3); margin-bottom: 10px; padding-right: 34px;
   }
-  .day-field > span { font-size: 12px; color: var(--txt3); flex-shrink: 0; }
-  .day-field input {
-    width: 100%; min-width: 0; border: none; background: none; color: var(--txt);
-    font-family: inherit; font-size: 15px; font-variant-numeric: tabular-nums; outline: none;
+  .wiz-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .wiz-field + .wiz-field, .wiz-pair + .wiz-field, .wiz-field + .wiz-pair { margin-top: 10px; }
+  /* the stacking margin must not reach inside a side-by-side pair, or the two
+     inputs sit at different heights */
+  .wiz-pair > .wiz-field + .wiz-field { margin-top: 0; }
+  .wiz-field > span { font-size: 12px; color: var(--txt3); line-height: 1.3; }
+  .wiz-field .desc-input, .wiz-field input { width: 100%; }
+  /* only genuinely short values share a line */
+  .wiz-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .wiz-check {
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    font-size: 13.5px; color: var(--txt2); margin-top: 12px;
   }
-  .wiz-del {
+  .wiz-check input { width: 19px; height: 19px; accent-color: var(--blue); flex-shrink: 0; }
+  .wiz-x {
+    position: absolute; top: 10px; right: 10px; z-index: 1;
     border: none; background: var(--glass); color: var(--txt3); cursor: pointer; font-family: inherit;
-    width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; align-self: center;
+    width: 30px; height: 30px; border-radius: 50%; font-size: 13px;
     display: flex; align-items: center; justify-content: center;
   }
-  .wiz-del:hover { color: var(--red); }
+  .wiz-x:hover { color: var(--red); }
+  .wiz-seg { width: 100%; }
+  .wiz-seg button { flex: 1; }
   .wiz-seg button:disabled { opacity: .4; cursor: not-allowed; }
+  .wiz-skip {
+    display: block; margin: 10px auto 0; border: none; background: none; cursor: pointer;
+    font-family: inherit; font-size: 13.5px; color: var(--txt3); padding: 6px 10px;
+  }
+  .wiz-skip:hover { color: var(--txt2); }
+  .wiz-sum { display: flex; flex-direction: column; gap: 9px; }
+  .wiz-sum .li { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; color: var(--txt2); }
+  .wiz-sum .li .ck { flex-shrink: 0; width: 18px; }
+  .wiz-sum .li.todo { color: var(--txt3); }
+
+  /* ---- home: what the wizard left undone ---- */
+  .setup-card {
+    display: flex; align-items: center; gap: 11px;
+    border-radius: 18px; padding: 11px 12px;
+    background: var(--glass); border: 1px solid var(--stroke);
+    box-shadow: 0 1px 0 var(--hl) inset, 0 10px 30px -12px var(--shadow);
+  }
+  .setup-card .ic {
+    width: 32px; height: 32px; border-radius: 10px; flex-shrink: 0; font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--glass2); box-shadow: 0 1px 0 var(--hl) inset;
+  }
+  .setup-card .t { font-size: 14.5px; font-weight: 600; color: var(--txt); }
+  .setup-card .s {
+    font-size: 12px; color: var(--txt3);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .setup-x {
+    border: none; background: none; color: var(--txt4); cursor: pointer; font-family: inherit;
+    width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0; font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .setup-x:hover { color: var(--txt2); }
+  .setup-more {
+    border: none; background: none; cursor: pointer; font-family: inherit;
+    font-size: 13px; color: var(--blue); font-weight: 600; padding: 4px 2px; text-align: left;
+  }
   .todo-count { font-size: 12.5px; color: var(--txt3); font-variant-numeric: tabular-nums; }
   .todo-skip {
     border: none; background: var(--glass2); color: var(--txt3); cursor: pointer;
@@ -946,10 +993,7 @@
     #scr-home .hcol.rail { flex: 1 1 0; max-width: 400px; }
     /* the rail never scrolls as a whole: balances must not fall off the bottom.
        The decision list is the elastic one, so it scrolls inside itself. */
-    #scr-home #todo-block { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 96px; }
-    #scr-home #todo-list { flex: 1; min-height: 0; overflow-y: auto; }
-    #scr-home #repeat-block { flex: 0 0 auto; }
-    #scr-home #todo-block { min-height: 0; }
+    #scr-home #repeat-block, #scr-home #todo-block { flex: 0 0 auto; }
     /* Suas contas closes the rail flush with the bottom of the movement list. It is the
        card allowed to shrink, and its instrument list scrolls, so the rail can never
        overflow past the column and push the balances off-screen. */
@@ -3658,26 +3702,35 @@ let wizCats = [
   { icon: '🛒', name: 'Mercado', budget: 1250, scope: 'couple' },
   { icon: '🚗', name: 'Transporte', budget: 500, scope: 'couple' },
 ];
+// What the wizard actually got, so the last step and the home cards can tell the
+// truth instead of assuming every step was answered.
+let wizPartner = 'Rayra';
+let wizDone = { renda: false, saldos: false, cartoes: false, limites: false, categorias: false };
 const money2 = v => (v || 0).toLocaleString(lang, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const WIZ_STEPS = [
   {
     t: 'Bem-vindo ao Juno 💛',
-    p: 'Só o essencial agora — o resto vira lembrete na tela inicial.',
+    p: 'Só o seu nome é obrigatório. Todo o resto dá pra pular e fazer depois pela tela inicial.',
     render: () => `
-      <input class="desc-input" id="wf-n1" placeholder="seu nome" value="${profile.name}">
-      <label class="wiz-check" style="margin-top:10px">
-        <input type="checkbox" id="wf-hasp" ${hasPartner ? 'checked' : ''}>
-        <span>divido contas com alguém</span>
-      </label>
-      <input class="desc-input" id="wf-n2" placeholder="nome do par" value="Rayra"
-             style="margin-top:8px;${hasPartner ? '' : 'display:none'}">`,
+      <div class="wiz-row">
+        <label class="wiz-field"><span>Como te chamamos</span>
+          <input class="desc-input" id="wf-n1" placeholder="seu nome" value="${profile.name}"></label>
+        <label class="wiz-check">
+          <input type="checkbox" id="wf-hasp" ${hasPartner ? 'checked' : ''}>
+          <span>divido contas com alguém</span>
+        </label>
+        <label class="wiz-field" id="wf-n2wrap" style="${hasPartner ? '' : 'display:none'}"><span>Nome do par</span>
+          <input class="desc-input" id="wf-n2" placeholder="nome do par" value="Rayra"></label>
+      </div>`,
     wire: () => {
-      $('wf-hasp').onchange = () => { $('wf-n2').style.display = $('wf-hasp').checked ? '' : 'none'; };
+      $('wf-hasp').onchange = () => { $('wf-n2wrap').style.display = $('wf-hasp').checked ? '' : 'none'; };
     },
     save: () => {
       profile.name = $('wf-n1').value.trim() || profile.name;
       hasPartner = $('wf-hasp').checked;
+      // keep it: by step 5 the input is gone, and the summary needs the name
+      wizPartner = $('wf-n2').value.trim() || wizPartner;
       applyPartnerMode();
     },
     btn: 'Começar',
@@ -3685,24 +3738,26 @@ const WIZ_STEPS = [
   {
     // Two dates, not one number: a salary paid on the 1st and the 15th is two
     // different moments of the month, and "disponível" is wrong if they merge.
+    key: 'renda',
     t: 'O que entra no mês',
     p: 'Valor e dia de cada entrada. Se a data já passou, marque como recebido.',
     render: () => wizIn.map((r, n) => `
       <div class="wiz-row" data-inrow="${n}">
-        <input class="desc-input" data-inname="${n}" placeholder="nome" value="${r.name}">
-        <div class="row" style="gap:8px;margin-top:6px">
-          <input class="desc-input money-in" data-inamt="${n}" value="${money2(r.amount)}" style="flex:1.4">
-          <div class="day-field" style="flex:1">
-            <span>dia</span><input type="number" min="1" max="31" data-inday="${n}" value="${r.day}">
-          </div>
-          <button class="wiz-del" data-indel="${n}" aria-label="remover">✕</button>
+        ${wizIn.length > 1 ? `<button class="wiz-x" data-indel="${n}" aria-label="remover">✕</button>` : ''}
+        <label class="wiz-field"><span>De onde vem</span>
+          <input class="desc-input" data-inname="${n}" placeholder="salário, freela…" value="${r.name}"></label>
+        <div class="wiz-pair">
+          <label class="wiz-field"><span>Valor</span>
+            <input class="desc-input money-in" data-inamt="${n}" value="${money2(r.amount)}"></label>
+          <label class="wiz-field"><span>Dia do mês</span>
+            <input type="number" class="desc-input" min="1" max="31" data-inday="${n}" value="${r.day}"></label>
         </div>
-        <label class="wiz-check" style="margin-top:6px">
+        <label class="wiz-check">
           <input type="checkbox" data-ingot="${n}" ${r.got ? 'checked' : ''}>
           <span>já recebi este mês</span>
         </label>
       </div>`).join('')
-      + `<button class="btn-ghost" id="wf-inadd" style="margin-top:10px">＋ outra entrada</button>`,
+      + `<button class="btn-ghost" id="wf-inadd" style="margin-top:12px">＋ outra entrada</button>`,
     wire: () => {
       document.querySelectorAll('[data-inamt]').forEach(maskEl);
       document.querySelectorAll('[data-indel]').forEach(b => b.onclick = () => {
@@ -3716,45 +3771,47 @@ const WIZ_STEPS = [
     },
     save: () => {
       wizSaveIncome();
-      expectations = wizIn.filter(r => r.amount > 0).map((r, n) => ({
+      const rows = wizIn.filter(r => r.amount > 0);
+      expectations = rows.map((r, n) => ({
         id: 'wz' + n, name: r.name || `Entrada ${n + 1}`, cat: 'salario', amount: r.amount, day: r.day,
+        // "já recebi" is an override for this month, not a fake entry
+        ...(r.got ? { override: { [CUR]: 'received' } } : {}),
       }));
-      // "já recebi" is an override for this month, not a fake entry
-      const paid = wizIn.filter(r => r.amount > 0);
-      expectations.forEach((x, n) => { if (paid[n].got) x.override = { [CUR]: 'received' }; });
       INCOME = expectations.reduce((sum, x) => sum + x.amount, 0);
+      wizDone.renda = rows.length > 0;
     },
     btn: 'Continuar',
   },
   {
     // The reconciliation step. Starting from the real balance is what lets the
     // first month be right instead of "right from here forward".
+    key: 'saldos',
     t: 'Onde seu dinheiro está hoje',
     p: 'Os números de agora. É a partir deles que o app fecha a conta com você.',
     render: () => `
       <div class="wiz-row">
-        <div class="label" style="padding:0">🏦 Saldo na conta</div>
-        <input class="desc-input money-in" id="wf-conta" value="${money2(wizConta)}" style="margin-top:6px">
+        <div class="wiz-rowhead">🏦 Conta</div>
+        <label class="wiz-field"><span>Saldo agora</span>
+          <input class="desc-input money-in" id="wf-conta" value="${money2(wizConta)}"></label>
       </div>
       ${wizCards.map((c, n) => `
-        <div class="wiz-row" data-cdrow="${n}" style="margin-top:12px">
-          <div class="row spread">
-            <div class="label" style="padding:0">💳 Cartão ${n + 1}</div>
-            ${wizCards.length > 1 ? `<button class="wiz-del" data-cddel="${n}" aria-label="remover">✕</button>` : ''}
+        <div class="wiz-row" data-cdrow="${n}">
+          <div class="wiz-rowhead">💳 Cartão ${n + 1}</div>
+          ${wizCards.length > 1 ? `<button class="wiz-x" data-cddel="${n}" aria-label="remover">✕</button>` : ''}
+          <label class="wiz-field"><span>Nome</span>
+            <input class="desc-input" data-cdname="${n}" placeholder="Nubank, Inter…" value="${c.name}"></label>
+          <div class="wiz-pair">
+            <label class="wiz-field"><span>Fecha dia</span>
+              <input type="number" class="desc-input" min="1" max="31" data-cdclose="${n}" value="${c.close}"></label>
+            <label class="wiz-field"><span>Vence dia</span>
+              <input type="number" class="desc-input" min="1" max="31" data-cddue="${n}" value="${c.due}"></label>
           </div>
-          <input class="desc-input" data-cdname="${n}" placeholder="nome do cartão" value="${c.name}" style="margin-top:6px">
-          <div class="row" style="gap:8px;margin-top:6px">
-            <div class="day-field" style="flex:1"><span>fecha</span><input type="number" min="1" max="31" data-cdclose="${n}" value="${c.close}"></div>
-            <div class="day-field" style="flex:1"><span>vence</span><input type="number" min="1" max="31" data-cddue="${n}" value="${c.due}"></div>
-          </div>
-          <div class="row" style="gap:8px;margin-top:6px">
-            <label class="wiz-field" style="flex:1"><span>fatura aberta hoje</span>
-              <input class="desc-input money-in" data-cdspent="${n}" value="${money2(c.spent)}"></label>
-            <label class="wiz-field" style="flex:1"><span>limite total</span>
-              <input class="desc-input money-in" data-cdlimit="${n}" value="${money2(c.limit)}"></label>
-          </div>
+          <label class="wiz-field"><span>Fatura aberta hoje</span>
+            <input class="desc-input money-in" data-cdspent="${n}" value="${money2(c.spent)}"></label>
+          <label class="wiz-field"><span>Limite total do cartão</span>
+            <input class="desc-input money-in" data-cdlimit="${n}" value="${money2(c.limit)}"></label>
         </div>`).join('')}
-      <button class="btn-ghost" id="wf-cdadd" style="margin-top:10px">＋ outro cartão</button>`,
+      <button class="btn-ghost" id="wf-cdadd" style="margin-top:12px">＋ outro cartão</button>`,
     wire: () => {
       maskEl($('wf-conta'));
       document.querySelectorAll('[data-cdspent], [data-cdlimit]').forEach(maskEl);
@@ -3787,32 +3844,39 @@ const WIZ_STEPS = [
         return made;
       });
       // a card the user removed goes away, but only if nothing was ever paid with it
-      existing.slice(named.length).forEach(old => {
-        if (entries.some(e => e.pay === old.id)) return;
-        instruments.splice(instruments.indexOf(old), 1);
+      existing.slice(named.length).forEach(gone => {
+        if (entries.some(e => e.pay === gone.id)) return;
+        instruments.splice(instruments.indexOf(gone), 1);
       });
       // the informed values become the anchors — the same mechanism as Conciliar
-      recon['conta'] = { val: wizConta, exp: expectedAt('conta', CUR) };
+      if (wizConta > 0) recon['conta'] = { val: wizConta, exp: expectedAt('conta', CUR) };
       cards.forEach((c, n) => { recon[c.id] = { val: named[n].spent, exp: expectedAt(c.id, CUR) }; });
+      wizDone.saldos = wizConta > 0;
+      wizDone.cartoes = cards.length > 0;
+      wizDone.limites = cards.every(c => c.limit > 0) && cards.length > 0;
     },
     btn: 'Continuar',
   },
   {
+    key: 'categorias',
     t: 'Suas categorias',
-    p: 'Duas ou três bastam. Marque o que é do casal — dá pra criar mais depois.',
+    p: 'Duas ou três bastam — categorias novas também nascem na hora do lançamento.',
     render: () => wizCats.map((c, n) => `
       <div class="wiz-row" data-ctrow="${n}">
-        <div class="row" style="gap:8px">
-          <input class="desc-input" data-ctname="${n}" placeholder="nome" value="${c.icon} ${c.name}" style="flex:1.3">
-          <input class="desc-input money-in" data-ctbud="${n}" value="${money2(c.budget)}" style="flex:1">
-          <button class="wiz-del" data-ctdel="${n}" aria-label="remover">✕</button>
-        </div>
-        <div class="seg wiz-seg" style="margin-top:6px">
-          <button class="${c.scope === 'personal' ? 'sel' : ''}" data-ctsc="${n}" data-v="personal">pessoal</button>
-          <button class="${c.scope === 'couple' ? 'sel' : ''}" data-ctsc="${n}" data-v="couple" ${hasPartner ? '' : 'disabled'}>casal</button>
-        </div>
+        <button class="wiz-x" data-ctdel="${n}" aria-label="remover">✕</button>
+        <label class="wiz-field"><span>Nome (com emoji, se quiser)</span>
+          <input class="desc-input" data-ctname="${n}" placeholder="🏷️ nome" value="${c.icon} ${c.name}"></label>
+        <label class="wiz-field"><span>Quanto por mês</span>
+          <input class="desc-input money-in" data-ctbud="${n}" value="${money2(c.budget)}"></label>
+        ${hasPartner ? `
+        <div class="wiz-field"><span>De quem é</span>
+          <div class="seg wiz-seg">
+            <button class="${c.scope === 'personal' ? 'sel' : ''}" data-ctsc="${n}" data-v="personal">pessoal</button>
+            <button class="${c.scope === 'couple' ? 'sel' : ''}" data-ctsc="${n}" data-v="couple">casal</button>
+          </div>
+        </div>` : ''}
       </div>`).join('')
-      + `<button class="btn-ghost" id="wf-ctadd" style="margin-top:10px">＋ nova categoria</button>`,
+      + `<button class="btn-ghost" id="wf-ctadd" style="margin-top:12px">＋ nova categoria</button>`,
     wire: () => {
       document.querySelectorAll('[data-ctbud]').forEach(maskEl);
       document.querySelectorAll('[data-ctsc]').forEach(b => b.onclick = () => {
@@ -3829,28 +3893,45 @@ const WIZ_STEPS = [
     },
     save: () => {
       wizSaveCats();
-      wizCats.filter(c => c.name.trim()).forEach(c => {
+      const named = wizCats.filter(c => c.name.trim());
+      named.forEach(c => {
         const list = c.scope === 'couple' ? CATS.couple : CATS.personal;
         const hit = list.find(x => x.name.toLowerCase() === c.name.toLowerCase());
         if (hit) hit.budget = c.budget;
         else list.push({ id: 'wc' + Math.round(c.budget * 100) + list.length,
                          name: c.name, icon: c.icon, budget: c.budget });
       });
+      wizDone.categorias = named.length > 0;
     },
     btn: 'Continuar',
   },
   {
-    // Ends pointing at the app, not at another form.
-    t: 'Pronto pra usar 🎉',
-    p: 'O jeito mais rápido de sentir o Juno é lançar o que você já gastou este mês. A cada lançamento a conta se aproxima do saldo que você informou.',
-    render: () => `
-      <div class="wiz-row">
-        <div class="row spread"><span>🏦 informado</span><span class="money">${fmt(wizConta)}</span></div>
-        <div class="row spread" style="margin-top:4px"><span>app espera</span><span class="money">${fmt(expectedAt('conta', CUR))}</span></div>
-        <div class="free-note" style="margin-top:8px">A diferença fica visível na tela inicial até você lançar o que falta — nada some sem explicação.</div>
-      </div>`,
+    // Ends pointing at the app, not at another form — and says only what is true.
+    t: 'Pronto pra começar 🎉',
+    p: 'Nada aqui é definitivo: o que ficou de fora vira um card na tela inicial.',
+    render: () => {
+      const li = (ok, txt) => `<div class="li${ok ? '' : ' todo'}"><span class="ck">${ok ? '✓' : '○'}</span><span>${txt}</span></div>`;
+      const diff = wizDone.saldos ? round2(expectedAt('conta', CUR) - wizConta) : 0;
+      return `<div class="wiz-row"><div class="wiz-sum">
+          ${li(true, `Você é <strong>${profile.name}</strong>${hasPartner ? ` e divide contas com <strong>${wizPartner}</strong>` : ' — modo individual'}`)}
+          ${li(wizDone.renda, wizDone.renda
+              ? `${expectations.length} entrada${expectations.length > 1 ? 's' : ''} prevista${expectations.length > 1 ? 's' : ''} · ${fmt(INCOME)} no mês`
+              : 'Entradas do mês — dá pra cadastrar depois')}
+          ${li(wizDone.saldos, wizDone.saldos ? `Saldo informado: ${fmt(wizConta)}` : 'Saldo da conta — o app não sabe quanto você tem')}
+          ${li(wizDone.cartoes, wizDone.cartoes
+              ? `${credits().length} cartão${credits().length > 1 ? 'ões' : ''}${wizDone.limites ? ' com limite' : ' — falta o limite'}`
+              : 'Cartões de crédito')}
+          ${li(wizDone.categorias, wizDone.categorias ? `${wizCats.filter(c => c.name.trim()).length} categorias` : 'Categorias — nascem sozinhas ao lançar')}
+        </div></div>
+        ${wizDone.saldos && Math.abs(diff) > 0.01 ? `
+        <div class="wiz-row" style="margin-top:12px">
+          <div class="wiz-rowhead">Próximo passo</div>
+          <div class="free-note" style="margin-top:0">O app espera <strong>${fmt(expectedAt('conta', CUR))}</strong> e você informou
+            <strong>${fmt(wizConta)}</strong>. Lance o que já gastou e a diferença de ${fmt(Math.abs(diff))} se fecha sozinha.</div>
+        </div>` : ''}`;
+    },
     save: () => {},
-    btn: 'Lançar o primeiro ✓',
+    btn: () => wizDone.saldos ? 'Lançar o primeiro ✓' : 'Ir para o início ✓',
   },
 ];
 
@@ -3880,30 +3961,52 @@ function wizSaveCats() {
   });
 }
 
+function wizFinish() {
+  $('wizard-backdrop').classList.remove('show');
+  wizStep = 0;
+  // Only what is genuinely missing becomes a card — a checklist of things you
+  // already did is noise, and noise is what people learn to swipe away.
+  setupPending = [
+    !wizDone.renda && 'renda',
+    !wizDone.saldos && 'saldos',
+    !wizDone.cartoes && 'cartoes',
+    wizDone.cartoes && !wizDone.limites && 'limites',
+    !wizDone.categorias && 'categorias',
+    'beneficios',
+    'reservas',
+    hasPartner && 'rateio',
+  ].filter(Boolean);
+  renderSetupCards(); renderAll();
+  if (wizDone.saldos) {
+    // the fastest way to feel the app is to use it
+    document.querySelector('.tab[data-scr="entry"]').click();
+    showToast('Tudo de pé — lance o que já gastou 🎉');
+  } else {
+    document.querySelector('.tab[data-scr="home"]').click();
+    showToast('Pronto — o que faltou está na tela inicial 💛');
+  }
+}
+
 function renderWizard() {
   const s = WIZ_STEPS[wizStep];
+  const last = wizStep === WIZ_STEPS.length - 1;
   $('wizard-sheet').innerHTML = `
     <div class="label">passo ${wizStep + 1} de ${WIZ_STEPS.length}</div>
     <h3>${s.t}</h3><p>${s.p}</p>
     <div class="wiz-body">${s.render()}</div>
     <div class="row" style="gap:8px;margin-top:14px">
       ${wizStep > 0 ? '<button class="btn-ghost" id="wiz-back" style="flex:none">‹ voltar</button>' : ''}
-      <button class="btn-primary" id="wiz-next" style="flex:1">${s.btn}</button>
-    </div>`;
+      <button class="btn-primary" id="wiz-next" style="flex:1">${typeof s.btn === 'function' ? s.btn() : s.btn}</button>
+    </div>
+    ${s.key ? `<button class="wiz-skip" id="wiz-skip">pular — faço isso depois</button>` : ''}`;
   s.wire?.();
   if ($('wiz-back')) $('wiz-back').onclick = () => { s.save(); wizStep--; renderWizard(); };
+  // Skipping must not save: a half-filled form written to the model is worse than
+  // an empty one, because nothing then tells the home screen it is still missing.
+  if ($('wiz-skip')) $('wiz-skip').onclick = () => { wizStep++; renderWizard(); };
   $('wiz-next').onclick = () => {
     s.save();
-    if (wizStep === WIZ_STEPS.length - 1) {
-      $('wizard-backdrop').classList.remove('show');
-      wizStep = 0;
-      setupPending = hasPartner ? ['beneficios', 'reservas', 'rateio'] : ['beneficios', 'reservas'];
-      renderSetupCards(); renderAll();
-      // land on the entry screen: the fastest way to feel the app is to use it
-      document.querySelector('.tab[data-scr="entry"]').click();
-      showToast('Tudo de pé — lance o que já gastou 🎉');
-      return;
-    }
+    if (last) return wizFinish();
     wizStep++;
     renderWizard();
   };
@@ -3911,30 +4014,42 @@ function renderWizard() {
 $('wizard-backdrop').onclick = e => { if (e.target === $('wizard-backdrop')) $('wizard-backdrop').classList.remove('show'); };
 
 const PENDING_META = {
+  renda: { i: '💵', t: 'Cadastrar o que entra', d: 'valor e dia de cada entrada', go: () => openExpectation(null) },
+  saldos: { i: '⚖️', t: 'Informar seus saldos', d: 'quanto tem na conta e no cartão hoje', go: openReconSheet },
+  cartoes: { i: '💳', t: 'Cadastrar um cartão', d: 'fechamento, vencimento e limite', go: () => newInst('credito') },
+  limites: { i: '💳', t: 'Preencher o limite', d: 'pra saber se cabe parcelar', go: () => openSettings('insts') },
   beneficios: { i: '🎫', t: 'Cadastrar VR/VA', d: 'saldo e recarga dos benefícios', go: () => newInst('beneficio') },
   reservas: { i: '🐷', t: 'Criar suas caixinhas', d: 'reservas com aporte mensal', go: () => openRsvEdit(null) },
   rateio: { i: '⚖️', t: 'Conferir o rateio', d: 'hoje 50/50 — dá pra mudar', go: () => openSplitEditor() },
   categorias: { i: '🏷️', t: 'Completar categorias', d: 'lazer, saúde, assinaturas…', go: () => openCatEdit(null, 'personal', 'settings') },
 };
+// Everything skipped at once would bury the home screen under a checklist — the
+// same wall the pendency queue avoids. Two at a time, the rest behind a counter.
+let setupOpen = false;
+const SETUP_VISIBLE = 2;
 function renderSetupCards() {
-  $('setup-cards').innerHTML = setupPending.map(p => {
+  const shown = setupOpen ? setupPending : setupPending.slice(0, SETUP_VISIBLE);
+  const rest = setupPending.length - shown.length;
+  $('setup-cards').innerHTML = shown.map(p => {
     const x = PENDING_META[p];
-    return `<div class="card" style="padding:12px 14px">
-      <div class="row spread">
-        <span style="font-size:13.5px;font-weight:600">${x.i} ${x.t}</span>
-        <span class="row" style="gap:4px">
-          <button class="btn-mini" data-wgo="${p}" style="flex:none">fazer</button>
-          <button class="back-btn" data-wskip="${p}" style="font-size:14px;padding:2px 6px">✕</button>
-        </span>
-      </div>
-      <div class="nums" style="margin-top:2px;font-size:12px;color:var(--ink-soft)">${x.d}</div>
+    return `<div class="setup-card">
+      <span class="ic">${x.i}</span>
+      <span class="stack" style="gap:1px;min-width:0;flex:1">
+        <span class="t">${x.t}</span><span class="s">${x.d}</span>
+      </span>
+      <button class="btn-mini" data-wgo="${p}" style="flex:none">fazer</button>
+      <button class="setup-x" data-wskip="${p}" aria-label="dispensar">✕</button>
     </div>`;
-  }).join('');
+  }).join('')
+    + (rest > 0 || setupOpen
+      ? `<button class="setup-more" id="setup-more">${rest > 0 ? `＋ mais ${rest} pra configurar` : 'mostrar menos'}</button>`
+      : '');
   $('setup-cards').querySelectorAll('[data-wgo]').forEach(el => el.onclick = () => PENDING_META[el.dataset.wgo].go());
   $('setup-cards').querySelectorAll('[data-wskip]').forEach(el => el.onclick = () => {
     setupPending = setupPending.filter(p => p !== el.dataset.wskip);
     renderSetupCards();
   });
+  if ($('setup-more')) $('setup-more').onclick = () => { setupOpen = !setupOpen; renderSetupCards(); };
 }
 
 // ============ Desktop toolbar: title, month, section switch, primary action =======
