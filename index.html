@@ -480,11 +480,11 @@
   .bar.thin { height: 3px; margin-top: 7px; }
   .budget-row .scope-tag, .budget-row .pay-tag { flex-shrink: 0; }
   #budget-personal .budget-row, #budget-couple .budget-row, #budget-fixed .budget-row,
-  #budget-reserves .budget-row {
+  #budget-income .budget-row, #budget-reserves .budget-row {
     display: block; padding: 12px 0; border-bottom: 1px solid var(--sep);
   }
   #budget-personal .budget-row:last-child, #budget-couple .budget-row:last-child,
-  #budget-fixed .budget-row:last-child,
+  #budget-fixed .budget-row:last-child, #budget-income .budget-row:last-child,
   #budget-reserves .budget-row:last-child { border-bottom: none; }
   .bar { height: 5px; border-radius: 999px; background: var(--track); margin-top: 9px; overflow: hidden; }
   .bar i { display: block; height: 100%; border-radius: 999px; background: var(--blue); }
@@ -1050,6 +1050,7 @@
         <div class="free-note" id="free-note">livre, sem destino — o resto já tem dono</div>
         <div class="free-note" id="upcoming-note"></div>
         <div class="free-note" id="benefit-note"></div>
+        <div class="free-note" id="income-note"></div>
       </div>
 
       <!-- what actually needs a decision today -->
@@ -1166,7 +1167,7 @@
       <div class="app-head"><h2 data-i18n="tab.budget">Orçamento</h2></div>
       <div class="seg" id="budget-seg">
         <button class="sel" data-bt="var" data-i18n="budget.variable">Variáveis</button>
-        <button data-bt="fix" data-i18n="budget.fixed">Fixas</button>
+        <button data-bt="fix" data-i18n="budget.fixed">Previstos</button>
         <button data-bt="rsv" data-i18n="budget.reserves">Reservas</button>
       </div>
       <div id="bt-var" class="bt on">
@@ -1177,6 +1178,16 @@
       </div>
       <div id="bt-fix" class="bt">
         <div class="card">
+          <div class="label">Entradas</div>
+          <div class="mini-stats" style="margin-top:0">
+            <div class="mini"><div class="k">Recebidas</div><div class="v money" id="inc-got"></div></div>
+            <div class="mini"><div class="k">A receber</div><div class="v money" id="inc-due"></div></div>
+          </div>
+          <div id="budget-income" style="margin-top:8px"></div>
+          <button class="btn-ghost" style="width:100%;margin-top:10px" id="inc-add">＋ nova entrada prevista</button>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <div class="label">Saídas fixas</div>
           <div class="mini-stats" style="margin-top:0">
             <div class="mini"><div class="k">Pagas</div><div class="v money" id="fix-paid"></div></div>
             <div class="mini"><div class="k">A pagar</div><div class="v money" id="fix-due"></div></div>
@@ -1232,6 +1243,29 @@
         <button class="back-btn" id="set-close">Fechar</button>
       </div>
       <div id="set-body"></div>
+    </div>
+  </div>
+
+  <!-- ============ Expected income — amount, date and its status ============ -->
+  <div class="sheet-backdrop" id="exp-backdrop">
+    <div class="sheet">
+      <h3 id="exp-title">Entrada prevista</h3>
+      <input class="desc-input" id="exp-name" placeholder="nome (ex: Salário · 2ª parte)">
+      <input type="text" inputmode="numeric" id="exp-amount" placeholder="valor esperado">
+      <div>
+        <div class="label" style="padding:0 0 6px">Quando</div>
+        <div class="chips" id="exp-when"></div>
+        <div class="chips-note" id="exp-when-note"></div>
+      </div>
+      <div>
+        <div class="label" style="padding:0 0 6px">Situação</div>
+        <div class="chips">
+          <button class="chip" data-st2="pending">○ A receber</button>
+          <button class="chip" data-st2="received">✓ Recebido</button>
+        </div>
+        <div class="chips-note">a data decide sozinha; aqui você corrige quando ela erra</div>
+      </div>
+      <button class="btn-primary" id="exp-save">Salvar</button>
     </div>
   </div>
 
@@ -1483,7 +1517,7 @@ const MESSAGES = {
     'home.available': 'Disponível para uso — {name}', 'home.projected': 'Disponível projetado — {name}',
     'home.free': 'livre, sem destino — o resto já tem dono',
     'home.inAccount': 'Em conta', 'home.cardRoom': 'No cartão ainda cabe',
-    'budget.variable': 'Variáveis', 'budget.fixed': 'Fixas', 'budget.reserves': 'Reservas',
+    'budget.variable': 'Variáveis', 'budget.fixed': 'Previstos', 'budget.reserves': 'Reservas',
     'entry.out': 'Saída', 'entry.in': 'Entrada', 'entry.category': 'Categoria',
     'entry.payment': 'Pagamento', 'entry.myPayment': 'Seu pagamento',
     'entry.save': 'Lançar', 'entry.update': 'Salvar', 'entry.editing': 'editando ✏️',
@@ -1509,7 +1543,7 @@ const MESSAGES = {
     'home.available': 'Available to spend — {name}', 'home.projected': 'Projected available — {name}',
     'home.free': 'free, no owner — the rest is already claimed',
     'home.inAccount': 'In the account', 'home.cardRoom': 'Card headroom',
-    'budget.variable': 'Variable', 'budget.fixed': 'Fixed', 'budget.reserves': 'Reserves',
+    'budget.variable': 'Variable', 'budget.fixed': 'Expected', 'budget.reserves': 'Reserves',
     'entry.out': 'Expense', 'entry.in': 'Income', 'entry.category': 'Category',
     'entry.payment': 'Payment', 'entry.myPayment': 'Your payment',
     'entry.save': 'Add', 'entry.update': 'Save', 'entry.editing': 'editing ✏️',
@@ -1623,7 +1657,7 @@ let entries = [
   { id: 9, m: '2026-08', d: '14/08', cat: 'refeicao', desc: 'Almoços', amount: 420, scope: 'personal', pay: 'vr' },
   { id: 10, m: '2026-08', d: '22/08', cat: 'refeicao', desc: 'Feira', amount: 260, scope: 'personal', pay: 'va' },
   // September (current month — the couple begins)
-  { id: 11, m: '2026-09', d: '01/09', cat: 'salario', amount: 15000, scope: 'personal', type: 'income', pay: 'conta' },
+  { id: 11, m: '2026-09', d: '01/09', cat: 'salario', amount: 11250, scope: 'personal', type: 'income', pay: 'conta', expId: 'sal1' },
   { id: 12, m: '2026-09', d: '05/09', cat: 'moradia', desc: 'Apto Piqueri', amount: 1200, scope: 'personal', pay: 'conta' },
   { id: 13, m: '2026-09', d: '05/09', cat: 'cond-p', desc: 'Cond Piqueri', amount: 420, scope: 'personal', pay: 'conta' },
   { id: 14, m: '2026-09', d: '08/09', cat: 'assin', desc: 'Apps do mês', amount: 129.9, scope: 'personal', pay: 'nubank' },
@@ -1648,6 +1682,42 @@ MONTHS.slice(2).forEach((m, i) => entries.push({
   scope: 'personal', pay: 'nubank', inst: { no: i + 3, of: 10 },
 }));
 let settlements = []; // {amount, from:'R'|'F', m}
+
+// ---- Expected income: the mirror of the fixed-bill checklist ---------------------
+// A salary paid twice a month is two lines of the same category, so the expectation
+// cannot live on the category the way `fixedAmount` does.
+let expectations = [
+  { id: 'sal1', name: 'Salário · 1ª parte', cat: 'salario', amount: 11250, day: 1 },
+  { id: 'sal2', name: 'Salário · 2ª parte', cat: 'salario', amount: 11250, day: 15 },
+  { id: 'fre1', name: 'Freela — landing page', cat: 'freela', amount: 2800, date: '2026-09-24' },
+];
+const expDateIn = (x, m) => x.date
+  ? (x.date.slice(0, 7) === m ? x.date : null)
+  : `${m}-${String(x.day).padStart(2, '0')}`;
+// status: a real entry wins; otherwise the date decides, and the user can override.
+function expStatus(x, m) {
+  const when = expDateIn(x, m);
+  if (!when) return null;
+  if (entries.some(e => e.expId === x.id && e.m === m)) return { when, state: 'received' };
+  const override = x.override && x.override[m];
+  if (override) return { when, state: override };
+  return { when, state: when <= TODAY ? 'auto' : 'pending' };
+}
+const expectationsIn = m => expectations
+  .map(x => ({ x, s: expStatus(x, m) })).filter(r => r.s)
+  .sort((a, b) => a.s.when < b.s.when ? -1 : 1);
+// Money already treated as in the account: confirmed entries, plus the ones the date
+// auto-confirmed (flagged in the UI, and the reconciliation is the safety net).
+function autoIncomeRows(m) {
+  return expectationsIn(m).filter(r => r.s.state === 'auto').map(r => ({
+    m, d: r.s.when.slice(8, 10) + '/' + r.s.when.slice(5, 7), cat: r.x.cat,
+    desc: r.x.name, amount: r.x.amount, scope: 'personal', type: 'income',
+    pay: accounts()[0] ? accounts()[0].id : 'conta', auto: true, expId: r.x.id,
+  }));
+}
+// Still to come this month — the part of "available" that has not landed yet.
+const stillToReceive = m => expectationsIn(m)
+  .filter(r => r.s.state === 'pending').reduce((sum, r) => sum + r.x.amount, 0);
 
 // ---- Reserves: accumulated total + monthly contribution ----
 let reserves = [ // monthly = Fernando's share (from the spreadsheet); totals are examples
@@ -1686,8 +1756,12 @@ function projectedFor(m) {
   // A projection only shows while the real entry hasn't been made in that month.
   const hasReal = (catId, income) => entries.some(e => e.m === m && e.cat === catId && (!income || e.type === 'income'));
   const p = [];
-  if (!hasReal('salario', true)) p.push({ m, d: '01', cat: 'salario', desc: 'Salário (previsto)',
-    amount: INCOME, scope: 'personal', type: 'income', pay: 'conta', projected: true });
+  // Future months project the expectations themselves, not one assumed salary
+  expectationsIn(m).forEach(r => {
+    if (entries.some(e => e.expId === r.x.id && e.m === m)) return;
+    p.push({ m, d: r.s.when.slice(8, 10), cat: r.x.cat, desc: r.x.name + ' (previsto)',
+      amount: r.x.amount, scope: 'personal', type: 'income', pay: 'conta', projected: true });
+  });
   CATS.couple.filter(c => c.fixedAmount && !hasReal(c.id)).forEach(c => p.push({
     m, d: '03', cat: c.id, desc: c.name + ' (previsto)', amount: c.fixedAmount,
     scope: 'couple', pay: 'conta', paidBy: 'split', projected: true }));
@@ -1696,7 +1770,7 @@ function projectedFor(m) {
     scope: 'personal', pay: 'conta', projected: true }));
   return p;
 }
-const monthEntries = m => [...projectedFor(m), ...entries.filter(e => e.m === m)];
+const monthEntries = m => [...projectedFor(m), ...autoIncomeRows(m), ...entries.filter(e => e.m === m)];
 
 // Card cycle: a purchase after the card's closing day lands on NEXT month's bill.
 function faturaMonthOf(e) {
@@ -1739,11 +1813,14 @@ function anchoredOf(id) {
   const r = recon[id];
   return { val: r ? r.val + (base - r.exp) : base, u: r ? r.val - r.exp : null };
 }
+// "Disponível para uso" is what should be left once the month has fully happened:
+// what is in the account, plus what is still coming in, minus what is still going out.
 function availableAt(m) { // per Fernando's decision, benefit balances count as available
   if (m === CUR) {
     return anchoredOf('conta').val
       - credits().reduce((s, c) => s + anchoredOf(c.id).val, 0)
       + benefits().reduce((s, b) => s + anchoredOf(b.id).val, 0)
+      + stillToReceive(m)
       - upcomingFixed(m).total;
   }
   return contaMonth(m)
@@ -1958,6 +2035,11 @@ function todoItems() {
         sub: `${fmt(Math.abs(a.u))} de diferença · falta lançar algo`, go: openReconSheet });
     }
   });
+  expectationsIn(CUR).filter(r => r.s.state === 'auto').forEach(r => out.push({
+    icon: '💵', scope: 'personal', title: `${r.x.name} caiu?`,
+    sub: `${fmt(r.x.amount)} · marcada automaticamente no dia ${r.s.when.slice(8, 10)} · confirme`,
+    go: () => openExpectation(r.x.id),
+  }));
   const s = seesaw(CUR);
   if (hasPartner && Math.abs(s) > SLACK) out.push({ icon: '⚖️', scope: 'couple',
     title: s > 0 ? 'Vez da Rayra' : 'Sua vez de pagar',
@@ -2035,6 +2117,9 @@ function renderHome() {
   const benef = benefits().reduce((sum, b) => sum + (m === CUR ? anchoredOf(b.id).val : benefitBalance(b.id, m)), 0);
   $('benefit-note').textContent = benef > 0
     ? `inclui ${fmt(benef)} em VR/VA, que só compram comida` : '';
+  const toCome = m === CUR ? stillToReceive(m) : 0;
+  $('income-note').textContent = toCome > 0
+    ? `conta com ${fmt(toCome)} que ainda entra este mês` : '';
   $('upcoming-note').textContent = up.total > 0
     ? `já descontado ${fmt(up.total)} a vencer (${up.items.map(i => i.name).join(', ')})`
     : (m === CUR ? 'nenhuma fixa a vencer ✓' : '');
@@ -2266,6 +2351,7 @@ function renderBudget() {
     launchInto(el.dataset.badd, el.dataset.baddscope);
   });
   renderFixedChecklist(m);
+  renderIncomeChecklist(m);
   $('budget-reserves').innerHTML = reserves.map(r => {
     const tag = `<span class="scope-tag ${r.sc === 'couple' ? 'couple' : 'personal'}">${r.sc === 'couple' ? 'casal' : 'pessoal'}</span>`;
     const mo = r.targetMonths ? coverageMonths(r) : 0;
@@ -2292,6 +2378,34 @@ function renderBudget() {
       </div>`;
   }).join('');
   document.querySelectorAll('[data-rsv]').forEach(el => el.onclick = () => openReserve(el.dataset.rsv));
+}
+
+// Entradas previstas: the same checklist, mirrored — Recebidas / A receber
+function renderIncomeChecklist(m) {
+  const rows = expectationsIn(m);
+  const got = rows.filter(r => r.s.state === 'received' || r.s.state === 'auto');
+  const due = rows.filter(r => r.s.state === 'pending');
+  $('inc-got').textContent = fmt(got.reduce((s2, r) => s2 + r.x.amount, 0));
+  $('inc-due').textContent = fmt(due.reduce((s2, r) => s2 + r.x.amount, 0));
+  $('budget-income').innerHTML = rows.length ? rows.map(r => {
+    const got1 = r.s.state === 'received' || r.s.state === 'auto';
+    const mark = got1 ? '✓' : '○';
+    const when = r.s.when.slice(8, 10) + '/' + r.s.when.slice(5, 7);
+    const note = r.s.state === 'received' ? `recebida em ${when}`
+      : r.s.state === 'auto' ? `dia ${when} passou · marcada automaticamente`
+      : `chega dia ${when}`;
+    return `<div class="budget-row" data-exp="${r.x.id}">
+      <div class="row spread">
+        <span class="name"><span style="color:${got1 ? 'var(--good)' : 'var(--txt3)'}">${mark}</span>
+          <span class="txt">${r.x.name}</span>
+          ${r.s.state === 'auto' ? '<span class="pay-tag">auto</span>' : ''}</span>
+        <span class="nums money">${fmt(r.x.amount)}</span>
+      </div>
+      <div class="nums wrap" style="margin-top:4px">${note}</div>
+    </div>`;
+  }).join('') : '<div class="empty-note">nenhuma entrada prevista</div>';
+  $('budget-income').querySelectorAll('[data-exp]').forEach(el =>
+    el.onclick = () => openExpectation(el.dataset.exp));
 }
 
 // Fixas: the spreadsheet's Pagas/A Pagar checklist, alive
@@ -2648,7 +2762,7 @@ function maskEl(el) {
   });
   el.setAttribute('inputmode', 'numeric');
 }
-['settle-amount', 'rsv-amount'].forEach(id => maskEl($(id)));
+['settle-amount', 'rsv-amount', 'exp-amount'].forEach(id => maskEl($(id)));
 
 // ============ Interactions ============
 let lastScreen = 'home'; // where the back arrow on the entry screen returns to
@@ -2717,6 +2831,7 @@ $('paidby-seg').querySelectorAll('button').forEach(b => b.onclick = () => {
 $('entry-desc').addEventListener('focus', () => setKeypad(false));
 $('entry-amount').addEventListener('input', () => { renderSplitPreview(); renderInstChips(); renderSettledChip(); });
 
+$('inc-add').onclick = () => openExpectation(null);
 $('recon-open').onclick = openReconSheet;
 $('extrato-open').onclick = () => { extratoOpen = true; renderExtrato(); $('extrato-backdrop').classList.add('show'); };
 $('extrato-backdrop').onclick = e => {
@@ -3376,6 +3491,59 @@ function renderDeskToolbar() {
     ['💳 ' + t('home.cardRoom'), fmt(cardHeadroom(m))],
   ].map(([k, v]) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
 }
+
+// ============ Expected income sheet =================================================
+let expId = null, expWhenDay = 1, expWhenDate = null, expState = null;
+function renderExpWhen() {
+  const days = [1, 5, 10, 15, 20, 25];
+  $('exp-when').innerHTML = days.map(d =>
+    `<button class="chip ${!expWhenDate && d === expWhenDay ? 'sel' : ''}" data-eday="${d}">todo dia ${d}</button>`).join('')
+    + `<button class="chip ${expWhenDate ? 'sel' : ''}" data-eonce>uma vez só</button>`;
+  $('exp-when').querySelectorAll('[data-eday]').forEach(b =>
+    b.onclick = () => { expWhenDay = +b.dataset.eday; expWhenDate = null; renderExpWhen(); });
+  $('exp-when').querySelector('[data-eonce]').onclick = () => {
+    expWhenDate = expWhenDate || TODAY; renderExpWhen();
+  };
+  $('exp-when-note').textContent = expWhenDate
+    ? `só em ${expWhenDate.slice(8, 10)}/${expWhenDate.slice(5, 7)} — o caso do freela`
+    : 'repete todo mês nesse dia';
+}
+function renderExpState() {
+  const st = expState ?? (expectationsIn(view()).find(r => r.x.id === expId)?.s.state || 'pending');
+  const got = st === 'received' || st === 'auto';
+  $('exp-backdrop').querySelectorAll('[data-st2]').forEach(b =>
+    b.classList.toggle('sel', (b.dataset.st2 === 'received') === got));
+}
+function openExpectation(id) {
+  const x = expectations.find(e => e.id === id);
+  expId = id;
+  $('exp-title').textContent = x ? x.name : 'Nova entrada prevista';
+  $('exp-name').value = x ? x.name : '';
+  $('exp-amount').value = x ? x.amount.toFixed(2).replace('.', ',') : '';
+  expWhenDay = x && x.day ? x.day : 1;
+  expWhenDate = x && x.date ? x.date : null;
+  expState = null;
+  renderExpWhen(); renderExpState();
+  $('exp-backdrop').classList.add('show');
+}
+$('exp-backdrop').onclick = e => { if (e.target === $('exp-backdrop')) $('exp-backdrop').classList.remove('show'); };
+$('exp-backdrop').querySelectorAll('[data-st2]').forEach(b => b.onclick = () => {
+  expState = b.dataset.st2; renderExpState();
+});
+$('exp-save').onclick = () => {
+  const name = $('exp-name').value.trim();
+  const amount = parseAmount($('exp-amount').value);
+  if (!name || amount <= 0) { showToast('Nome e valor'); return; }
+  let x = expectations.find(e => e.id === expId);
+  if (!x) { x = { id: 'x' + nextId++ }; expectations.push(x); }
+  x.name = name; x.amount = amount;
+  if (expWhenDate) { x.date = expWhenDate; delete x.day; } else { x.day = expWhenDay; delete x.date; }
+  x.cat = x.cat || (expWhenDate ? 'freela' : 'salario');
+  if (expState) { x.override = x.override || {}; x.override[view()] = expState; }
+  $('exp-backdrop').classList.remove('show');
+  renderAll();
+  showToast('Entrada prevista salva ✓');
+};
 
 // ============ Movement detail — one informative modal for both shells =============
 let movId = null;
