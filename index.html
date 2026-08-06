@@ -774,6 +774,35 @@
   /* ============ Desktop: same screens, a window instead of a phone ============ */
   .desk-side, .desk-toolbar { display: none; }   /* desktop-only chrome */
   .row-end { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+  /* ---- first-run wizard: rows the user can add to and delete ---- */
+  .wiz-body { max-height: 46vh; overflow-y: auto; margin-top: 4px; padding-right: 2px; }
+  .wiz-row {
+    border-radius: 18px; padding: 12px; background: var(--glass2);
+    border: 1px solid var(--stroke2); box-shadow: 0 1px 0 var(--hl) inset;
+  }
+  .wiz-row + .wiz-row { margin-top: 10px; }
+  .wiz-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--txt2); cursor: pointer; }
+  .wiz-check input { width: 17px; height: 17px; accent-color: var(--blue); }
+  .wiz-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .wiz-field > span { font-size: 11.5px; color: var(--txt3); }
+  .day-field {
+    display: flex; align-items: center; gap: 6px; min-width: 0;
+    border-radius: 14px; padding: 0 10px; height: 46px;
+    background: var(--glass); border: 1px solid var(--stroke);
+  }
+  .day-field > span { font-size: 12px; color: var(--txt3); flex-shrink: 0; }
+  .day-field input {
+    width: 100%; min-width: 0; border: none; background: none; color: var(--txt);
+    font-family: inherit; font-size: 15px; font-variant-numeric: tabular-nums; outline: none;
+  }
+  .wiz-del {
+    border: none; background: var(--glass); color: var(--txt3); cursor: pointer; font-family: inherit;
+    width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; align-self: center;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .wiz-del:hover { color: var(--red); }
+  .wiz-seg button:disabled { opacity: .4; cursor: not-allowed; }
   .todo-count { font-size: 12.5px; color: var(--txt3); font-variant-numeric: tabular-nums; }
   .todo-skip {
     border: none; background: var(--glass2); color: var(--txt3); cursor: pointer;
@@ -1798,8 +1827,8 @@ const view = () => MONTHS[viewIdx];
 // ---- Payment instruments (would come from a settings/cadastro screen) ----
 const instruments = [
   { id: 'conta', type: 'conta', name: 'Conta', icon: '🏦' },
-  { id: 'nubank', type: 'credito', name: 'Nubank', icon: '💳', close: 25, due: 3, color: '#AF52DE' },
-  { id: 'inter', type: 'credito', name: 'Inter', icon: '💳', close: 10, due: 17, color: '#FF9500' },
+  { id: 'nubank', type: 'credito', name: 'Nubank', icon: '💳', close: 25, due: 3, limit: 12000, color: '#AF52DE' },
+  { id: 'inter', type: 'credito', name: 'Inter', icon: '💳', close: 10, due: 17, limit: 5000, color: '#FF9500' },
   { id: 'vr', type: 'beneficio', name: 'VR', icon: '🍽️', recharge: 600, day: 1, start: 200, color: '#34C759' },
   { id: 'va', type: 'beneficio', name: 'VA', icon: '🛒', recharge: 400, day: 1, start: 120, color: '#0A6CFF' },
 ];
@@ -3614,50 +3643,265 @@ $('rsv-new').onclick = () => openRsvEdit(null);
 // ============ First-run wizard: essentials only, the rest becomes friendly pending cards ============
 let wizStep = 0;
 let setupPending = [];
-const WIZ_STEPS = [
-  { t: 'Bem-vindos ao Juno 💛', p: 'Só o essencial agora — o resto a gente deixa engatilhado pra depois.',
-    body: `<input class="desc-input" id="wf-n1" placeholder="seu nome" value="Fernando">
-           <input class="desc-input" id="wf-n2" placeholder="nome do par" value="Rayra" style="margin-top:8px">`, btn: 'Começar' },
-  { t: 'Sua renda mensal', p: 'Usada no disponível e nas projeções dos próximos meses.',
-    body: `<input class="desc-input" inputmode="numeric" id="wf-income" placeholder="R$" value="15.000,00">`, btn: 'Continuar' },
-  { t: 'Seu cartão principal', p: 'Fechamento e vencimento fazem a fatura bater com o app do banco.',
-    body: `<input class="desc-input" id="wf-card" placeholder="nome do cartão" value="Nubank">
-           <div class="row" style="gap:8px;margin-top:8px">
-             <input type="number" class="desc-input" id="wf-close" placeholder="fecha dia" value="25" style="flex:1">
-             <input type="number" class="desc-input" id="wf-due" placeholder="vence dia" value="3" style="flex:1">
-           </div>`, btn: 'Continuar' },
-  { t: 'Essenciais do mês', p: 'Três pra começar — categorias novas nascem na hora do lançamento.',
-    body: `<div class="row" style="gap:8px"><span style="width:110px;font-size:13px">🏠 Moradia</span><input class="desc-input" inputmode="numeric" id="wf-b1" value="1.200,00" style="flex:1"></div>
-           <div class="row" style="gap:8px;margin-top:8px"><span style="width:110px;font-size:13px">🛒 Mercado</span><input class="desc-input" inputmode="numeric" id="wf-b2" value="1.250,00" style="flex:1"></div>
-           <div class="row" style="gap:8px;margin-top:8px"><span style="width:110px;font-size:13px">🚗 Transporte</span><input class="desc-input" inputmode="numeric" id="wf-b3" value="500,00" style="flex:1"></div>`,
-    btn: 'Concluir ✓' },
+// The first run collects only what makes the first screen honest: what comes in,
+// where the money is right now, and a couple of categories. Everything else is a
+// pending card on the home screen. The last step deliberately ends in "launch
+// something" — reconciling by using the app beats a setup form.
+let wizIn = [
+  { name: 'Salário · 1ª parte', amount: 11250, day: 1, got: false },
+  { name: 'Salário · 2ª parte', amount: 11250, day: 15, got: false },
 ];
+let wizConta = 12000;
+let wizCards = [{ name: 'Nubank', close: 25, due: 3, spent: 1103.57, limit: 12000 }];
+let wizCats = [
+  { icon: '🏠', name: 'Moradia', budget: 1200, scope: 'personal' },
+  { icon: '🛒', name: 'Mercado', budget: 1250, scope: 'couple' },
+  { icon: '🚗', name: 'Transporte', budget: 500, scope: 'couple' },
+];
+const money2 = v => (v || 0).toLocaleString(lang, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+const WIZ_STEPS = [
+  {
+    t: 'Bem-vindo ao Juno 💛',
+    p: 'Só o essencial agora — o resto vira lembrete na tela inicial.',
+    render: () => `
+      <input class="desc-input" id="wf-n1" placeholder="seu nome" value="${profile.name}">
+      <label class="wiz-check" style="margin-top:10px">
+        <input type="checkbox" id="wf-hasp" ${hasPartner ? 'checked' : ''}>
+        <span>divido contas com alguém</span>
+      </label>
+      <input class="desc-input" id="wf-n2" placeholder="nome do par" value="Rayra"
+             style="margin-top:8px;${hasPartner ? '' : 'display:none'}">`,
+    wire: () => {
+      $('wf-hasp').onchange = () => { $('wf-n2').style.display = $('wf-hasp').checked ? '' : 'none'; };
+    },
+    save: () => {
+      profile.name = $('wf-n1').value.trim() || profile.name;
+      hasPartner = $('wf-hasp').checked;
+      applyPartnerMode();
+    },
+    btn: 'Começar',
+  },
+  {
+    // Two dates, not one number: a salary paid on the 1st and the 15th is two
+    // different moments of the month, and "disponível" is wrong if they merge.
+    t: 'O que entra no mês',
+    p: 'Valor e dia de cada entrada. Se a data já passou, marque como recebido.',
+    render: () => wizIn.map((r, n) => `
+      <div class="wiz-row" data-inrow="${n}">
+        <input class="desc-input" data-inname="${n}" placeholder="nome" value="${r.name}">
+        <div class="row" style="gap:8px;margin-top:6px">
+          <input class="desc-input money-in" data-inamt="${n}" value="${money2(r.amount)}" style="flex:1.4">
+          <div class="day-field" style="flex:1">
+            <span>dia</span><input type="number" min="1" max="31" data-inday="${n}" value="${r.day}">
+          </div>
+          <button class="wiz-del" data-indel="${n}" aria-label="remover">✕</button>
+        </div>
+        <label class="wiz-check" style="margin-top:6px">
+          <input type="checkbox" data-ingot="${n}" ${r.got ? 'checked' : ''}>
+          <span>já recebi este mês</span>
+        </label>
+      </div>`).join('')
+      + `<button class="btn-ghost" id="wf-inadd" style="margin-top:10px">＋ outra entrada</button>`,
+    wire: () => {
+      document.querySelectorAll('[data-inamt]').forEach(maskEl);
+      document.querySelectorAll('[data-indel]').forEach(b => b.onclick = () => {
+        wizSaveIncome(); wizIn.splice(+b.dataset.indel, 1); renderWizard();
+      });
+      $('wf-inadd').onclick = () => {
+        wizSaveIncome();
+        wizIn.push({ name: '', amount: 0, day: 1, got: false });
+        renderWizard();
+      };
+    },
+    save: () => {
+      wizSaveIncome();
+      expectations = wizIn.filter(r => r.amount > 0).map((r, n) => ({
+        id: 'wz' + n, name: r.name || `Entrada ${n + 1}`, cat: 'salario', amount: r.amount, day: r.day,
+      }));
+      // "já recebi" is an override for this month, not a fake entry
+      const paid = wizIn.filter(r => r.amount > 0);
+      expectations.forEach((x, n) => { if (paid[n].got) x.override = { [CUR]: 'received' }; });
+      INCOME = expectations.reduce((sum, x) => sum + x.amount, 0);
+    },
+    btn: 'Continuar',
+  },
+  {
+    // The reconciliation step. Starting from the real balance is what lets the
+    // first month be right instead of "right from here forward".
+    t: 'Onde seu dinheiro está hoje',
+    p: 'Os números de agora. É a partir deles que o app fecha a conta com você.',
+    render: () => `
+      <div class="wiz-row">
+        <div class="label" style="padding:0">🏦 Saldo na conta</div>
+        <input class="desc-input money-in" id="wf-conta" value="${money2(wizConta)}" style="margin-top:6px">
+      </div>
+      ${wizCards.map((c, n) => `
+        <div class="wiz-row" data-cdrow="${n}" style="margin-top:12px">
+          <div class="row spread">
+            <div class="label" style="padding:0">💳 Cartão ${n + 1}</div>
+            ${wizCards.length > 1 ? `<button class="wiz-del" data-cddel="${n}" aria-label="remover">✕</button>` : ''}
+          </div>
+          <input class="desc-input" data-cdname="${n}" placeholder="nome do cartão" value="${c.name}" style="margin-top:6px">
+          <div class="row" style="gap:8px;margin-top:6px">
+            <div class="day-field" style="flex:1"><span>fecha</span><input type="number" min="1" max="31" data-cdclose="${n}" value="${c.close}"></div>
+            <div class="day-field" style="flex:1"><span>vence</span><input type="number" min="1" max="31" data-cddue="${n}" value="${c.due}"></div>
+          </div>
+          <div class="row" style="gap:8px;margin-top:6px">
+            <label class="wiz-field" style="flex:1"><span>fatura aberta hoje</span>
+              <input class="desc-input money-in" data-cdspent="${n}" value="${money2(c.spent)}"></label>
+            <label class="wiz-field" style="flex:1"><span>limite total</span>
+              <input class="desc-input money-in" data-cdlimit="${n}" value="${money2(c.limit)}"></label>
+          </div>
+        </div>`).join('')}
+      <button class="btn-ghost" id="wf-cdadd" style="margin-top:10px">＋ outro cartão</button>`,
+    wire: () => {
+      maskEl($('wf-conta'));
+      document.querySelectorAll('[data-cdspent], [data-cdlimit]').forEach(maskEl);
+      document.querySelectorAll('[data-cddel]').forEach(b => b.onclick = () => {
+        wizSaveCards(); wizCards.splice(+b.dataset.cddel, 1); renderWizard();
+      });
+      $('wf-cdadd').onclick = () => {
+        wizSaveCards();
+        wizCards.push({ name: '', close: 1, due: 10, spent: 0, limit: 0 });
+        renderWizard();
+      };
+    },
+    save: () => {
+      wizSaveCards();
+      wizConta = parseAmount($('wf-conta').value) || 0;
+      // Edit the existing cards in place and only mint ids for genuinely new ones:
+      // re-issuing ids would orphan every entry that already points at a card.
+      const existing = credits();
+      const PAL = ['#AF52DE', '#FF9500', '#0A6CFF', '#34C759', '#FF375F'];
+      const named = wizCards.filter(c => c.name.trim());
+      const cards = named.map((c, n) => {
+        const cur = existing[n];
+        if (cur) {
+          Object.assign(cur, { name: c.name.trim(), close: c.close, due: c.due, limit: c.limit });
+          return cur;
+        }
+        const made = { id: 'card' + Date.now() + n, type: 'credito', name: c.name.trim(), icon: '💳',
+                       close: c.close, due: c.due, limit: c.limit, color: PAL[n % PAL.length] };
+        instruments.push(made);
+        return made;
+      });
+      // a card the user removed goes away, but only if nothing was ever paid with it
+      existing.slice(named.length).forEach(old => {
+        if (entries.some(e => e.pay === old.id)) return;
+        instruments.splice(instruments.indexOf(old), 1);
+      });
+      // the informed values become the anchors — the same mechanism as Conciliar
+      recon['conta'] = { val: wizConta, exp: expectedAt('conta', CUR) };
+      cards.forEach((c, n) => { recon[c.id] = { val: named[n].spent, exp: expectedAt(c.id, CUR) }; });
+    },
+    btn: 'Continuar',
+  },
+  {
+    t: 'Suas categorias',
+    p: 'Duas ou três bastam. Marque o que é do casal — dá pra criar mais depois.',
+    render: () => wizCats.map((c, n) => `
+      <div class="wiz-row" data-ctrow="${n}">
+        <div class="row" style="gap:8px">
+          <input class="desc-input" data-ctname="${n}" placeholder="nome" value="${c.icon} ${c.name}" style="flex:1.3">
+          <input class="desc-input money-in" data-ctbud="${n}" value="${money2(c.budget)}" style="flex:1">
+          <button class="wiz-del" data-ctdel="${n}" aria-label="remover">✕</button>
+        </div>
+        <div class="seg wiz-seg" style="margin-top:6px">
+          <button class="${c.scope === 'personal' ? 'sel' : ''}" data-ctsc="${n}" data-v="personal">pessoal</button>
+          <button class="${c.scope === 'couple' ? 'sel' : ''}" data-ctsc="${n}" data-v="couple" ${hasPartner ? '' : 'disabled'}>casal</button>
+        </div>
+      </div>`).join('')
+      + `<button class="btn-ghost" id="wf-ctadd" style="margin-top:10px">＋ nova categoria</button>`,
+    wire: () => {
+      document.querySelectorAll('[data-ctbud]').forEach(maskEl);
+      document.querySelectorAll('[data-ctsc]').forEach(b => b.onclick = () => {
+        wizSaveCats(); wizCats[+b.dataset.ctsc].scope = b.dataset.v; renderWizard();
+      });
+      document.querySelectorAll('[data-ctdel]').forEach(b => b.onclick = () => {
+        wizSaveCats(); wizCats.splice(+b.dataset.ctdel, 1); renderWizard();
+      });
+      $('wf-ctadd').onclick = () => {
+        wizSaveCats();
+        wizCats.push({ icon: '🏷️', name: '', budget: 0, scope: 'personal' });
+        renderWizard();
+      };
+    },
+    save: () => {
+      wizSaveCats();
+      wizCats.filter(c => c.name.trim()).forEach(c => {
+        const list = c.scope === 'couple' ? CATS.couple : CATS.personal;
+        const hit = list.find(x => x.name.toLowerCase() === c.name.toLowerCase());
+        if (hit) hit.budget = c.budget;
+        else list.push({ id: 'wc' + Math.round(c.budget * 100) + list.length,
+                         name: c.name, icon: c.icon, budget: c.budget });
+      });
+    },
+    btn: 'Continuar',
+  },
+  {
+    // Ends pointing at the app, not at another form.
+    t: 'Pronto pra usar 🎉',
+    p: 'O jeito mais rápido de sentir o Juno é lançar o que você já gastou este mês. A cada lançamento a conta se aproxima do saldo que você informou.',
+    render: () => `
+      <div class="wiz-row">
+        <div class="row spread"><span>🏦 informado</span><span class="money">${fmt(wizConta)}</span></div>
+        <div class="row spread" style="margin-top:4px"><span>app espera</span><span class="money">${fmt(expectedAt('conta', CUR))}</span></div>
+        <div class="free-note" style="margin-top:8px">A diferença fica visível na tela inicial até você lançar o que falta — nada some sem explicação.</div>
+      </div>`,
+    save: () => {},
+    btn: 'Lançar o primeiro ✓',
+  },
+];
+
+function wizSaveIncome() {
+  wizIn.forEach((r, n) => {
+    r.name = document.querySelector(`[data-inname="${n}"]`)?.value ?? r.name;
+    r.amount = parseAmount(document.querySelector(`[data-inamt="${n}"]`)?.value) || 0;
+    r.day = +document.querySelector(`[data-inday="${n}"]`)?.value || r.day;
+    r.got = document.querySelector(`[data-ingot="${n}"]`)?.checked ?? r.got;
+  });
+}
+function wizSaveCards() {
+  wizCards.forEach((c, n) => {
+    c.name = document.querySelector(`[data-cdname="${n}"]`)?.value ?? c.name;
+    c.close = +document.querySelector(`[data-cdclose="${n}"]`)?.value || c.close;
+    c.due = +document.querySelector(`[data-cddue="${n}"]`)?.value || c.due;
+    c.spent = parseAmount(document.querySelector(`[data-cdspent="${n}"]`)?.value) || 0;
+    c.limit = parseAmount(document.querySelector(`[data-cdlimit="${n}"]`)?.value) || 0;
+  });
+}
+function wizSaveCats() {
+  wizCats.forEach((c, n) => {
+    const raw = (document.querySelector(`[data-ctname="${n}"]`)?.value ?? '').trim();
+    const m = raw.match(/^(\p{Extended_Pictographic}️?)\s*(.*)$/u);
+    if (m) { c.icon = m[1]; c.name = m[2]; } else if (raw) { c.name = raw; }
+    c.budget = parseAmount(document.querySelector(`[data-ctbud="${n}"]`)?.value) || 0;
+  });
+}
+
 function renderWizard() {
   const s = WIZ_STEPS[wizStep];
   $('wizard-sheet').innerHTML = `
     <div class="label">passo ${wizStep + 1} de ${WIZ_STEPS.length}</div>
-    <h3>${s.t}</h3><p>${s.p}</p><div>${s.body}</div>
-    <button class="btn-primary" id="wiz-next">${s.btn}</button>`;
-  const inc = $('wf-income'); if (inc) maskEl(inc);
-  ['wf-b1', 'wf-b2', 'wf-b3'].forEach(id => { const el = $(id); if (el) maskEl(el); });
+    <h3>${s.t}</h3><p>${s.p}</p>
+    <div class="wiz-body">${s.render()}</div>
+    <div class="row" style="gap:8px;margin-top:14px">
+      ${wizStep > 0 ? '<button class="btn-ghost" id="wiz-back" style="flex:none">‹ voltar</button>' : ''}
+      <button class="btn-primary" id="wiz-next" style="flex:1">${s.btn}</button>
+    </div>`;
+  s.wire?.();
+  if ($('wiz-back')) $('wiz-back').onclick = () => { s.save(); wizStep--; renderWizard(); };
   $('wiz-next').onclick = () => {
-    if (wizStep === 1) INCOME = parseAmount($('wf-income').value) || INCOME;
-    if (wizStep === 2) {
-      const nb = instById('nubank');
-      nb.name = $('wf-card').value.trim() || nb.name;
-      nb.close = +$('wf-close').value || nb.close;
-      nb.due = +$('wf-due').value || nb.due;
-    }
-    if (wizStep === 3) {
-      catById('moradia').budget = parseAmount($('wf-b1').value) || catById('moradia').budget;
-      catById('moradia').fixedAmount = catById('moradia').budget;
-      catById('mercado').budget = parseAmount($('wf-b2').value) || catById('mercado').budget;
-      catById('transporte').budget = parseAmount($('wf-b3').value) || catById('transporte').budget;
+    s.save();
+    if (wizStep === WIZ_STEPS.length - 1) {
       $('wizard-backdrop').classList.remove('show');
-      setupPending = ['beneficios', 'reservas', 'rateio', 'categorias'];
       wizStep = 0;
+      setupPending = hasPartner ? ['beneficios', 'reservas', 'rateio'] : ['beneficios', 'reservas'];
       renderSetupCards(); renderAll();
-      showToast('Pronto! O essencial tá de pé 🎉');
+      // land on the entry screen: the fastest way to feel the app is to use it
+      document.querySelector('.tab[data-scr="entry"]').click();
+      showToast('Tudo de pé — lance o que já gastou 🎉');
       return;
     }
     wizStep++;
