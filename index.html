@@ -831,6 +831,14 @@
     }
     .desk-toolbar .step button:disabled { color: var(--txt4); opacity: .4; }
     .desk-toolbar .step .m { font-size: 13px; font-weight: 600; color: var(--txt); min-width: 104px; text-align: center; }
+    .pal-open {
+      display: flex; align-items: center; gap: 8px; cursor: pointer; font-family: inherit;
+      border-radius: 999px; padding: 7px 12px; font-size: 13px; color: var(--txt3);
+      background: var(--glass2); border: 1px solid var(--stroke2); box-shadow: 0 1px 0 var(--hl) inset;
+      min-width: 190px;
+    }
+    .pal-open span { flex: 1; text-align: left; }
+    .pal-open svg { color: var(--txt4); }
     .desk-toolbar .kpi { display: flex; gap: 18px; }
     .desk-toolbar .kpi div { text-align: right; }
     .desk-toolbar .kpi .k { font-size: 10.5px; color: var(--txt3); }
@@ -876,6 +884,68 @@
     #scr-couple.active { grid-template-columns: minmax(320px, 460px) minmax(320px, 1fr); }
     .seesaw-wrap { grid-row: span 2; }
   }
+
+  /* ============ Command palette ============ */
+  .pal-backdrop {
+    display: none; position: absolute; inset: 0; z-index: 45;
+    background: rgba(10,22,40,.3); backdrop-filter: blur(3px);
+    align-items: flex-start; justify-content: center; padding: 12vh 16px 16px;
+    animation: jfade .14s ease-out;
+  }
+  .pal-backdrop.show { display: flex; }
+  .pal {
+    width: min(620px, 100%); max-height: 62vh; display: flex; flex-direction: column;
+    border-radius: 22px; overflow: hidden; animation: jpop .16s ease-out;
+    background: var(--sheet); backdrop-filter: blur(40px) saturate(190%);
+    -webkit-backdrop-filter: blur(40px) saturate(190%);
+    border: 1px solid var(--shellStroke);
+    box-shadow: 0 1px 0 var(--hl) inset, 0 30px 70px -20px rgba(12,30,60,.5);
+  }
+  .pal-field {
+    display: flex; align-items: center; gap: 10px; padding: 14px 16px;
+    border-bottom: 1px solid var(--sep); color: var(--txt3);
+  }
+  .pal-field input {
+    flex: 1; border: none; background: none; color: var(--txt); font-family: inherit;
+    font-size: 16.5px; outline: none;
+  }
+  .pal-field input::placeholder { color: var(--txt4); }
+  .pal-esc {
+    font-size: 10.5px; font-weight: 600; color: var(--txt4); border: 1px solid var(--stroke2);
+    border-radius: 6px; padding: 2px 6px;
+  }
+  .pal-list { flex: 1; overflow-y: auto; padding: 6px; }
+  .pal-group {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--txt4); padding: 10px 12px 6px;
+  }
+  .pal-item {
+    display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: 12px;
+    cursor: pointer; color: var(--txt);
+  }
+  .pal-item.on { background: rgba(10,108,255,.92); color: #fff; }
+  .pal-item .ic {
+    width: 26px; height: 26px; border-radius: 8px; background: var(--pill); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
+  }
+  .pal-item.on .ic { background: rgba(255,255,255,.22); }
+  .pal-item .tt { flex: 1; min-width: 0; font-size: 14.5px; }
+  .pal-item .tt b { font-weight: 600; }
+  .pal-item .sb { font-size: 12px; color: var(--txt3); }
+  .pal-item.on .sb { color: rgba(255,255,255,.8); }
+  .pal-item .amt { font-size: 13.5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .pal-empty { padding: 22px 14px; text-align: center; color: var(--txt3); font-size: 13.5px; }
+  .pal-foot {
+    display: flex; justify-content: space-between; padding: 9px 14px;
+    border-top: 1px solid var(--sep); font-size: 11.5px; color: var(--txt4);
+  }
+  kbd {
+    font-family: inherit; font-size: 11px; font-weight: 600; color: var(--txt2);
+    border: 1px solid var(--stroke2); background: var(--pill);
+    border-radius: 6px; padding: 2px 6px; margin-left: 4px;
+  }
+  /* keyboard selection on lists */
+  .swipe-row.ksel .entry { background: var(--glass2); box-shadow: inset 2px 0 0 var(--blue); }
 
   /* ============ Toast + snackbar ============ */
   .toast, .snack {
@@ -1243,6 +1313,30 @@
         <button class="back-btn" id="set-close">Fechar</button>
       </div>
       <div id="set-body"></div>
+    </div>
+  </div>
+
+  <!-- ============ Command palette (⌘K): search and jump in one place ============ -->
+  <div class="pal-backdrop" id="pal-backdrop">
+    <div class="pal" id="pal">
+      <div class="pal-field">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
+             stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+        <input id="pal-input" placeholder="Buscar lançamento, categoria ou ação…" autocomplete="off">
+        <span class="pal-esc">esc</span>
+      </div>
+      <div class="pal-list" id="pal-list"></div>
+      <div class="pal-foot">
+        <span>↑↓ navegar · ↵ abrir · esc fechar</span><span id="pal-count"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Shortcuts cheat sheet (?) ============ -->
+  <div class="sheet-backdrop" id="keys-backdrop">
+    <div class="sheet">
+      <h3>Atalhos</h3>
+      <div class="set-rows" id="keys-list"></div>
     </div>
   </div>
 
@@ -2990,6 +3084,8 @@ function settingsPage() {
       row({ id: 'language', icon: '⌘', title: t('settings.language'),
         value: LANGS.find(l => l.id === lang).label, go: 1 })
       + row({ id: 'appearance', icon: '◐', title: t('settings.appearance'), value: themeLabel, go: 1 })
+      + row({ id: 'search', icon: '🔎', title: 'Buscar', sub: 'lançamentos, categorias e ações · ⌘K', go: 1 })
+      + row({ id: 'keys', icon: '⌘', title: 'Atalhos', sub: 'a lista completa · ?', go: 1 })
       + row({ id: 'wizard', icon: '▶', title: 'Rever o primeiro acesso', sub: 'o wizard de boas-vindas', go: 1 })
       + row({ id: 'switch-person', icon: '⇄', title: `Ver como ${me === 'F' ? 'a Rayra' : 'o Fernando'}`,
           sub: 'só no protótipo, pra ver os dois lados', go: 1 }))}
@@ -3128,6 +3224,8 @@ function settingsGo(id) {
     showToast(`Vendo como ${me === 'F' ? 'Fernando' : 'Rayra'}`);
     return;
   }
+  if (id === 'search') { $('settings-backdrop').classList.remove('show'); openPalette(); return; }
+  if (id === 'keys') { $('settings-backdrop').classList.remove('show'); openKeys(); return; }
   if (id === 'wizard') { $('settings-backdrop').classList.remove('show'); wizStep = 0; renderWizard(); $('wizard-backdrop').classList.add('show'); return; }
   if (id === 'c-invite') { openInvite(); return; }
   if (id === 'c-add-partner') {
@@ -3469,6 +3567,11 @@ function renderDeskToolbar() {
     <span class="tt">${t(SCREEN_TITLE[scr])}</span>
     ${seg}
     <span class="grow"></span>
+    <button class="pal-open" data-palopen>
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+           stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+      <span>Buscar</span><kbd>⌘K</kbd>
+    </button>
     <span class="kpi">
       <div><div class="k">${lang === 'en' ? 'Available' : 'Disponível'}</div>
         <div class="v money">${fmt(availableAt(m))}</div></div>
@@ -3479,6 +3582,7 @@ function renderDeskToolbar() {
       <button data-dm="1" ${MONTHS.indexOf(m) >= MONTHS.length - 1 ? 'disabled' : ''}>›</button>
       ${m !== CUR ? '<button data-dm="today" style="font-size:11.5px;font-weight:600">hoje</button>' : ''}
     </span>`;
+  $('desk-toolbar').querySelector('[data-palopen]')?.addEventListener('click', openPalette);
   $('desk-toolbar').querySelectorAll('[data-dbt]').forEach(b =>
     b.onclick = () => document.querySelector(`#budget-seg [data-bt="${b.dataset.dbt}"]`).click());
   $('desk-toolbar').querySelectorAll('[data-dm]').forEach(b => b.onclick = () => {
@@ -3593,12 +3697,182 @@ $('mov-backdrop').onclick = e => { if (e.target === $('mov-backdrop')) $('mov-ba
 $('mov-edit').onclick = () => { $('mov-backdrop').classList.remove('show'); openEdit(movId); };
 $('mov-del').onclick = () => { $('mov-backdrop').classList.remove('show'); deleteEntry(movId); };
 
-// keyboard, because a desktop app without shortcuts feels like a website
+// ============ Command palette: one place to search and to act ======================
+const deburr = v => v.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+let palOpen = false, palIndex = 0, palRows = [];
+
+function paletteRows(q) {
+  const n = deburr(q.trim());
+  const hit = (...fields) => !n || deburr(fields.filter(Boolean).join(' ')).includes(n);
+  const out = [];
+
+  // Actions first: a palette that only searches is half a palette
+  const actions = [
+    { icon: '＋', title: 'Lançar', sub: '⌘N', run: () => document.querySelector('.tabbar .tab[data-scr="entry"]').click() },
+    { icon: '⚖', title: 'Conciliar', sub: 'saldos de hoje', run: openReconSheet },
+    { icon: '💌', title: hasPartner ? 'Convidar a Rayra' : 'Adicionar um par',
+      run: () => hasPartner ? openInvite() : settingsGo('c-add-partner') },
+    { icon: '💵', title: 'Nova entrada prevista', run: () => openExpectation(null) },
+    { icon: '◐', title: 'Alternar tema', run: () => { darkOverride = !document.documentElement.classList.contains('jdark'); applyTheme(); } },
+    { icon: '⌘', title: 'Ver atalhos', sub: '?', run: openKeys },
+  ].filter(a => hit(a.title, a.sub));
+  if (actions.length) out.push({ group: 'Ações' }, ...actions);
+
+  // Jump to a screen or a settings page
+  const places = [
+    { icon: '⌂', title: 'Início', sub: '⌘1', run: () => go('home') },
+    { icon: '◫', title: 'Orçamento', sub: '⌘2', run: () => go('budget') },
+    ...(hasPartner ? [{ icon: '⚖', title: 'Casal', sub: '⌘3', run: () => go('couple') }] : []),
+    { icon: '⚙', title: 'Ajustes', sub: '⌘4', run: () => openSettings('root') },
+    { icon: '💳', title: 'Instrumentos', run: () => openSettings('insts') },
+    { icon: '🏷️', title: 'Categorias', run: () => openSettings('cats') },
+    { icon: '🐷', title: 'Reservas', run: () => openSettings('rsvs') },
+  ].filter(p => hit(p.title, p.sub));
+  if (places.length) out.push({ group: 'Ir para' }, ...places);
+
+  // Movements of the browsed month, then categories
+  if (n) {
+    const movs = monthEntries(view()).filter(e => !e.projected)
+      .filter(e => hit(e.desc, catById(e.cat).name, String(e.amount)))
+      .slice(0, 8)
+      .map(e => ({ icon: catById(e.cat).icon, title: e.desc || catById(e.cat).name,
+        sub: `${e.d} · ${catById(e.cat).name}`, amount: e.amount, income: e.type === 'income',
+        run: () => e.id && openMovement(e.id) }));
+    if (movs.length) out.push({ group: 'Lançamentos de ' + mLabel(view()) }, ...movs);
+
+    const cats = [...CATS.personal, ...CATS.couple].filter(c => hit(c.name))
+      .slice(0, 6)
+      .map(c => ({ icon: c.icon, title: c.name, sub: 'ver lançamentos',
+        run: () => openCatSheet(c.id, CATS.couple.includes(c) ? 'couple' : 'personal') }));
+    if (cats.length) out.push({ group: 'Categorias' }, ...cats);
+  }
+  return out;
+}
+function renderPalette() {
+  const q = $('pal-input').value;
+  palRows = paletteRows(q);
+  const items = palRows.filter(r => !r.group);
+  if (palIndex >= items.length) palIndex = Math.max(0, items.length - 1);
+  let i = -1;
+  $('pal-list').innerHTML = items.length ? palRows.map(r => {
+    if (r.group) return `<div class="pal-group">${r.group}</div>`;
+    i++;
+    return `<div class="pal-item ${i === palIndex ? 'on' : ''}" data-pi="${i}">
+      <span class="ic">${r.icon}</span>
+      <span class="tt"><b>${r.title}</b>${r.sub ? `<div class="sb">${r.sub}</div>` : ''}</span>
+      ${r.amount != null ? `<span class="amt">${r.income ? '+' : '−'} ${fmt(r.amount)}</span>` : ''}
+    </div>`;
+  }).join('') : '<div class="pal-empty">nada encontrado</div>';
+  $('pal-count').textContent = items.length ? `${items.length} resultado${items.length > 1 ? 's' : ''}` : '';
+  $('pal-list').querySelectorAll('[data-pi]').forEach(el => {
+    el.onclick = () => runPalette(+el.dataset.pi);
+    el.onmousemove = () => { if (palIndex !== +el.dataset.pi) { palIndex = +el.dataset.pi; renderPalette(); } };
+  });
+  const on = $('pal-list').querySelector('.pal-item.on');
+  if (on) on.scrollIntoView({ block: 'nearest' });
+}
+function runPalette(i) {
+  const item = palRows.filter(r => !r.group)[i];
+  if (!item) return;
+  closePalette();
+  item.run();
+}
+let palReturnFocus = null;
+function openPalette() {
+  palReturnFocus = document.activeElement;
+  palOpen = true; palIndex = 0;
+  $('pal-input').value = '';
+  renderPalette();
+  $('pal-backdrop').classList.add('show');
+  $('pal-input').focus();
+}
+// Focus must come back, or every shortcut stays swallowed by the (hidden) input.
+function closePalette() {
+  palOpen = false;
+  $('pal-backdrop').classList.remove('show');
+  $('pal-input').blur();
+  if (palReturnFocus && palReturnFocus !== $('pal-input')) palReturnFocus.focus?.();
+  palReturnFocus = null;
+}
+$('pal-backdrop').onclick = e => { if (e.target === $('pal-backdrop')) closePalette(); };
+$('pal-input').addEventListener('input', () => { palIndex = 0; renderPalette(); });
+
+// ============ Shortcut sheet ========================================================
+const KEYMAP = [
+  ['⌘K', 'Buscar e agir em qualquer lugar'],
+  ['⌘N', 'Novo lançamento'],
+  ['⌘1 · ⌘2 · ⌘3 · ⌘4', 'Início · Orçamento · Casal · Ajustes'],
+  ['← · →', 'Mês anterior · próximo'],
+  ['T', 'Voltar para o mês de hoje'],
+  ['↑ · ↓', 'Andar pelos lançamentos'],
+  ['↵', 'Abrir o lançamento selecionado'],
+  ['E · ⌫', 'Editar · excluir o selecionado'],
+  ['?', 'Esta lista'],
+  ['Esc', 'Fechar o que estiver aberto'],
+];
+function openKeys() {
+  $('keys-list').innerHTML = KEYMAP.map(([k, d]) => `
+    <div class="set-row static"><span class="body">
+      <span class="t">${d}</span><span class="v">${k.split(' · ').map(x => `<kbd>${x}</kbd>`).join('')}</span>
+    </span></div>`).join('');
+  $('keys-backdrop').classList.add('show');
+}
+$('keys-backdrop').onclick = e => { if (e.target === $('keys-backdrop')) $('keys-backdrop').classList.remove('show'); };
+
+// ============ Keyboard: a desktop app without shortcuts feels like a website ========
+const go = k => document.querySelector(`.tabbar .tab[data-scr="${k}"]`).click();
+let ksel = null;   // id of the keyboard-selected movement
+function visibleRows() {
+  const host = $('extrato-backdrop').classList.contains('show') ? $('extrato-entries')
+    : currentScr() === 'couple' ? $('couple-entries') : $('home-entries');
+  return [...host.querySelectorAll('.swipe-row[data-id]')];
+}
+function moveSel(step) {
+  const rows = visibleRows();
+  if (!rows.length) return;
+  const at = rows.findIndex(r => +r.dataset.id === ksel);
+  const next = rows[Math.max(0, Math.min(rows.length - 1, (at < 0 ? -1 : at) + step))];
+  ksel = +next.dataset.id;
+  rows.forEach(r => r.classList.toggle('ksel', +r.dataset.id === ksel));
+  next.scrollIntoView({ block: 'nearest' });
+}
 addEventListener('keydown', ev => {
-  if (ev.key === 'Escape') { document.querySelectorAll('.sheet-backdrop.show').forEach(b => b.classList.remove('show')); return; }
-  if ((ev.metaKey || ev.ctrlKey) && ev.key.toLowerCase() === 'n') {
+  const typing = /^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName || '');
+  const mod = ev.metaKey || ev.ctrlKey;
+
+  if (mod && ev.key.toLowerCase() === 'k') { ev.preventDefault(); palOpen ? closePalette() : openPalette(); return; }
+  if (palOpen) {
+    if (ev.key === 'Escape') { ev.preventDefault(); closePalette(); return; }
+    if (ev.key === 'ArrowDown') { ev.preventDefault(); palIndex++; renderPalette(); return; }
+    if (ev.key === 'ArrowUp') { ev.preventDefault(); palIndex = Math.max(0, palIndex - 1); renderPalette(); return; }
+    if (ev.key === 'Enter') { ev.preventDefault(); runPalette(palIndex); return; }
+    return;
+  }
+  if (ev.key === 'Escape') {
+    const open = [...document.querySelectorAll('.sheet-backdrop.show')].pop();
+    if (open) { open.classList.remove('show'); return; }
+    if (currentScr() === 'entry') $('entry-back').click();
+    return;
+  }
+  if (mod && ev.key.toLowerCase() === 'n') { ev.preventDefault(); go('entry'); return; }
+  if (mod && '1234'.includes(ev.key)) {
     ev.preventDefault();
-    document.querySelector('.tabbar .tab[data-scr="entry"]').click();
+    ({ 1: () => go('home'), 2: () => go('budget'),
+       3: () => hasPartner && go('couple'), 4: () => openSettings('root') })[ev.key]();
+    return;
+  }
+  if (typing) return;
+
+  if (ev.key === '?') { ev.preventDefault(); openKeys(); return; }
+  if (ev.key === 'ArrowLeft') { document.querySelector('[data-mnav="-1"]')?.click(); return; }
+  if (ev.key === 'ArrowRight') { document.querySelector('[data-mnav="1"]')?.click(); return; }
+  if (ev.key.toLowerCase() === 't') { viewIdx = MONTHS.indexOf(CUR); renderAll(); return; }
+  if (ev.key === 'ArrowDown') { ev.preventDefault(); moveSel(1); return; }
+  if (ev.key === 'ArrowUp') { ev.preventDefault(); moveSel(-1); return; }
+  if (ksel != null) {
+    if (ev.key === 'Enter') { ev.preventDefault(); openMovement(ksel); return; }
+    if (ev.key.toLowerCase() === 'e') { ev.preventDefault(); openEdit(ksel); return; }
+    if (ev.key === 'Backspace' || ev.key === 'Delete') { ev.preventDefault(); deleteEntry(ksel); ksel = null; return; }
   }
 });
 
