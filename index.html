@@ -1,7 +1,3 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
 <title>Juno — Protótipo</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%23F1F6FF'/%3E%3Ccircle cx='48' cy='64' r='30' fill='%230A6CFF'/%3E%3Ccircle cx='80' cy='64' r='30' fill='%23FF9500'/%3E%3Cpath d='M64 38.62A30 30 0 0164 89.38 30 30 0 0164 38.62z' fill='%23108F6A'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
@@ -589,6 +585,8 @@
   }
   .set-row { display: flex; align-items: center; gap: 12px; cursor: pointer; }
   .set-row.static { cursor: default; }
+  .set-row:focus { outline: none; background: var(--sel); border-radius: 10px; }
+  .sheet-backdrop.show :focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
   .set-row .ic {
     width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0; font-size: 15px;
     display: flex; align-items: center; justify-content: center; background: var(--pill);
@@ -2866,6 +2864,10 @@ document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 'scr-' + t.dataset.scr));
   syncChrome();
   document.querySelector('.screens').scrollTop = 0;
+  // arriving at the entry screen means one thing: type the amount
+  if (t.dataset.scr === 'entry' && isDesk() && !parseAmount($('entry-amount').value)) {
+    requestAnimationFrame(() => $('entry-amount').focus());
+  }
 });
 // large title collapses into the capsule as soon as the content moves (iOS pattern)
 function onScreensScroll() {
@@ -3051,7 +3053,7 @@ const setTitle = p => t(p === 'root' ? 'settings.title'
       language: 'settings.language' }[p]);
 
 const row = (o) => `
-  <div class="set-row${o.go ? '' : ' static'}"${o.id ? ` data-sgo="${o.id}"` : ''}>
+  <div class="set-row${o.go ? '' : ' static'}"${o.id ? ` data-sgo="${o.id}" tabindex="0"` : ''}>
     ${o.icon ? `<span class="ic">${o.icon}</span>` : ''}
     <span class="body">
       <span class="stack" style="gap:0;min-width:0">
@@ -3723,7 +3725,7 @@ function paletteRows(q) {
     { icon: '⌂', title: 'Início', sub: '⌘1', run: () => go('home') },
     { icon: '◫', title: 'Orçamento', sub: '⌘2', run: () => go('budget') },
     ...(hasPartner ? [{ icon: '⚖', title: 'Casal', sub: '⌘3', run: () => go('couple') }] : []),
-    { icon: '⚙', title: 'Ajustes', sub: '⌘4', run: () => openSettings('root') },
+    { icon: '⚙', title: 'Ajustes', sub: '⌘,', run: () => openSettings('root') },
     { icon: '💳', title: 'Instrumentos', run: () => openSettings('insts') },
     { icon: '🏷️', title: 'Categorias', run: () => openSettings('cats') },
     { icon: '🐷', title: 'Reservas', run: () => openSettings('rsvs') },
@@ -3801,7 +3803,9 @@ $('pal-input').addEventListener('input', () => { palIndex = 0; renderPalette(); 
 const KEYMAP = [
   ['⌘K', 'Buscar e agir em qualquer lugar'],
   ['⌘N', 'Novo lançamento'],
-  ['⌘1 · ⌘2 · ⌘3 · ⌘4', 'Início · Orçamento · Casal · Ajustes'],
+  ['⌘1 · ⌘2 · ⌘3', 'Início · Orçamento · Casal'],
+  ['⌘,', 'Ajustes'],
+  ['⌘↵', 'Confirmar: lançar, ou o botão principal do que estiver aberto'],
   ['← · →', 'Mês anterior · próximo'],
   ['T', 'Voltar para o mês de hoje'],
   ['↑ · ↓', 'Andar pelos lançamentos'],
@@ -3836,6 +3840,37 @@ function moveSel(step) {
   rows.forEach(r => r.classList.toggle('ksel', +r.dataset.id === ksel));
   next.scrollIntoView({ block: 'nearest' });
 }
+// Closing a sheet must not leave focus stranded inside it: a hidden input keeps the
+// keyboard hostage (the palette taught us this) and a hidden row anchors the arrows nowhere.
+document.querySelectorAll('.sheet-backdrop').forEach(bd => {
+  new MutationObserver(() => {
+    if (!bd.classList.contains('show') && bd.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
+  }).observe(bd, { attributes: true, attributeFilter: ['class'] });
+});
+
+const sheetTop = () => [...document.querySelectorAll('.sheet-backdrop.show')].pop() || null;
+function sheetItems(sh) {
+  const all = [...sh.querySelectorAll(
+    '.set-row[tabindex], button, [data-sgo], [data-act], input:not([type=hidden]), select, textarea')]
+    .filter(el => !el.disabled && el.tabIndex >= 0
+      && el.getBoundingClientRect().width > 0 && getComputedStyle(el).visibility !== 'hidden');
+  // a row and the control inside it are one stop, not two
+  return all.filter(el =>
+    // the header is Esc's job — arrows belong to the list
+    !el.closest('.nav-head, .sheet-head')
+    && !all.some(o => o !== el && o.classList.contains('set-row') && o.contains(el)));
+}
+function sheetMove(sh, d) {
+  const items = sheetItems(sh);
+  if (!items.length) return;
+  const i = items.indexOf(document.activeElement);
+  const next = items[i < 0 ? (d > 0 ? 0 : items.length - 1) : (i + d + items.length) % items.length];
+  next.focus();
+  next.scrollIntoView({ block: 'nearest' });
+}
+
 addEventListener('keydown', ev => {
   const typing = /^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName || '');
   const mod = ev.metaKey || ev.ctrlKey;
@@ -3849,16 +3884,40 @@ addEventListener('keydown', ev => {
     return;
   }
   if (ev.key === 'Escape') {
-    const open = [...document.querySelectorAll('.sheet-backdrop.show')].pop();
-    if (open) { open.classList.remove('show'); return; }
+    const open = sheetTop();
+    if (open) {
+      if (open.contains(document.activeElement)) document.activeElement.blur();
+      open.classList.remove('show');
+      return;
+    }
     if (currentScr() === 'entry') $('entry-back').click();
     return;
   }
   if (mod && ev.key.toLowerCase() === 'n') { ev.preventDefault(); go('entry'); return; }
-  if (mod && '1234'.includes(ev.key)) {
+  if (mod && ev.key === ',') { ev.preventDefault(); openSettings('root'); return; }
+  if (mod && '123'.includes(ev.key)) {
     ev.preventDefault();
-    ({ 1: () => go('home'), 2: () => go('budget'),
-       3: () => hasPartner && go('couple'), 4: () => openSettings('root') })[ev.key]();
+    ({ 1: () => go('home'), 2: () => go('budget'), 3: () => hasPartner && go('couple') })[ev.key]();
+    return;
+  }
+  // ⌘↵ commits: the primary button of whatever is open, or the entry itself
+  if (mod && ev.key === 'Enter') {
+    ev.preventDefault();
+    const sheet = [...document.querySelectorAll('.sheet-backdrop.show')].pop();
+    const primary = sheet ? sheet.querySelector('.btn-primary') : null;
+    if (primary) primary.click();
+    else if (currentScr() === 'entry') $('entry-save').click();
+    return;
+  }
+  // An open sheet owns the keyboard: arrows walk *it*, and nothing reaches the screen behind
+  const sh = sheetTop();
+  if (sh) {
+    if (/Arrow(Down|Up)/.test(ev.key) && document.activeElement?.tagName !== 'TEXTAREA') {
+      ev.preventDefault(); sheetMove(sh, ev.key === 'ArrowDown' ? 1 : -1); return;
+    }
+    if (ev.key === 'Enter' && !typing && document.activeElement !== document.body) {
+      ev.preventDefault(); document.activeElement.click(); return;
+    }
     return;
   }
   if (typing) return;
@@ -4021,5 +4080,3 @@ syncChrome();
 applyLang();
 syncAmountInput();
 </script>
-
-</html>
