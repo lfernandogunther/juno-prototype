@@ -238,7 +238,7 @@
   /* Below desktop the two column wrappers do not exist; `order` keeps the phone's
      original reading order (available → decisions → accounts → movement). */
   .hgrid, .hcol { display: contents; }
-  #todo-block { order: 1; } #repeat-block { order: 2; }
+  #repeat-block { order: 1; } #todo-block { order: 2; }
   #accounts-card { order: 3; } #mov-card { order: 4; } .proto-note { order: 5; }
   .mini-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
   /* the banner host only exists on desktop — same class, so it needs to outrank .mini-stats */
@@ -773,7 +773,16 @@
 
   /* ============ Desktop: same screens, a window instead of a phone ============ */
   .desk-side, .desk-toolbar { display: none; }   /* desktop-only chrome */
+  .row-end { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .todo-count { font-size: 12.5px; color: var(--txt3); font-variant-numeric: tabular-nums; }
+  .todo-skip {
+    border: none; background: var(--glass2); color: var(--txt3); cursor: pointer;
+    width: 26px; height: 26px; border-radius: 50%; font-size: 12px; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .todo-skip:hover { color: var(--txt); }
   .row-actions { display: none; }               /* pointer-only: phones swipe */
+  .desk-proto { display: none; }                /* the rail carries this below desktop */
   /* A single person can use Juno: with no seat B, the couple scope disappears
      instead of sitting there disabled. */
   .solo .tab[data-scr="couple"], .solo #scope-seg, .solo #paidby-block,
@@ -816,6 +825,7 @@
     }
     .desk-nav button .ic { display: flex; }
     .desk-nav button.sel { background: var(--navSel, var(--pill)); color: var(--blue); }
+    .desk-proto { font-size: 11px; color: var(--txt4); text-align: center; padding-top: 2px; }
     .desk-kpis { display: flex; flex-direction: column; gap: 8px; padding: 2px 4px; }
     .desk-kpis div {
       border-radius: 14px; padding: 9px 11px; background: var(--glass2);
@@ -870,10 +880,19 @@
     #scr-entry.active > .app-head { display: flex; }
 
     /* desktop rows: aligned columns and hover actions instead of swipe */
-    .entry .rowline { display: grid; grid-template-columns: 1fr auto auto; gap: 14px; align-items: center; }
-    .entry .row-actions { display: flex; gap: 6px; opacity: 0; transition: opacity .12s; }
-    .swipe-row .row-actions { display: flex; }
-    .swipe-row:hover .row-actions { opacity: 1; }
+    /* Flex, not a fixed column count: the pay tag was a fourth item in a three-column
+       grid, which wrapped the row to a second line and doubled its height. */
+    .entry .rowline {
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      padding-top: 7px; padding-bottom: 7px;
+    }
+    .entry .dot { width: 28px; height: 28px; border-radius: 9px; font-size: 14px; }
+    .entry .who { font-size: 14.5px; }
+    .entry .meta { font-size: 12px; }
+    /* hovering offers the actions in place of the tag and the amount, not beside them */
+    .swipe-row:hover .row-end { display: none; }
+    .entry .row-actions { display: none; gap: 6px; flex-shrink: 0; }
+    .swipe-row:hover .row-actions { display: flex; }
     .swipe-row:hover .entry { background: var(--glass2); }
     .row-act {
       border: none; background: var(--pill); color: var(--blue); border-radius: 8px;
@@ -900,7 +919,17 @@
        The decision list is the elastic one, so it scrolls inside itself. */
     #scr-home #todo-block { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 96px; }
     #scr-home #todo-list { flex: 1; min-height: 0; overflow-y: auto; }
-    #scr-home #repeat-block, #scr-home #accounts-card { flex: 0 0 auto; }
+    #scr-home #repeat-block { flex: 0 0 auto; }
+    #scr-home #todo-block { min-height: 0; }
+    /* Suas contas closes the rail flush with the bottom of the movement list. It is the
+       card allowed to shrink, and its instrument list scrolls, so the rail can never
+       overflow past the column and push the balances off-screen. */
+    #scr-home #accounts-card {
+      margin-top: auto; flex: 0 1 auto; min-height: 0;
+      display: flex; flex-direction: column;
+    }
+    #scr-home #inst-rows { min-height: 0; overflow-y: auto; }
+    #scr-home .proto-note { display: none; }
     /* the movement list eats the leftover height instead of leaving a hole under it */
     #scr-home .hcol.main > .card { flex: 1; min-height: 0; display: flex; flex-direction: column; }
     #scr-home #home-entries { flex: 1; min-height: 0; overflow-y: auto; }
@@ -1129,6 +1158,7 @@
     <div class="desk-foot">
       <button class="btn-primary" id="desk-new">＋ Novo lançamento</button>
       <button class="btn-mini" id="desk-settings"><span class="tab-av" id="desk-av">F</span> Ajustes</button>
+      <div class="desk-proto">protótipo · dados de exemplo</div>
     </div>
   </aside>
 
@@ -1204,15 +1234,18 @@
         </div>
         </div>
         <div class="hcol rail">
-        <!-- what actually needs a decision today -->
-        <div id="todo-block" style="display:none">
-          <div class="label" data-i18n="home.needsYou">Precisa de você</div>
-          <div class="entry-list" id="todo-list"></div>
-        </div>
         <!-- one-tap repeats, learned from history -->
         <div id="repeat-block" style="display:none">
           <div class="label" data-i18n="home.repeats">Lançar de novo</div>
           <div class="chips hrow" id="repeat-chips"></div>
+        </div>
+        <!-- what actually needs a decision today -->
+        <div id="todo-block" style="display:none">
+          <div class="row spread">
+            <div class="label" data-i18n="home.needsYou">Precisa de você</div>
+            <span class="todo-count" id="todo-count"></span>
+          </div>
+          <div class="entry-list" id="todo-list"></div>
         </div>
         <div class="card" id="accounts-card">
           <div class="row spread">
@@ -2055,8 +2088,7 @@ function entryRow(e) {
           <span class="who">${title}</span>
           <span class="meta">${e.d}${catMeta}${paidMeta}${payTag}${projMeta}</span>
         </div>
-        ${payChip}
-        <span class="val money ${e.type === 'income' ? 'in' : ''}">${e.type === 'income' ? '+' : '−'} ${fmt(e.amount)}</span>
+        <span class="row-end">${payChip}<span class="val money ${e.type === 'income' ? 'in' : ''}">${e.type === 'income' ? '+' : '−'} ${fmt(e.amount)}</span></span>
       </div>
     </div>`;
   return e.projected
@@ -2222,19 +2254,37 @@ function todoItems() {
     go: () => document.querySelector('.tab[data-scr="couple"]').click() });
   return out;
 }
+// A list of five pendencies is a wall you learn to ignore. One at a time, with a way to
+// skip it, is a queue you work through. Skipping lasts for this session only — the
+// pendency is real and returns the next time it is computed.
+const todoSkipped = new Set();
+const todoKey = t => `${t.title}|${t.sub}`;
+
 function renderTodos() {
-  const items = todoItems();
-  $('todo-block').style.display = items.length ? '' : 'none';
-  $('todo-list').innerHTML = items.map((t, n) => `
-    <div class="swipe-row"><div class="entry" data-todo="${n}">
+  const queue = todoItems().filter(t => !todoSkipped.has(todoKey(t)));
+  $('todo-block').style.display = queue.length ? '' : 'none';
+  $('todo-count').textContent = queue.length > 1 ? `1 de ${queue.length}` : '';
+  if (!queue.length) return;
+  const t = queue[0];
+  $('todo-list').innerHTML = `
+    <div class="swipe-row"><div class="entry" data-todo="0">
       <div class="dot ${t.scope}">${t.icon}</div>
       <div class="rowline">
         <div class="stack"><span class="who">${t.title}</span><span class="meta">${t.sub}</span></div>
-        <span class="chev">›</span>
+        <span class="row-end">
+          <button class="todo-skip" data-skip="1" aria-label="Desconsiderar por agora">✕</button>
+          <span class="chev">›</span>
+        </span>
       </div>
-    </div></div>`).join('');
-  $('todo-list').querySelectorAll('[data-todo]').forEach(el =>
-    el.onclick = () => items[+el.dataset.todo].go());
+    </div></div>`;
+  $('todo-list').querySelector('[data-todo]').onclick = ev => {
+    if (!ev.target.closest('[data-skip]')) t.go();
+  };
+  $('todo-list').querySelector('[data-skip]').onclick = ev => {
+    ev.stopPropagation();
+    todoSkipped.add(todoKey(t));
+    renderTodos();
+  };
 }
 
 // ============ "Lançar de novo" — the repeats the app already knows ============
@@ -2306,7 +2356,10 @@ function renderHome() {
     ...[...monthEntries(m)].reverse().map(entryRow),
   ];
   $('extrato-open').style.display = rows.length > 5 ? 'inline-block' : 'none';
-  $('home-entries').innerHTML = rows.length ? rows.slice(0, 5).join('') : '<div class="empty-note">nada lançado neste mês</div>';
+  // The phone shows a teaser with "Ver tudo" behind it; on desktop the card owns the
+  // full height, so a five-row cap would just leave a hole under the list.
+  const shown = isDesk() ? rows : rows.slice(0, 5);
+  $('home-entries').innerHTML = rows.length ? shown.join('') : '<div class="empty-note">nada lançado neste mês</div>';
   $('home-swipe-hint').style.display = m === CUR ? '' : 'none';
   attachSwipes($('home-entries'));
   attachProjectedTaps($('home-entries'));
@@ -2866,7 +2919,12 @@ function syncAmountInput() {
   if (desk && !maskAttached) { maskEl(el); maskAttached = true; }
   if (desk && keypadOpen) setKeypad(false);
 }
-addEventListener('resize', syncAmountInput);
+let wasDesk = isDesk();
+addEventListener('resize', () => {
+  syncAmountInput();
+  // crossing the desktop breakpoint changes what the home list may show
+  if (isDesk() !== wasDesk) { wasDesk = isDesk(); renderAll(); }
+});
 
 function setKeypad(open) {
   if (open && isDesk()) open = false;
