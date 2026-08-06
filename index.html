@@ -235,7 +235,14 @@
   #hero-label { font-size: 13px; color: var(--txt2); font-weight: 500;
     text-transform: none; letter-spacing: 0; padding: 0; }
 
+  /* Below desktop the two column wrappers do not exist; `order` keeps the phone's
+     original reading order (available → decisions → accounts → movement). */
+  .hgrid, .hcol { display: contents; }
+  #todo-block { order: 1; } #repeat-block { order: 2; }
+  #accounts-card { order: 3; } #mov-card { order: 4; } .proto-note { order: 5; }
   .mini-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  /* the banner host only exists on desktop — same class, so it needs to outrank .mini-stats */
+  .mini-stats.hero-stats { display: none; }
   .mini {
     flex: 1 1 calc(50% - 5px); min-width: calc(50% - 5px);
     border-radius: 18px; padding: 11px 13px;
@@ -299,6 +306,21 @@
   .entry .dot.personal { background: var(--accent-soft); }
   .entry .dot.couple { background: var(--gold-soft); }
   .entry .chev { color: var(--txt4); font-size: 17px; flex-shrink: 0; }
+  /* which card/account paid — a tag, not the tail of a line that gets cut off */
+  .pay-tag {
+    display: none; align-items: center; gap: 6px; flex-shrink: 0;
+    font-size: 12px; font-weight: 500; color: var(--txt2); white-space: nowrap;
+    padding: 3px 10px 3px 8px; border-radius: 999px;
+    background: var(--glass2); border: 1px solid var(--stroke2);
+  }
+  .pay-tag i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); flex-shrink: 0; }
+  .pay-tag.credito { font-variant-numeric: tabular-nums; }
+  .pay-tag.conta i { background: transparent; box-shadow: 0 0 0 1.5px var(--txt4) inset; }
+  /* from tablet up there is room for the tag, so the meta stops repeating it */
+  @media (min-width: 700px) {
+    .pay-tag { display: inline-flex; }
+    .pay-meta { display: none; }
+  }
 
   /* "Lançar de novo" — repeat chips carry a title + amount */
   .repeat-chip {
@@ -861,12 +883,46 @@
     .swipe-hint { display: none; }
 
     /* cards flow in columns instead of one long strip */
-    #scr-home.active, #scr-budget.active, #scr-couple.active {
+    #scr-budget.active, #scr-couple.active {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 18px; align-items: start;
     }
-    #scr-home > .app-head, #scr-budget > .app-head, #scr-couple > .app-head,
-    #scr-budget > .seg, #scr-home > #setup-cards { grid-column: 1 / -1; }
+    #scr-budget > .app-head, #scr-couple > .app-head, #scr-budget > .seg { grid-column: 1 / -1; }
+
+    /* Home is not a pile of cards that happen to reflow: a full-width banner with the
+       month's headline numbers, then a reading column and a status rail beside it. */
+    #scr-home.active { height: 100%; gap: 16px; }
+    #scr-home .hgrid { display: flex; gap: 16px; flex: 1; min-height: 0; align-items: stretch; }
+    #scr-home .hcol { display: flex; flex-direction: column; gap: 16px; min-height: 0; }
+    #scr-home .hcol.main { flex: 1.35 1 0; }
+    #scr-home .hcol.rail { flex: 1 1 0; max-width: 400px; }
+    /* the rail never scrolls as a whole: balances must not fall off the bottom.
+       The decision list is the elastic one, so it scrolls inside itself. */
+    #scr-home #todo-block { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 96px; }
+    #scr-home #todo-list { flex: 1; min-height: 0; overflow-y: auto; }
+    #scr-home #repeat-block, #scr-home #accounts-card { flex: 0 0 auto; }
+    /* the movement list eats the leftover height instead of leaving a hole under it */
+    #scr-home .hcol.main > .card { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+    #scr-home #home-entries { flex: 1; min-height: 0; overflow-y: auto; }
+    #scr-home .proto-note { margin-top: auto; }
+
+    .hero-available {
+      display: grid; gap: 12px 30px; align-items: center;
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+    .hero-available .hero-main { grid-area: 1 / 1; min-width: 0; }
+    /* the notes get a full line under the number instead of a squeezed column */
+    .hero-available .hero-notes {
+      grid-area: 2 / 1; min-width: 0;
+      display: flex; flex-wrap: wrap; gap: 2px 26px;
+    }
+    .hero-available .hero-notes .free-note { margin-top: 0; }
+    .hero-available .hero-notes .free-note:empty { display: none; }
+    .mini-stats.hero-stats { display: flex; grid-area: 1 / 2 / span 2 / 3; align-self: center; }
+    .hero-stats { margin-top: 0; width: 320px; }
+    .hero-stats .mini { flex: 1 1 0; min-width: 0; }
+    /* the same numbers twice is the clutter — inside the card they give way to the banner */
+    #mini-grid, .desk-kpis { display: none; }
     #scr-entry.active { max-width: 560px; margin: 0 auto; padding-bottom: 24px; }
     #scr-budget .bt.on { display: contents; }
     #bt-var > .card, #bt-fix > .card, #bt-rsv > .card { margin-top: 0 !important; }
@@ -1113,48 +1169,65 @@
       <div id="setup-cards" class="stack" style="gap:10px"></div>
 
       <div class="card hero-available">
-        <div class="label" id="hero-label">Disponível para uso — Fernando</div>
-        <div class="amount money" id="home-available">R$ 0,00</div>
-        <div class="free-note" id="free-note">livre, sem destino — o resto já tem dono</div>
-        <div class="free-note" id="upcoming-note"></div>
-        <div class="free-note" id="benefit-note"></div>
-        <div class="free-note" id="income-note"></div>
-      </div>
-
-      <!-- what actually needs a decision today -->
-      <div id="todo-block" style="display:none">
-        <div class="label" data-i18n="home.needsYou">Precisa de você</div>
-        <div class="entry-list" id="todo-list"></div>
-      </div>
-
-      <!-- one-tap repeats, learned from history -->
-      <div id="repeat-block" style="display:none">
-        <div class="label" data-i18n="home.repeats">Lançar de novo</div>
-        <div class="chips hrow" id="repeat-chips"></div>
-      </div>
-
-      <div class="card">
-        <div class="row spread">
-          <div class="label" data-i18n="home.accounts">Suas contas</div>
-          <span class="row" style="gap:6px">
-            <button class="back-btn" id="insts-manage" style="font-size:14.5px" data-i18n="settings.instruments">Instrumentos</button>
-            <button class="back-btn" id="recon-open" style="font-size:14.5px" data-i18n="home.reconcile">Conciliar</button>
-          </span>
+        <div class="hero-main">
+          <div class="label" id="hero-label">Disponível para uso — Fernando</div>
+          <div class="amount money" id="home-available">R$ 0,00</div>
         </div>
-        <div class="mini-stats" id="mini-grid" style="margin-top:10px"></div>
-        <div class="inst-rows" id="inst-rows"></div>
-      </div>
-
-      <div class="card">
-        <div class="row spread">
-          <div class="label" data-i18n="home.movement">Movimento do mês</div>
-          <button class="back-btn" id="extrato-open" style="font-size:14.5px" data-i18n="home.seeAll">Ver tudo</button>
+        <div class="hero-notes">
+          <div class="free-note" id="free-note">livre, sem destino — o resto já tem dono</div>
+          <div class="free-note" id="upcoming-note"></div>
+          <div class="free-note" id="benefit-note"></div>
+          <div class="free-note" id="income-note"></div>
         </div>
-        <div class="entry-list" id="home-entries" style="margin-top:6px"></div>
-        <div class="swipe-hint" id="home-swipe-hint">arrasta → pra editar · ← pra excluir</div>
+        <!-- the same two stats: in the banner on desktop, inside Suas contas below it -->
+        <div class="mini-stats hero-stats" id="hero-stats"></div>
       </div>
 
-      <div class="proto-note">protótipo · dados de exemplo</div>
+
+
+
+
+
+
+
+
+
+      <div class="hgrid">
+        <div class="hcol main">
+        <div class="card" id="mov-card">
+          <div class="row spread">
+            <div class="label" data-i18n="home.movement">Movimento do mês</div>
+            <button class="back-btn" id="extrato-open" style="font-size:14.5px" data-i18n="home.seeAll">Ver tudo</button>
+          </div>
+          <div class="entry-list" id="home-entries" style="margin-top:6px"></div>
+          <div class="swipe-hint" id="home-swipe-hint">arrasta → pra editar · ← pra excluir</div>
+        </div>
+        </div>
+        <div class="hcol rail">
+        <!-- what actually needs a decision today -->
+        <div id="todo-block" style="display:none">
+          <div class="label" data-i18n="home.needsYou">Precisa de você</div>
+          <div class="entry-list" id="todo-list"></div>
+        </div>
+        <!-- one-tap repeats, learned from history -->
+        <div id="repeat-block" style="display:none">
+          <div class="label" data-i18n="home.repeats">Lançar de novo</div>
+          <div class="chips hrow" id="repeat-chips"></div>
+        </div>
+        <div class="card" id="accounts-card">
+          <div class="row spread">
+            <div class="label" data-i18n="home.accounts">Suas contas</div>
+            <span class="row" style="gap:6px">
+              <button class="back-btn" id="insts-manage" style="font-size:14.5px" data-i18n="settings.instruments">Instrumentos</button>
+              <button class="back-btn" id="recon-open" style="font-size:14.5px" data-i18n="home.reconcile">Conciliar</button>
+            </span>
+          </div>
+          <div class="mini-stats" id="mini-grid" style="margin-top:10px"></div>
+          <div class="inst-rows" id="inst-rows"></div>
+        </div>
+        <div class="proto-note">protótipo · dados de exemplo</div>
+        </div>
+      </div>
     </section>
 
     <!-- ============ QUICK ENTRY ============ -->
@@ -1965,7 +2038,13 @@ function entryRow(e) {
     ? ` · ${e.paidBy === 'split' ? 'cada um' : (e.paidBy === 'F' ? 'Fernando' : 'Rayra')}` : '';
   const instTag = e.inst ? ` ${e.inst.no}/${e.inst.of}` : '';
   const i = instById(e.pay);
-  const payTag = !e.type && !e.projected ? ` · ${i.name}` : '';
+  // The meta line ellipsizes, so the instrument used to vanish exactly on the rows that
+  // needed it. It gets its own tag, colour-coded and shrink-proof.
+  const showPay = !e.type && !e.projected;
+  const payTag = showPay ? `<span class="pay-meta"> · ${i.name}${instTag}</span>` : '';
+  const payChip = showPay
+    ? `<span class="pay-tag ${i.type}" style="--c:${i.color || 'var(--txt4)'}"><i></i>${i.name}${instTag}</span>`
+    : '';
   const catMeta = e.desc ? '' : ` · ${cat.name}`;
   const projMeta = e.projected ? ' · previsto, toca pra lançar' : '';
   const inner = `
@@ -1974,8 +2053,9 @@ function entryRow(e) {
       <div class="rowline">
         <div class="stack">
           <span class="who">${title}</span>
-          <span class="meta">${e.d}${catMeta}${paidMeta}${payTag}${instTag}${projMeta}</span>
+          <span class="meta">${e.d}${catMeta}${paidMeta}${payTag}${projMeta}</span>
         </div>
+        ${payChip}
         <span class="val money ${e.type === 'income' ? 'in' : ''}">${e.type === 'income' ? '+' : '−'} ${fmt(e.amount)}</span>
       </div>
     </div>`;
@@ -2066,13 +2146,16 @@ function renderMiniGrid(m) {
   const at = id => m === CUR ? anchoredOf(id) : { val: expectedAt(id, m), u: null };
   const openTotal = credits().reduce((s, c) => s + at(c.id).val, 0);
   const conta = at('conta');
-  $('mini-grid').innerHTML = `
+  const stats = `
     <div class="mini"><div class="k">${t('home.inAccount')}</div>
       <div class="v money">${fmt(conta.val)}</div>
       <div class="sub">inclui ${fmt(openTotal)} de faturas abertas</div>${diffLine(conta.u, 'conta')}</div>
     <div class="mini"><div class="k">${t('home.cardRoom')}</div>
       <div class="v money">${fmt(cardHeadroom(m))}</div>
       <div class="sub">sobra dos orçamentos do mês</div></div>`;
+  // one render, two hosts — CSS decides which one is on screen at this width
+  $('mini-grid').innerHTML = stats;
+  $('hero-stats').innerHTML = stats;
 
   // Compact instrument rows: minus + warm color = money leaving; plain = money you have
   const idiff = (u, kind) => {
@@ -2141,7 +2224,7 @@ function todoItems() {
 }
 function renderTodos() {
   const items = todoItems();
-  $('todo-block').style.display = items.length ? 'block' : 'none';
+  $('todo-block').style.display = items.length ? '' : 'none';
   $('todo-list').innerHTML = items.map((t, n) => `
     <div class="swipe-row"><div class="entry" data-todo="${n}">
       <div class="dot ${t.scope}">${t.icon}</div>
@@ -2173,7 +2256,7 @@ function repeatItems() {
 }
 function renderRepeats() {
   const items = repeatItems();
-  $('repeat-block').style.display = items.length && view() === CUR ? 'block' : 'none';
+  $('repeat-block').style.display = items.length && view() === CUR ? '' : 'none';
   $('repeat-chips').innerHTML = items.map((e, n) => {
     const cat = catById(e.cat);
     return `<button class="repeat-chip" data-rep="${n}">
@@ -2224,7 +2307,7 @@ function renderHome() {
   ];
   $('extrato-open').style.display = rows.length > 5 ? 'inline-block' : 'none';
   $('home-entries').innerHTML = rows.length ? rows.slice(0, 5).join('') : '<div class="empty-note">nada lançado neste mês</div>';
-  $('home-swipe-hint').style.display = m === CUR ? 'block' : 'none';
+  $('home-swipe-hint').style.display = m === CUR ? '' : 'none';
   attachSwipes($('home-entries'));
   attachProjectedTaps($('home-entries'));
   renderTodos();
@@ -3668,7 +3751,10 @@ function openMovement(id) {
   const rows = [
     { icon: e.scope === 'couple' ? '💛' : '👤', title: 'Escopo',
       value: e.scope === 'couple' ? 'do casal' : 'pessoal' },
-    { icon: i.icon, title: 'Pagamento', value: i.name },
+    { icon: i.icon, title: 'Pagamento',
+      // on a card the useful question is not "which card" but "which bill pays for it"
+      sub: i.type === 'credito' ? `entra na fatura de ${mLabel(faturaMonthOf(e))}` : undefined,
+      value: i.name },
   ];
   if (e.scope === 'couple' && !income) {
     const myPart = share(e);
