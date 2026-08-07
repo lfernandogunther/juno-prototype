@@ -362,6 +362,8 @@
   .empty-invite .t { font-size: 15.5px; font-weight: 600; color: var(--txt2); }
   .empty-invite .s { font-size: 13px; color: var(--txt3); line-height: 1.45; max-width: 320px; }
   .empty-invite .btn-primary { margin-top: 6px; }
+  /* "disponível" reads as cash on hand unless the line under it says otherwise. */
+  .hero-caption { font-size: 12.5px; color: var(--txt3); margin-top: 4px; line-height: 1.35; }
   .swipe-hint { font-size: 12px; color: var(--txt4); text-align: center; padding: 9px 0; }
 
   .scope-tag {
@@ -1025,7 +1027,7 @@
       /* The amount needs about 400px and never more; everything past that is
          better spent on the stats, which clip the moment a six-digit value
          meets a third tile. */
-      grid-template-columns: minmax(0, 1fr) minmax(340px, 520px);
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 420px);
     }
     .hero-available .hero-main { grid-area: 1 / 1; min-width: 0; }
     /* the notes get a full line under the number instead of a squeezed column */
@@ -1296,6 +1298,7 @@
         <div class="hero-main">
           <div class="label" id="hero-label">Disponível para uso — Fernando</div>
           <div class="amount money" id="home-available">R$ 0,00</div>
+          <div class="hero-caption">o que deve sobrar depois que tudo do mês acontecer</div>
         </div>
         <div class="hero-notes">
           <div class="free-note" id="free-note">livre, sem destino — o resto já tem dono</div>
@@ -2269,12 +2272,6 @@ function renderMiniGrid(m) {
   const at = id => m === CUR ? anchoredOf(id) : { val: expectedAt(id, m), u: null };
   const openTotal = credits().reduce((s, c) => s + at(c.id).val, 0);
   const conta = at('conta');
-  // The card's own ceiling, a different number from the budget's leftover above:
-  // cards with no limit informed are left out rather than counted as zero.
-  const limited = credits().filter(c => c.limit > 0);
-  const limitTotal = limited.reduce((sum, c) => sum + c.limit, 0);
-  const limitUsed = limited.reduce((sum, c) => sum + at(c.id).val, 0);
-  const limitFree = limitTotal - limitUsed;
   const stats = `
     <div class="mini"><div class="k">${t('home.inAccount')}</div>
       <div class="v money">${fmt(conta.val)}</div>
@@ -2282,9 +2279,7 @@ function renderMiniGrid(m) {
     <div class="mini"><div class="k">Ainda cabe no orçamento</div>
       <div class="v money">${fmt(cardHeadroom(m))}</div>
       <div class="sub">sobra dos tetos do mês</div></div>
-    ${limited.length ? `<div class="mini"><div class="k">Limite disponível</div>
-      <div class="v money">${fmt(limitFree)}</div>
-      <div class="sub">${fmt(limitUsed)} de ${fmt(limitTotal)} usados</div></div>` : ''}`;
+`;
   // one render, two hosts — CSS decides which one is on screen at this width
   $('mini-grid').innerHTML = stats;
   $('hero-stats').innerHTML = stats;
@@ -2312,7 +2307,8 @@ function renderMiniGrid(m) {
   let rows = '';
   credits().forEach(c => {
     const a = at(c.id);
-    rows += instRow(c, a.val, a.u, 'credito', `fecha ${c.close} · vence dia ${c.due}`);
+    rows += instRow(c, a.val, a.u, 'credito',
+      c.limit > 0 ? `${fmt(a.val)} de ${fmt(c.limit)} usados` : `fecha ${c.close} · vence dia ${c.due}`);
   });
   benefits().forEach(b => {
     const a = at(b.id);
@@ -2438,16 +2434,16 @@ function renderHome() {
   $('home-available').classList.toggle('neg', avail < 0);
   $('free-note').textContent = m > CUR
     ? `${mLabel(m)} — ${t('home.free')}`
-    : t('home.free');
+    : up.total > 0
+      ? `livre, sem destino — ${fmt(up.total)} já tem dono entre orçamentos e previstos`
+      : t('home.free');
   const benef = benefits().reduce((sum, b) => sum + (m === CUR ? anchoredOf(b.id).val : benefitBalance(b.id, m)), 0);
   $('benefit-note').textContent = benef > 0
     ? `inclui ${fmt(benef)} em VR/VA, que só compram comida` : '';
   const toCome = m === CUR ? stillToReceive(m) : 0;
   $('income-note').textContent = toCome > 0
     ? `conta com ${fmt(toCome)} que ainda entra este mês` : '';
-  $('upcoming-note').textContent = up.total > 0
-    ? `já descontado ${fmt(up.total)} a vencer (${up.items.map(i => i.name).join(', ')})`
-    : (m === CUR ? 'nenhuma fixa a vencer ✓' : '');
+  $('upcoming-note').textContent = '';
   renderMiniGrid(m);
 
   $('recon-open').style.display = m === CUR ? 'inline-block' : 'none';
