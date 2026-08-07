@@ -1425,13 +1425,16 @@
       </div>
       <div id="bt-fix" class="bt">
         <div class="card">
-          <div class="label">Entradas</div>
+          <div class="row spread">
+            <div class="label">Entradas</div>
+            <button class="back-btn" id="inc-manage" style="font-size:14.5px">Gerenciar</button>
+          </div>
           <div class="mini-stats" style="margin-top:0">
             <div class="mini"><div class="k">Recebidas</div><div class="v money" id="inc-got"></div></div>
             <div class="mini"><div class="k">A receber</div><div class="v money" id="inc-due"></div></div>
           </div>
           <div id="budget-income" style="margin-top:8px"></div>
-          <button class="btn-ghost" style="width:100%;margin-top:10px" id="inc-add">＋ nova entrada prevista</button>
+          <div class="chips-note">Tocar numa linha lança o que caiu — o valor pode ser outro.</div>
         </div>
         <div class="card" style="margin-top:16px">
           <div class="label">Saídas fixas</div>
@@ -1528,14 +1531,8 @@
         <div class="chips" id="exp-when"></div>
         <div class="chips-note" id="exp-when-note"></div>
       </div>
-      <div>
-        <div class="label" style="padding:0 0 6px">Situação</div>
-        <div class="chips">
-          <button class="chip" data-st2="pending">○ A receber</button>
-          <button class="chip" data-st2="received">✓ Recebido</button>
-        </div>
-        <div class="chips-note">a data decide sozinha; aqui você corrige quando ela erra</div>
-      </div>
+      <div class="chips-note">Isto é o plano. O que realmente entrou você lança em Orçamento ›
+        Previstos, e o valor pode ser outro.</div>
       <button class="btn-primary" id="exp-save">Salvar</button>
     </div>
   </div>
@@ -1796,8 +1793,8 @@ const MESSAGES = {
     'entry.typeAmount': 'digite o valor', 'entry.keepGoing': 'toque em Pronto pra continuar',
     'scope.personal': 'Pessoal', 'scope.couple': 'Casal',
     'settings.title': 'Ajustes', 'settings.profile': 'Perfil', 'settings.couple': 'Casal',
-    'settings.instruments': 'Instrumentos', 'settings.categories': 'Categorias',
-    'settings.reserves': 'Reservas', 'settings.appearance': 'Aparência',
+    'settings.instruments': 'Contas e cartões', 'settings.categories': 'Categorias',
+    'settings.reserves': 'Reservas', 'settings.income': 'Entradas previstas', 'settings.appearance': 'Aparência',
     'settings.language': 'Idioma', 'settings.close': 'Fechar',
     'settings.lists': 'Listas', 'settings.lean': 'Enxutas', 'settings.full': 'Completas',
     'settings.registers': 'Cadastros', 'settings.app': 'App',
@@ -1822,8 +1819,8 @@ const MESSAGES = {
     'entry.typeAmount': 'type the amount', 'entry.keepGoing': 'tap Done to carry on',
     'scope.personal': 'Personal', 'scope.couple': 'Couple',
     'settings.title': 'Settings', 'settings.profile': 'Profile', 'settings.couple': 'Couple',
-    'settings.instruments': 'Instruments', 'settings.categories': 'Categories',
-    'settings.reserves': 'Reserves', 'settings.appearance': 'Appearance',
+    'settings.instruments': 'Accounts & cards', 'settings.categories': 'Categories',
+    'settings.reserves': 'Reserves', 'settings.income': 'Expected income', 'settings.appearance': 'Appearance',
     'settings.language': 'Language', 'settings.close': 'Close',
     'settings.lists': 'Lists', 'settings.lean': 'Lean', 'settings.full': 'Detailed',
     'settings.registers': 'Setup', 'settings.app': 'App',
@@ -1965,13 +1962,13 @@ let expectations = [
 const expDateIn = (x, m) => x.date
   ? (x.date.slice(0, 7) === m ? x.date : null)
   : `${m}-${String(x.day).padStart(2, '0')}`;
-// status: a real entry wins; otherwise the date decides, and the user can override.
+// An entry exists or it does not — same rule as the fixed-bill checklist. Past its
+// day with nothing recorded is `auto`: a nudge to record it, never a claim that the
+// money arrived. Counting an assumption as received is what made the total lie.
 function expStatus(x, m) {
   const when = expDateIn(x, m);
   if (!when) return null;
   if (entries.some(e => e.expId === x.id && e.m === m)) return { when, state: 'received' };
-  const override = x.override && x.override[m];
-  if (override) return { when, state: override };
   return { when, state: when <= TODAY ? 'auto' : 'pending' };
 }
 const expectationsIn = m => expectations
@@ -2492,6 +2489,7 @@ function openReconSheet() {
 
 // Quick entry state
 let entryType = 'expense', entryScope = 'personal', entryCat = null, entryPaid = 'F';
+let entryExpId = null; // set when the entry is confirming an expected income
 let entryPay = 'nubank', entryInst = 1, payTouched = false, entrySettled = false;
 let catsExpanded = false, instsExpanded = false;
 const CATS_VISIBLE = 4;
@@ -2683,33 +2681,40 @@ function renderBudget() {
 
 // Entradas previstas: the same checklist, mirrored — Recebidas / A receber
 function renderIncomeChecklist(m) {
-  const rows = expectationsIn(m);
-  const got = rows.filter(r => r.s.state === 'received' || r.s.state === 'auto');
-  const due = rows.filter(r => r.s.state === 'pending');
-  $('inc-got').textContent = fmt(got.reduce((s2, r) => s2 + r.x.amount, 0));
-  $('inc-due').textContent = fmt(due.reduce((s2, r) => s2 + r.x.amount, 0));
+  // Binary, exactly like the fixed-bill checklist: an entry exists or it does
+  // not. "The day passed" is a nudge to record it, never a claim that the money
+  // arrived — counting an assumption as received is what made the total lie.
+  const rows = expectationsIn(m).map(r => {
+    const e = entries.find(x => x.expId === r.x.id && x.m === m);
+    return { ...r, e, landed: !!e, val: e ? e.amount : r.x.amount };
+  });
+  $('inc-got').textContent = fmt(rows.filter(r => r.landed).reduce((s2, r) => s2 + r.val, 0));
+  $('inc-due').textContent = fmt(rows.filter(r => !r.landed).reduce((s2, r) => s2 + r.val, 0));
   $('budget-income').innerHTML = rows.length ? rows.map(r => {
-    const got1 = r.s.state === 'received' || r.s.state === 'auto';
-    const mark = got1 ? '✓' : '○';
     const when = r.s.when.slice(8, 10) + '/' + r.s.when.slice(5, 7);
-    const note = r.s.state === 'received' ? `recebida em ${when}`
-      : r.s.state === 'auto' ? `dia ${when} passou · marcada automaticamente`
-      : `chega dia ${when}`;
+    // What was planned and what landed are rarely the same number, so when they
+    // differ the row shows both rather than quietly replacing one with the other.
+    const drift = r.landed && Math.abs(r.e.amount - r.x.amount) > 0.005;
+    const note = r.landed
+      ? (drift ? `previsto ${fmt(r.x.amount)} · veio ${fmt(r.e.amount)}` : `recebida em ${r.e.d}`)
+      : (r.s.when <= TODAY ? `dia ${when} passou — toca pra lançar` : `chega dia ${when}`);
     return `<div class="budget-row" data-exp="${r.x.id}">
       <div class="row spread">
-        <span class="name"><span style="color:${got1 ? 'var(--good)' : 'var(--txt3)'}">${mark}</span>
-          <span class="txt">${r.x.name}</span>
-          ${r.s.state === 'auto' ? '<span class="pay-tag">auto</span>' : ''}</span>
-        <span class="nums money">${fmt(r.x.amount)}</span>
+        <span class="name"><span style="color:${r.landed ? 'var(--good)' : 'var(--txt3)'}">${r.landed ? '✓' : '○'}</span>
+          <span class="txt">${r.x.name}</span></span>
+        <span class="nums money">${fmt(r.val)}</span>
       </div>
       <div class="nums wrap" style="margin-top:4px">${note}</div>
     </div>`;
   }).join('') : '<div class="empty-note">nenhuma entrada prevista</div>';
-  $('budget-income').querySelectorAll('[data-exp]').forEach(el =>
-    el.onclick = () => openExpectation(el.dataset.exp));
+  $('budget-income').querySelectorAll('[data-exp]').forEach(el => el.onclick = () => {
+    const id = el.dataset.exp;
+    const landed = entries.find(x => x.expId === id && x.m === m);
+    // A landed row opens what it produced; an open one goes to the launch screen.
+    if (landed) openMovement(landed.id); else launchExpectation(id, m);
+  });
 }
 
-// Fixas: the spreadsheet's Pagas/A Pagar checklist, alive
 function renderFixedChecklist(m) {
   const all = [
     ...CATS.personal.filter(c => c.fixedAmount).map(c => ({ c, scope: 'personal' })),
@@ -2737,6 +2742,26 @@ function renderFixedChecklist(m) {
     else launchFixedEntry(el.dataset.fcat, el.dataset.fscope, m);
   });
 }
+// Confirming an expected income is the same gesture as paying a fixed bill:
+// it opens the entry screen. The amount arrives prefilled with the plan and
+// stays editable — what was expected and what landed are rarely the same
+// number, and the app must record the second one.
+function launchExpectation(expId2, m) {
+  const x = expectations.find(e => e.id === expId2);
+  if (!x) return;
+  const when = expDateIn(x, m);
+  editingId = null;
+  entryType = 'income'; entryScope = 'personal'; entryCat = x.cat;
+  entryPay = 'conta'; entryInst = 1; entryPaid = 'F';
+  payTouched = true; catsExpanded = true; entrySettled = false;
+  entryExpId = x.id;
+  $('entry-amount').value = x.amount.toFixed(2).replace('.', ',');
+  $('entry-desc').value = x.name;
+  setEntryDate(when && when <= TODAY ? when : (m === CUR ? TODAY : `${m}-01`));
+  syncEntryForm();
+  document.querySelector('.tab[data-scr="entry"]').click();
+}
+
 function launchFixedEntry(catId, scope, m) {
   const c = catById(catId);
   editingId = null;
@@ -2919,6 +2944,7 @@ function resetEntryForm() {
   $('entry-amount').value = ''; $('entry-desc').value = '';
   setEntryDate(TODAY);
   entryInst = 1; instsExpanded = false; catsExpanded = false; payTouched = false; entrySettled = false;
+  entryExpId = null;
   syncEntryForm();
 }
 
@@ -3141,7 +3167,7 @@ $('paidby-seg').querySelectorAll('button').forEach(b => b.onclick = () => {
 $('entry-desc').addEventListener('focus', () => setKeypad(false));
 $('entry-amount').addEventListener('input', () => { renderSplitPreview(); renderInstChips(); renderSettledChip(); });
 
-$('inc-add').onclick = () => openExpectation(null);
+$('inc-manage').onclick = () => openSettings('income');
 $('recon-open').onclick = openReconSheet;
 $('extrato-open').onclick = () => { extratoOpen = true; renderExtrato(); $('extrato-backdrop').classList.add('show'); };
 $('extrato-backdrop').onclick = e => {
@@ -3170,7 +3196,10 @@ $('entry-save').onclick = () => {
       const edt = entryDate;
       if (MONTHS.includes(edt.slice(0, 7))) { e.m = edt.slice(0, 7); e.d = edt.slice(8, 10) + '/' + edt.slice(5, 7); }
       e.amount = v; e.desc = desc; e.cat = entryCat; e.scope = entryScope;
-      if (entryType === 'income') { e.type = 'income'; e.pay = 'conta'; delete e.paidBy; }
+      if (entryType === 'income') {
+        e.type = 'income'; e.pay = 'conta'; delete e.paidBy;
+        if (entryExpId) e.expId = entryExpId;
+      }
       else {
         delete e.type; e.pay = entryPay;
         if (entryScope === 'couple') e.paidBy = entryPaid; else delete e.paidBy;
@@ -3189,8 +3218,9 @@ $('entry-save').onclick = () => {
   const dd = dt.slice(8, 10) + '/' + dt.slice(5, 7);
   if (entryType === 'income') {
     entries.push({ id: nextId++, m: m0, d: dd, cat: entryCat, desc,
-      scope: 'personal', amount: v, type: 'income', pay: 'conta' });
-    showToast('Lançado ✓');
+      scope: 'personal', amount: v, type: 'income', pay: 'conta',
+      ...(entryExpId ? { expId: entryExpId } : {}) });
+    showToast(entryExpId ? 'Entrada confirmada ✓' : 'Lançado ✓');
   } else {
     const n = instById(entryPay).type === 'credito' ? entryInst : 1;
     const per = Math.round((v / n) * 100) / 100;
@@ -3260,10 +3290,11 @@ function showToast(msg) {
 // ============ Settings — a small navigation stack inside one sheet ============
 const profile = { name: 'Fernando', email: 'fgunther@gmail.com', lock: false, notify: true };
 let setPage = 'root';
-const SET_PAGES = ['root', 'profile', 'couple', 'insts', 'cats', 'rsvs', 'appearance', 'language'];
+const SET_PAGES = ['root', 'profile', 'couple', 'insts', 'cats', 'rsvs', 'income', 'appearance', 'language'];
 const setTitle = p => t(p === 'root' ? 'settings.title'
   : { profile: 'settings.profile', couple: 'settings.couple', insts: 'settings.instruments',
-      cats: 'settings.categories', rsvs: 'settings.reserves', appearance: 'settings.appearance',
+      cats: 'settings.categories', rsvs: 'settings.reserves', income: 'settings.income',
+      appearance: 'settings.appearance',
       language: 'settings.language' }[p]);
 
 const row = (o) => `
@@ -3295,7 +3326,8 @@ function settingsPage() {
     ${group(t('settings.registers'),
       row({ id: 'insts', icon: '💳', title: t('settings.instruments'), value: `${instruments.length}`, go: 1 })
       + row({ id: 'cats', icon: '🏷️', title: t('settings.categories'), value: `${CATS.personal.length + CATS.couple.length}`, go: 1 })
-      + row({ id: 'rsvs', icon: '🐷', title: t('settings.reserves'), value: `${reserves.length}`, go: 1 }))}
+      + row({ id: 'rsvs', icon: '🐷', title: t('settings.reserves'), value: `${reserves.length}`, go: 1 })
+      + row({ id: 'income', icon: '💵', title: t('settings.income'), value: `${expectations.length}`, go: 1 }))}
     ${group(t('settings.app'),
       row({ id: 'language', icon: '⌘', title: t('settings.language'),
         value: LANGS.find(l => l.id === lang).label, go: 1 })
@@ -3354,6 +3386,15 @@ function settingsPage() {
     ${partnerBound ? '' : group('', row({ id: 'c-no-partner', icon: '⊘',
         title: 'Usar sem par', sub: 'esconde o escopo do casal · o histórico fica', danger: 1, go: 1 }))}`;
   }
+
+  if (setPage === 'income') return `
+    ${group('', expectations.map(x => row({
+        id: 'x:' + x.id, icon: '💵', title: x.name,
+        sub: x.date ? `uma vez só · ${x.date.slice(8, 10)}/${x.date.slice(5, 7)}` : `todo dia ${x.day}`,
+        value: fmt(x.amount), go: 1 })).join('')
+      + row({ id: 'x-new', icon: '＋', title: 'Nova entrada prevista', go: 1 }),
+      'O valor aqui é o que você espera. O que realmente cair você lança em Orçamento › Previstos, '
+      + 'e a diferença fica visível na linha.')}`;
 
   if (setPage === 'insts') return `
     ${group('Conta', accounts().map(i =>
@@ -3466,6 +3507,8 @@ function settingsGo(id) {
   if (id === 'c-new-couple') { openCatEdit(null, 'couple', 'settings'); return; }
   if (id === 'p-name') { openNameEditor(); return; }
   if (id === 'p-out') { $('settings-backdrop').classList.remove('show'); $('login').classList.remove('hide'); return; }
+  if (id.startsWith('x:')) { openExpectation(id.slice(2)); return; }
+  if (id === 'x-new') { openExpectation(null); return; }
   if (id.startsWith('i:')) { openInstEdit(id.slice(2)); return; }
   if (id.startsWith('r:')) { openRsvEdit(id.slice(2)); return; }
   if (id.startsWith('c:')) { const [, cid, sc] = id.split(':'); openCatEdit(cid, sc, 'settings'); return; }
@@ -4099,7 +4142,7 @@ function renderDeskToolbar() {
 }
 
 // ============ Expected income sheet =================================================
-let expId = null, expWhenDay = 1, expWhenDate = null, expState = null;
+let expId = null, expWhenDay = 1, expWhenDate = null;
 function renderExpWhen() {
   const days = [1, 5, 10, 15, 20, 25];
   $('exp-when').innerHTML = days.map(d =>
@@ -4114,12 +4157,6 @@ function renderExpWhen() {
     ? `só em ${expWhenDate.slice(8, 10)}/${expWhenDate.slice(5, 7)} — o caso do freela`
     : 'repete todo mês nesse dia';
 }
-function renderExpState() {
-  const st = expState ?? (expectationsIn(view()).find(r => r.x.id === expId)?.s.state || 'pending');
-  const got = st === 'received' || st === 'auto';
-  $('exp-backdrop').querySelectorAll('[data-st2]').forEach(b =>
-    b.classList.toggle('sel', (b.dataset.st2 === 'received') === got));
-}
 function openExpectation(id) {
   const x = expectations.find(e => e.id === id);
   expId = id;
@@ -4128,14 +4165,10 @@ function openExpectation(id) {
   $('exp-amount').value = x ? x.amount.toFixed(2).replace('.', ',') : '';
   expWhenDay = x && x.day ? x.day : 1;
   expWhenDate = x && x.date ? x.date : null;
-  expState = null;
-  renderExpWhen(); renderExpState();
+  renderExpWhen();
   $('exp-backdrop').classList.add('show');
 }
 $('exp-backdrop').onclick = e => { if (e.target === $('exp-backdrop')) $('exp-backdrop').classList.remove('show'); };
-$('exp-backdrop').querySelectorAll('[data-st2]').forEach(b => b.onclick = () => {
-  expState = b.dataset.st2; renderExpState();
-});
 $('exp-save').onclick = () => {
   const name = $('exp-name').value.trim();
   const amount = parseAmount($('exp-amount').value);
@@ -4145,7 +4178,6 @@ $('exp-save').onclick = () => {
   x.name = name; x.amount = amount;
   if (expWhenDate) { x.date = expWhenDate; delete x.day; } else { x.day = expWhenDay; delete x.date; }
   x.cat = x.cat || (expWhenDate ? 'freela' : 'salario');
-  if (expState) { x.override = x.override || {}; x.override[view()] = expState; }
   $('exp-backdrop').classList.remove('show');
   renderAll();
   showToast('Entrada prevista salva ✓');
@@ -4229,7 +4261,7 @@ function paletteRows(q) {
     { icon: '◫', title: 'Orçamento', sub: '⌘2', run: () => go('budget') },
     ...(hasPartner ? [{ icon: '⚖', title: 'Casal', sub: '⌘3', run: () => go('couple') }] : []),
     { icon: '⚙', title: 'Ajustes', sub: '⌘,', run: () => openSettings('root') },
-    { icon: '💳', title: 'Instrumentos', run: () => openSettings('insts') },
+    { icon: '💳', title: t('settings.instruments'), run: () => openSettings('insts') },
     { icon: '🏷️', title: 'Categorias', run: () => openSettings('cats') },
     { icon: '🐷', title: 'Reservas', run: () => openSettings('rsvs') },
   ].filter(p => hit(p.title, p.sub));
