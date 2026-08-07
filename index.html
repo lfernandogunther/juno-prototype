@@ -364,6 +364,7 @@
   .empty-invite .btn-primary { margin-top: 6px; }
   /* "disponível" reads as cash on hand unless the line under it says otherwise. */
   .hero-caption { font-size: 12.5px; color: var(--txt3); margin-top: 4px; line-height: 1.35; }
+  .card-sub { font-size: 11.5px; color: var(--txt3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .swipe-hint { font-size: 12px; color: var(--txt4); text-align: center; padding: 9px 0; }
 
   .scope-tag {
@@ -1346,7 +1347,10 @@
         </div>
         <div class="card" id="accounts-card">
           <div class="row spread">
-            <div class="label" data-i18n="home.accounts">Suas contas</div>
+            <span class="stack" style="gap:1px;min-width:0">
+              <div class="label" data-i18n="home.accounts">Suas contas</div>
+              <span class="card-sub" id="recon-when"></span>
+            </span>
             <span class="row" style="gap:6px">
               <button class="back-btn" id="insts-manage" style="font-size:14.5px" data-i18n="settings.instruments">Instrumentos</button>
               <button class="back-btn" id="recon-open" style="font-size:14.5px" data-i18n="home.reconcile">Conciliar</button>
@@ -1820,6 +1824,11 @@ const MESSAGES = {
     'settings.instruments': 'Contas e cartões', 'settings.categories': 'Categorias',
     'settings.reserves': 'Reservas', 'settings.income': 'Entradas previstas', 'settings.appearance': 'Aparência',
     'settings.language': 'Idioma', 'settings.close': 'Fechar',
+    'settings.search': 'Buscar', 'settings.searchSub': 'lançamentos, categorias e ações · ⌘K',
+    'settings.shortcuts': 'Atalhos', 'settings.shortcutsSub': 'a lista completa · ?',
+    'settings.rerunWizard': 'Rever o primeiro acesso', 'settings.rerunWizardSub': 'o wizard de boas-vindas',
+    'home.neverReconciled': 'nunca conciliado', 'home.reconciledToday': 'conciliado hoje',
+    'home.reconciledYesterday': 'conciliado ontem', 'home.reconciledDaysAgo': 'conciliado há {days} dias',
     'settings.lists': 'Listas', 'settings.lean': 'Enxutas', 'settings.full': 'Completas',
     'settings.registers': 'Cadastros', 'settings.app': 'App',
   },
@@ -1846,6 +1855,11 @@ const MESSAGES = {
     'settings.instruments': 'Accounts & cards', 'settings.categories': 'Categories',
     'settings.reserves': 'Reserves', 'settings.income': 'Expected income', 'settings.appearance': 'Appearance',
     'settings.language': 'Language', 'settings.close': 'Close',
+    'settings.search': 'Search', 'settings.searchSub': 'movements, categories and actions · ⌘K',
+    'settings.shortcuts': 'Shortcuts', 'settings.shortcutsSub': 'the full list · ?',
+    'settings.rerunWizard': 'Replay first run', 'settings.rerunWizardSub': 'the welcome wizard',
+    'home.neverReconciled': 'never reconciled', 'home.reconciledToday': 'reconciled today',
+    'home.reconciledYesterday': 'reconciled yesterday', 'home.reconciledDaysAgo': 'reconciled {days} days ago',
     'settings.lists': 'Lists', 'settings.lean': 'Lean', 'settings.full': 'Detailed',
     'settings.registers': 'Setup', 'settings.app': 'App',
   },
@@ -2000,16 +2014,11 @@ const expectationsIn = m => expectations
   .sort((a, b) => a.s.when < b.s.when ? -1 : 1);
 // Money already treated as in the account: confirmed entries, plus the ones the date
 // auto-confirmed (flagged in the UI, and the reconciliation is the safety net).
-function autoIncomeRows(m) {
-  return expectationsIn(m).filter(r => r.s.state === 'auto').map(r => ({
-    m, d: r.s.when.slice(8, 10) + '/' + r.s.when.slice(5, 7), cat: r.x.cat,
-    desc: r.x.name, amount: r.x.amount, scope: 'personal', type: 'income',
-    pay: accounts()[0] ? accounts()[0].id : 'conta', auto: true, expId: r.x.id,
-  }));
-}
-// Still to come this month — the part of "available" that has not landed yet.
+// Still to come this month: everything without a real entry, whether its day
+// has passed (auto — a nudge to log it) or not (pending). Only an entry moves
+// a balance; an assumption is never money.
 const stillToReceive = m => expectationsIn(m)
-  .filter(r => r.s.state === 'pending').reduce((sum, r) => sum + r.x.amount, 0);
+  .filter(r => r.s.state !== 'received').reduce((sum, r) => sum + r.x.amount, 0);
 
 // ---- Reserves: accumulated total + monthly contribution ----
 let reserves = [ // monthly = Fernando's share (from the spreadsheet); totals are examples
@@ -2062,7 +2071,7 @@ function projectedFor(m) {
     scope: 'personal', pay: 'conta', projected: true }));
   return p;
 }
-const monthEntries = m => [...projectedFor(m), ...autoIncomeRows(m), ...entries.filter(e => e.m === m)];
+const monthEntries = m => [...projectedFor(m), ...entries.filter(e => e.m === m)];
 
 // Card cycle: a purchase after the card's closing day lands on NEXT month's bill.
 function faturaMonthOf(e) {
@@ -2098,12 +2107,14 @@ function expectedAt(id, m) {
   if (i.type === 'credito') return faturaOpen(id, m);
   return benefitBalance(id, m);
 }
-// Anchoring: once reconciled, the informed value wins; later entries flow on top;
-// the snapshot diff stays visible as "unexplained" until a matching entry lands.
+// The reconciliation is a target, never a source: the value shown is always
+// what the entries say, and the difference to the informed figure is the
+// history still to be logged — closing it, entry by entry with the bank app in
+// hand, is the whole point of reconciling.
 function anchoredOf(id) {
   const base = expectedAt(id, CUR);
   const r = recon[id];
-  return { val: r ? r.val + (base - r.exp) : base, u: r ? r.val - r.exp : null };
+  return { val: base, u: r ? r.val - r.exp : null };
 }
 // "Disponível para uso" is what should be left once the month has fully happened:
 // what is in the account, plus what is still coming in, minus what is still going out.
@@ -2113,13 +2124,21 @@ function availableAt(m) { // per Fernando's decision, benefit balances count as 
       - credits().reduce((s, c) => s + anchoredOf(c.id).val, 0)
       + benefits().reduce((s, b) => s + anchoredOf(b.id).val, 0)
       + stillToReceive(m)
-      - upcomingFixed(m).total;
+      - upcomingFixed(m).total
+      - reservedByCeilings(m);
   }
   return contaMonth(m)
     - credits().reduce((s, c) => s + faturaOpen(c.id, m), 0)
     + benefits().reduce((s, b) => s + benefitBalance(b.id, m), 0);
 }
 function cardHeadroom(m) { // Σ remaining budget of variable categories — the old "saque cartão"
+  return [...CATS.personal, ...CATS.couple].filter(c => !c.fixed)
+    .reduce((s, c) => s + (c.budget - spentIn(c.id, m)), 0);
+}
+// What the ceilings still hold back. Clamped per category: a blown ceiling
+// reserves nothing more — spending inside a ceiling moves nothing (reserved
+// becomes spent), and blowing it drops the leftover by exactly the overspend.
+function reservedByCeilings(m) {
   return [...CATS.personal, ...CATS.couple].filter(c => !c.fixed)
     .reduce((s, c) => s + Math.max(0, c.budget - spentIn(c.id, m)), 0);
 }
@@ -2281,6 +2300,17 @@ function renderMiniGrid(m) {
       <div class="sub">sobra dos tetos do mês</div></div>
 `;
   // one render, two hosts — CSS decides which one is on screen at this width
+  // Reconciling has a rhythm: knowing when it last happened says whether the
+  // figures on this screen are worth trusting today.
+  const anchors = Object.values(recon).filter(r => r.at);
+  $('recon-when').textContent = anchors.length === 0 ? t('home.neverReconciled')
+    : (() => {
+        const latest = anchors.reduce((x, y) => (x.at > y.at ? x : y)).at;
+        const days = Math.round((new Date(TODAY) - new Date(latest)) / 86_400_000);
+        return days <= 0 ? t('home.reconciledToday')
+          : days === 1 ? t('home.reconciledYesterday')
+          : t('home.reconciledDaysAgo', { days });
+      })();
   $('mini-grid').innerHTML = stats;
   $('hero-stats').innerHTML = stats;
 
@@ -2512,7 +2542,7 @@ function openReconSheet() {
     maskEl(inp);
     if (recon[i.id]) inp.value = recon[i.id].val.toFixed(2).replace('.', ',');
     inp.addEventListener('input', () => {
-      if (inp.value) recon[i.id] = { val: parseAmount(inp.value), exp: expectedAt(i.id, CUR) };
+      if (inp.value) recon[i.id] = { val: parseAmount(inp.value), exp: expectedAt(i.id, CUR), at: TODAY };
       else delete recon[i.id];
       reconRowStatus(i.id);
     });
@@ -2586,7 +2616,7 @@ function renderEntryCats() {
     b.onclick = () => {
       entryCat = b.dataset.cat;
       // benefit hint: market categories default to VR unless the user picked a payment
-      if (!payTouched && ['mercado', 'refeicao'].includes(entryCat) && instById(entryPay).type === 'credito') {
+      if (!payTouched && ['mercado', 'refeicao'].includes(entryCat) && instById(entryPay)?.type === 'credito') {
         entryPay = 'vr'; entryInst = 1;
       }
       maybePrefillFixed();
@@ -2620,7 +2650,10 @@ function renderInstChips() {
   const sorted = [...instruments].sort((a, b) => usageInst(b.id) - usageInst(a.id));
   let html = sorted.map(i =>
     `<button class="chip ${entryPay === i.id ? 'sel' : ''}" data-pay="${i.id}">${i.icon} ${i.name}</button>`).join('');
-  const isCredit = instById(entryPay).type === 'credito';
+  // The selected instrument can stop existing — deleted in Ajustes, or a demo
+  // board swap — and a dangling id must degrade to "pick again", never crash.
+  if (!instById(entryPay)) entryPay = instruments[0]?.id ?? null;
+  const isCredit = instById(entryPay)?.type === 'credito';
   if (isCredit) {
     const nums = instsExpanded ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 12] : [2, 3, 6, 10, 12];
     html += `<button class="chip ${entryInst === 1 ? 'sel' : ''}" data-n="1">à vista</button>`
@@ -2630,7 +2663,7 @@ function renderInstChips() {
   $('inst-chips').innerHTML = html;
   $('inst-chips').querySelectorAll('[data-pay]').forEach(b => b.onclick = () => {
     entryPay = b.dataset.pay; payTouched = true;
-    if (instById(entryPay).type !== 'credito') entryInst = 1;
+    if (instById(entryPay)?.type !== 'credito') entryInst = 1;
     renderInstChips();
   });
   $('inst-chips').querySelectorAll('.chip[data-n]').forEach(b =>
@@ -3256,7 +3289,7 @@ $('entry-save').onclick = () => {
       ...(entryExpId ? { expId: entryExpId } : {}) });
     showToast(entryExpId ? 'Entrada confirmada ✓' : 'Lançado ✓');
   } else {
-    const n = instById(entryPay).type === 'credito' ? entryInst : 1;
+    const n = instById(entryPay)?.type === 'credito' ? entryInst : 1;
     const per = Math.round((v / n) * 100) / 100;
     const first = Math.round((v - per * (n - 1)) * 100) / 100; // rounding lands on the first
     let created = 0;
@@ -3366,9 +3399,9 @@ function settingsPage() {
       row({ id: 'language', icon: '⌘', title: t('settings.language'),
         value: LANGS.find(l => l.id === lang).label, go: 1 })
       + row({ id: 'appearance', icon: '◐', title: t('settings.appearance'), value: themeLabel, go: 1 })
-      + row({ id: 'search', icon: '🔎', title: 'Buscar', sub: 'lançamentos, categorias e ações · ⌘K', go: 1 })
-      + row({ id: 'keys', icon: '⌘', title: 'Atalhos', sub: 'a lista completa · ?', go: 1 })
-      + row({ id: 'wizard', icon: '▶', title: 'Rever o primeiro acesso', sub: 'o wizard de boas-vindas', go: 1 })
+      + row({ id: 'search', icon: '🔎', title: t('settings.search'), sub: t('settings.searchSub'), go: 1 })
+      + row({ id: 'keys', icon: '⌘', title: t('settings.shortcuts'), sub: t('settings.shortcutsSub'), go: 1 })
+      + row({ id: 'wizard', icon: '▶', title: t('settings.rerunWizard'), sub: t('settings.rerunWizardSub'), go: 1 })
       + row({ id: 'switch-person', icon: '⇄', title: `Ver como ${me === 'F' ? 'a Rayra' : 'o Fernando'}`,
           sub: 'só no protótipo, pra ver os dois lados', go: 1 }))}
     <div class="set-note" style="text-align:center;padding-top:4px">Juno · protótipo de design</div>`;
@@ -3926,8 +3959,8 @@ const WIZ_STEPS = [
         instruments.splice(instruments.indexOf(gone), 1);
       });
       // the informed values become the anchors — the same mechanism as Conciliar
-      if (wizConta > 0) recon['conta'] = { val: wizConta, exp: expectedAt('conta', CUR) };
-      cards.forEach((c, n) => { recon[c.id] = { val: named[n].spent, exp: expectedAt(c.id, CUR) }; });
+      if (wizConta > 0) recon['conta'] = { val: wizConta, exp: expectedAt('conta', CUR), at: TODAY };
+      cards.forEach((c, n) => { recon[c.id] = { val: named[n].spent, exp: expectedAt(c.id, CUR), at: TODAY }; });
       wizDone.saldos = wizConta > 0;
       wizDone.cartoes = cards.length > 0;
       wizDone.limites = cards.every(c => c.limit > 0) && cards.length > 0;
