@@ -3037,8 +3037,8 @@ function renderEntryCats() {
   }
   $('entry-cats').classList.remove('hrow');
   $('entry-cats').innerHTML =
-    `<input class="field" id="cat-search" placeholder="🔎 outra categoria…" value="${catSearch}"
-       style="flex:1 0 100%;padding:9px 12px;font-size:14px">`
+    `<input class="desc-input" id="cat-search" placeholder="🔎 outra categoria…" value="${catSearch}"
+       autocomplete="off" style="flex:1 0 100%">`
     + shown.map(c =>
     `<button class="chip ${c.id === entryCat ? 'sel' : ''}" data-cat="${c.id}">${c.icon} ${c.name}</button>`).join('')
     + (!q && !catsExpanded && list.length > 3 ? `<button class="chip more" data-morecats>todas…</button>` : '')
@@ -3973,7 +3973,7 @@ function syncEntryForm() {
   $('scope-seg').querySelectorAll('button').forEach(x => x.classList.toggle('sel', x.dataset.scope === entryScope));
   $('paidby-seg').querySelectorAll('button').forEach(x => x.classList.toggle('sel', x.dataset.paid === entryPaid));
   $('entry-mode').textContent = t(editingId ? 'entry.editing' : 'entry.fast');
-  $('entry-save').textContent = t(editingId ? 'entry.update' : 'entry.save');
+  $('entry-save').textContent = t(keypadOpen ? 'entry.done' : editingId ? 'entry.update' : 'entry.save');
   renderEntryCats();
 }
 function openEdit(id) {
@@ -4089,6 +4089,7 @@ function setKeypad(open) {
   if (open && isDesk()) open = false;
   keypadOpen = open;
   if (open) renderKeypadHint();
+  $('entry-save').textContent = t(open ? 'entry.done' : editingId ? 'entry.update' : 'entry.save');
   $('keypad').classList.toggle('show', open);
   $('amount-field').classList.toggle('editing', open);
   $('scr-entry').classList.toggle('keypad-open', open);
@@ -4256,6 +4257,7 @@ $('recon-save').onclick = () => {
 };
 
 $('entry-save').onclick = () => {
+  if (keypadOpen) { setKeypad(false); return; }
   const v = parseAmount($('entry-amount').value);
   if (v <= 0) { showToast('Digite um valor'); return; }
   const desc = $('entry-desc').value.trim() || undefined;
