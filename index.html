@@ -266,6 +266,87 @@
     -webkit-backdrop-filter: none; border-radius: 0; padding-left: 0;
   }
   .inst-rows { margin-top: 12px; }
+  /* three amounts under the bar, each tied to a slice of it */
+  .blegend { display: flex; flex-wrap: wrap; gap: 11px; margin-top: 6px;
+    font-size: 11.5px; color: var(--txt2); }
+  .blegend span { display: inline-flex; align-items: center; gap: 5px; }
+  .blegend s { width: 8px; height: 8px; border-radius: 3px; flex-shrink: 0; text-decoration: none; }
+  .blegend s.sp { background: var(--accent); }
+  .blegend s.kn { background: color-mix(in srgb, var(--accent) 40%, transparent); }
+  .blegend s.fr { background: var(--track); }
+  .blegend b { font-weight: 600; color: var(--txt); }
+  .blegend .over { color: var(--crit); }
+  .blegend .over b { color: var(--crit); }
+  /* conhecidos nested inside the category card, right under its bar */
+  .knowns { margin-top: 9px; border-top: 1px solid var(--sep); }
+  .kn-row { display: flex; align-items: center; gap: 9px; width: 100%; padding: 7px 0;
+    border: none; background: none; color: inherit; text-align: left; cursor: pointer;
+    border-bottom: 1px solid var(--sep); font-size: 13.5px; }
+  .kn-row:last-child { border-bottom: none; padding-bottom: 1px; }
+  .kn-row .st { width: 16px; text-align: center; flex-shrink: 0; font-size: 11px; }
+  .kn-row .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .kn-row .nm em { font-style: normal; color: var(--txt4); font-size: 11.5px; }
+  .kn-row .vl { margin-left: auto; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .kn-row.done .nm, .kn-row.done .vl { color: var(--txt4); }
+  .kn-row.done .vl { text-decoration: line-through; }
+  .kn-row .ed { flex-shrink: 0; padding: 2px 6px; border-radius: 7px; color: var(--txt4);
+    font-size: 12px; }
+  .kn-row .ed:hover { color: var(--txt); background: var(--glass2); }
+  .share-check { width: 24px; height: 24px; border-radius: 8px; border: 1.5px solid var(--sep);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    font-size: 12px; color: transparent; background: var(--glass2); }
+  .share-check.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  /* three columns that must not wrap: what, how much, balance after */
+  .flow-row { display: flex; align-items: center; gap: 8px; padding: 8px 2px; opacity: .78;
+    border-bottom: 1px solid var(--sep); font-size: 13.5px; }
+  .flow-row:last-of-type { border-bottom: none; }
+  .flow-row .st { width: 14px; flex-shrink: 0; text-align: center; color: var(--txt4); }
+  .flow-row .nm { min-width: 0; flex: 1; }
+  .flow-row .nm b { display: block; font-weight: 500; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; }
+  .flow-row .nm em { font-style: normal; font-size: 11px; color: var(--txt4); }
+  .flow-row .vl { font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .flow-row .bl { width: 82px; flex-shrink: 0; text-align: right; white-space: nowrap;
+    font-size: 12px; color: var(--txt4); font-variant-numeric: tabular-nums; }
+
+  .rec-add { display: block; width: 100%; margin-top: 8px; padding: 7px 0; border: none;
+    background: none; color: var(--accent); font: inherit; font-size: 13px; font-weight: 600;
+    cursor: pointer; text-align: center; border-radius: 14px; }
+  .kn-save { display: block; width: 100%; margin-top: 9px; border-radius: 14px; padding: 9px 12px;
+    background: rgba(18,161,80,.14); color: var(--good); font-size: 12.5px; font-weight: 600;
+    border: none; cursor: pointer; text-align: left; }
+
+  /* the committed-but-not-yet-charged slice of a ceiling */
+  /* .bar i is a block, so two of them would stack and the second would be
+     clipped by the track's overflow. Only the bars that carry a second slice
+     become a row — every other bar in the app keeps its single fill. */
+  .bar:has(i.coming) { display: flex; }
+  .bar i.coming {
+    border-radius: 0 999px 999px 0;
+    background: color-mix(in srgb, var(--blue) 34%, transparent);
+    background-image: repeating-linear-gradient(115deg, transparent 0 3px, rgba(255,255,255,.6) 3px 5px);
+  }
+  .bar:has(i.coming) i:first-child { border-radius: 999px 0 0 999px; }
+  .known-row { display: flex; align-items: center; gap: 10px; padding: 9px 2px;
+    border-bottom: 1px solid var(--sep); width: 100%; font-size: 14.5px;
+    background: none; border-left: none; border-right: none; border-top: none;
+    color: inherit; text-align: left; cursor: pointer; }
+  .known-row:last-child { border-bottom: none; }
+  .known-row .st { width: 20px; text-align: center; flex-shrink: 0; font-size: 12px; }
+  .known-row .nm { min-width: 0; }
+  .known-row .nm b { display: block; font-weight: 500; }
+  .known-row .nm em { font-style: normal; font-size: 11.5px; color: var(--txt3); }
+  .known-row .vl { margin-left: auto; font-weight: 600; white-space: nowrap; }
+  .known-row.done .nm b, .known-row.done .vl { color: var(--txt3); }
+  .known-row.done .vl { text-decoration: line-through; text-decoration-color: var(--txt4); }
+  .bill-tile { border-radius: 20px; padding: 13px 15px; margin-bottom: 9px; }
+  .bill-tile:last-child { margin-bottom: 0; }
+  .bill-tile .tag { font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+  .bill-tile.due { background: var(--gold-soft); } .bill-tile.due .tag { color: var(--amber); }
+  .bill-tile.open { background: var(--glass2); } .bill-tile.open .tag { color: var(--blue); }
+  .bill-tile .amt { font-size: 25px; font-weight: 700; letter-spacing: -.02em; margin-top: 2px; }
+  .bill-tile .when { font-size: 12px; color: var(--txt2); margin-top: 2px; }
+  .bill-tile .acts { display: flex; gap: 8px; margin-top: 10px; }
   .inst-row { display: flex; align-items: center; gap: 11px; }
   .inst-row > div:last-child {
     flex: 1; display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -510,9 +591,10 @@
   .bar.thin { height: 3px; margin-top: 7px; }
   .budget-row .scope-tag, .budget-row .pay-tag { flex-shrink: 0; }
   #budget-personal .budget-row, #budget-couple .budget-row, #budget-fixed .budget-row,
-  #budget-income .budget-row, #budget-reserves .budget-row {
+  #budget-income .budget-row, #budget-reserves .budget-row, #couple-budgets .budget-row {
     display: block; padding: 12px 0; border-bottom: 1px solid var(--sep);
   }
+  #couple-budgets .budget-row:last-child,
   #budget-personal .budget-row:last-child, #budget-couple .budget-row:last-child,
   #budget-fixed .budget-row:last-child, #budget-income .budget-row:last-child,
   #budget-reserves .budget-row:last-child { border-bottom: none; }
@@ -762,16 +844,20 @@
     .screens { padding-left: 20px; padding-right: 20px; }
 
     /* two columns of cards when they fit — the same rule the desktop uses */
-    #scr-home.active, #scr-budget.active, #scr-couple.active {
+    #scr-couple.active { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; align-items: start; }
+    #scr-couple.active > .app-head { grid-column: 1 / -1; }
+    #scr-couple.active .cpl-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+    #scr-home.active, #scr-budget.active {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 16px; align-items: start;
     }
-    #scr-home.active > .app-head, #scr-budget.active > .app-head, #scr-couple.active > .app-head,
+    #scr-home.active > .app-head, #scr-budget.active > .app-head,
     #scr-budget.active > .seg, #scr-home.active > #setup-cards { grid-column: 1 / -1; }
     #scr-budget .bt.on { display: contents; }
     #bt-var > .card, #bt-fix > .card, #bt-rsv > .card { margin-top: 0 !important; }
     #bt-var > .btn-ghost, #bt-fix > .btn-ghost, #bt-rsv > .btn-ghost { margin-top: 0 !important; }
-    #scr-couple.active .seesaw-wrap { grid-row: span 2; }
+    /* Four cards now: [seesaw | falta resolver] over [orçamentos | movimento].
+       The span-2 seesaw was the old two-card layout and left a hole under it. */
 
     /* one-hand controls stay reachable: centred at phone width instead of stretched */
     #scr-entry.active { max-width: 560px; margin: 0 auto; }
@@ -782,6 +868,12 @@
     }
     .toast { text-align: center; }
   }
+
+  .cpl-col { display: contents; }
+  #scr-couple .seesaw-wrap { order: 1; }
+  #scr-couple #couple-todo-card { order: 2; }
+  #scr-couple #couple-budgets-card { order: 3; }
+  #scr-couple #couple-mov-card { order: 4; }
 
   /* ============ Desktop: same screens, a window instead of a phone ============ */
   .desk-side, .desk-toolbar { display: none; }   /* desktop-only chrome */
@@ -1062,7 +1154,7 @@
     .toast, .snack { left: auto; right: 40px; width: 340px; bottom: 28px; text-align: left; }
     /* the couple screen reads better as one column of its own width */
     #scr-couple.active { grid-template-columns: minmax(320px, 460px) minmax(320px, 1fr); }
-    .seesaw-wrap { grid-row: span 2; }
+    #scr-couple.active .cpl-col { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
   }
 
   /* ============ Command palette ============ */
@@ -1388,6 +1480,7 @@
             <span class="cur" id="amount-sign">R$</span>
             <input type="text" inputmode="none" readonly id="entry-amount" placeholder="0,00" autocomplete="off">
           </div>
+          <div class="chips-note" id="amount-total-note" style="display:none;text-align:center"></div>
           <button class="date-pill" id="date-open">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
                  stroke-width="1.9" stroke-linecap="round">
@@ -1413,6 +1506,8 @@
           <div class="chips hrow" id="inst-chips"></div>
           <div class="chips-note" id="inst-note" style="display:none"></div>
         </div>
+
+        <div id="entry-reserve-row" style="display:none"></div>
 
         <div id="paidby-block" class="split-preview" style="display:none;padding:12px 14px">
           <div class="label" style="padding:0 0 7px">Quem pagou</div>
@@ -1473,7 +1568,7 @@
           <div id="budget-fixed" style="margin-top:8px"></div>
           <div class="tap-note">paga ✓ toca pra ver · a vencer toca pra lançar</div>
         </div>
-        <button class="btn-ghost" style="width:100%;margin-top:12px" id="fix-add">＋ nova fixa</button>
+        <button class="btn-ghost" style="width:100%;margin-top:12px" id="fix-add">＋ nova conta recorrente</button>
       </div>
       <div id="bt-rsv" class="bt">
         <div class="card"><div class="label">Reservas</div><div id="budget-reserves"></div>
@@ -1486,28 +1581,46 @@
     <section class="screen" id="scr-couple">
       <div class="app-head"><h2 data-i18n="tab.couple">Casal</h2></div>
 
-      <div class="card seesaw-wrap">
-        <div class="seesaw">
-          <div class="nm-base f">Fernando</div>
-          <div class="nm-base r">Rayra</div>
-          <div class="rider f" id="rider-f"><div class="face">F</div></div>
-          <div class="rider r" id="rider-r"><div class="face">R</div></div>
-          <div class="pivot"></div>
-          <div class="beam" id="beam"></div>
+      <div class="cpl-col">
+        <div class="card seesaw-wrap">
+          <div class="seesaw">
+            <div class="nm-base f">Fernando</div>
+            <div class="nm-base r">Rayra</div>
+            <div class="rider f" id="rider-f"><div class="face">F</div></div>
+            <div class="rider r" id="rider-r"><div class="face">R</div></div>
+            <div class="pivot"></div>
+            <div class="beam" id="beam"></div>
+          </div>
+          <div class="seesaw-phrase" id="seesaw-phrase"></div>
+          <div class="seesaw-sub" id="seesaw-sub"></div>
+          <div class="row" style="gap:10px;margin-top:16px">
+            <button class="btn-ghost" style="flex:1" id="reveal-btn">ver números</button>
+            <button class="btn-primary" style="flex:1;padding:12px 0;font-size:14.5px" id="settle-open">Registrar acerto</button>
+          </div>
+          <div class="exact money" id="seesaw-exact"></div>
         </div>
-        <div class="seesaw-phrase" id="seesaw-phrase"></div>
-        <div class="seesaw-sub" id="seesaw-sub"></div>
-        <div class="row" style="gap:10px;margin-top:16px">
-          <button class="btn-ghost" style="flex:1" id="reveal-btn">ver números</button>
-          <button class="btn-primary" style="flex:1;padding:12px 0;font-size:14.5px" id="settle-open">Registrar acerto</button>
+
+        <div class="card" id="couple-budgets-card">
+          <div class="label">Orçamentos da casa</div>
+          <div id="couple-budgets"></div>
+          <div class="tap-note">valores cheios do casal — no Orçamento você vê a sua parte</div>
         </div>
-        <div class="exact money" id="seesaw-exact"></div>
       </div>
 
-      <div class="card">
-        <div class="label">Do casal neste mês</div>
-        <div class="entry-list" id="couple-entries"></div>
-        <div class="swipe-hint">arrasta → pra editar · ← pra excluir</div>
+      <div class="cpl-col">
+        <div class="card" id="couple-todo-card" style="display:none">
+          <div class="row spread">
+            <div class="label">Falta resolver</div>
+            <span class="todo-count" id="couple-todo-count"></span>
+          </div>
+          <div class="entry-list" id="couple-todo"></div>
+        </div>
+
+        <div class="card" id="couple-mov-card">
+          <div class="label">Do casal neste mês</div>
+          <div class="entry-list" id="couple-entries"></div>
+          <div class="swipe-hint">arrasta → pra editar · ← pra excluir</div>
+        </div>
       </div>
     </section>
   </div>
@@ -1723,6 +1836,11 @@
     </div>
   </div>
 
+  <!-- ============ Send-share confirmation sheet ============ -->
+  <div class="sheet-backdrop" id="send-backdrop">
+    <div class="sheet" id="send-sheet"></div>
+  </div>
+
   <!-- ============ Reconciliation sheet (one row per instrument) ============ -->
   <div class="sheet-backdrop" id="recon-backdrop">
     <div class="sheet">
@@ -1737,6 +1855,7 @@
   <div class="sheet-backdrop" id="extrato-backdrop">
     <div class="sheet">
       <h3 id="extrato-title"></h3>
+      <div id="extrato-flow"></div>
       <div class="entry-list" id="extrato-entries"></div>
       <div class="swipe-hint">arrasta → pra editar · ← pra excluir</div>
     </div>
@@ -1747,9 +1866,66 @@
     <div class="sheet">
       <h3 id="cat-title"></h3>
       <p id="cat-summary"></p>
+      <div id="cat-known"></div>
       <div class="entry-list" id="cat-entries"></div>
       <div class="swipe-hint">arrasta → pra editar · ← pra excluir</div>
       <button class="btn-primary" id="cat-add"></button>
+      <button class="btn-ghost" id="cat-known-add" style="margin-top:8px"></button>
+    </div>
+  </div>
+
+  <div class="sheet-backdrop" id="simple-backdrop"><div class="sheet"></div></div>
+
+  <!-- ============ Conhecido editor: a charge you already know is coming ======== -->
+  <div class="sheet-backdrop" id="known-backdrop">
+    <div class="sheet">
+      <h3 id="kf-title"></h3>
+      <p id="kf-where"></p>
+      <input type="text" class="desc-input" id="kf-name" placeholder="nome — ex: Luz, Spotify, Seguro">
+      <input type="text" inputmode="numeric" id="kf-amount" placeholder="valor">
+      <div class="seg" id="kf-kind">
+        <button class="sel" data-kk="exact">Valor exato</button>
+        <button data-kk="est">Estimado</button>
+      </div>
+      <div class="chips-note" id="kf-kind-note"></div>
+      <div>
+        <div class="label" style="padding:0 0 6px">Dia do mês</div>
+        <div class="chips hrow" id="kf-days"></div>
+      </div>
+      <div>
+        <div class="label" style="padding:0 0 6px">Onde cai</div>
+        <div class="chips hrow" id="kf-pay"></div>
+      </div>
+      <div>
+        <div class="chips" id="kf-auto"></div>
+        <div class="chips-note" id="kf-auto-note"></div>
+      </div>
+      <div>
+        <div class="label" style="padding:0 0 6px">Com que frequência</div>
+        <div class="chips" id="kf-every"></div>
+        <div class="chips-note" id="kf-every-note"></div>
+      </div>
+      <div id="kf-split-block">
+        <div class="label" style="padding:0 0 6px">Divisão</div>
+        <div class="chips" id="kf-split"></div>
+        <div class="chips-note" id="kf-split-note"></div>
+      </div>
+      <button class="btn-primary" id="kf-save">Salvar</button>
+      <button class="btn-ghost" id="kf-del" style="margin-top:8px;display:none">Excluir conhecido</button>
+    </div>
+  </div>
+
+  <!-- ============ Card bill sheet: pay the oldest open one, advance the rest ==== -->
+  <div class="sheet-backdrop" id="bill-backdrop">
+    <div class="sheet">
+      <h3 id="bill-title"></h3>
+      <div id="bill-tiles"></div>
+      <div id="bill-form" style="display:none">
+        <div class="label" id="bill-form-label"></div>
+        <input type="text" inputmode="numeric" id="bill-amount" placeholder="valor">
+        <div class="chips-note" id="bill-note"></div>
+        <button class="btn-primary" id="bill-confirm" style="margin-top:12px"></button>
+      </div>
     </div>
   </div>
 
@@ -1925,7 +2101,15 @@ const CATS = {
     { essential: true, id: 'moradia', name: 'Apto Piqueri', icon: '🏠', budget: 1200, fixed: true, fixedAmount: 1200 },
     { essential: true, id: 'cond-p', name: 'Cond Piqueri', icon: '🏢', budget: 420, fixed: true, fixedAmount: 420 },
     { essential: true, id: 'luz-p', name: 'Luz Piqueri', icon: '💡', budget: 50, fixed: true, fixedAmount: 50 },
-    { id: 'assin', name: 'Assinaturas & apps', icon: '📱', budget: 130, fixed: true, fixedAmount: 130 },
+    // A ceiling that carries the charges you already know about. The teto is
+    // 148,83 and not 130 because the annual Amazon (226) needs 1/12 of room.
+    { id: 'assin', name: 'Assinaturas & apps', icon: '📱', budget: 148.83, leftoverTo: 'cx-assin', items: [
+      { name: 'Spotify', amount: 40.90, day: 5, auto: true, pay: 'nubank' },
+      { name: 'Seguro Itaú', amount: 34.00, day: 8, auto: true, pay: 'nubank' },
+      { name: 'Google AI', amount: 24.99, day: 12, auto: true, pay: 'nubank' },
+      { name: 'Assinatura Dif', amount: 20.11, day: 18, auto: true, pay: 'nubank' },
+      { name: 'Celular', amount: 10.00, day: 20, auto: true, pay: 'nubank' },
+    ] },
     { id: 'academia', name: 'Academia', icon: '🏋️', budget: 295, fixed: true, fixedAmount: 295 },
     { id: 'compras', name: 'Compras Pessoais', icon: '🛍️', budget: 600 },
     { id: 'refeicao', name: 'Refeição (VR/VA)', icon: '🍽️', budget: 1000 },
@@ -1934,7 +2118,11 @@ const CATS = {
     { essential: true, id: 'condominio', name: 'Condomínio', icon: '🏢', budget: 562.5, fixed: true, fixedAmount: 1125 },
     { essential: true, id: 'luz', name: 'Luz', icon: '💡', budget: 125, fixed: true, fixedAmount: 250 },
     { essential: true, id: 'internet', name: 'Internet', icon: '🌐', budget: 100, fixed: true, fixedAmount: 200 },
-    { id: 'streaming', name: 'Streaming & assinaturas', icon: '📺', budget: 60.32, fixed: true, fixedAmount: 120.64 },
+    { id: 'streaming', name: 'Streaming & assinaturas', icon: '📺', budget: 60.32, items: [
+      { name: 'HBO', amount: 55.86, day: 3, auto: true, pay: 'nubank' },
+      { name: 'Disney/Star/ML', amount: 39.80, day: 9, auto: true, pay: 'nubank' },
+      { name: 'Assinaturas Dif', amount: 24.98, day: 14, auto: true, pay: 'nubank' },
+    ] },
     { essential: true, id: 'mercado', name: 'Mercado', icon: '🛒', budget: 1250 },
     { id: 'transporte', name: 'Transporte', icon: '🚗', budget: 500 },
     { id: 'lazer', name: 'Lazer', icon: '🎉', budget: 1150 },
@@ -1956,7 +2144,11 @@ let entries = [
   { id: 2, m: '2026-08', d: '05/08', cat: 'moradia', desc: 'Apto Piqueri', amount: 1200, scope: 'personal', pay: 'conta' },
   { id: 3, m: '2026-08', d: '05/08', cat: 'cond-p', desc: 'Cond Piqueri', amount: 420, scope: 'personal', pay: 'conta' },
   { id: 4, m: '2026-08', d: '12/08', cat: 'luz-p', desc: 'Luz Piqueri', amount: 47.3, scope: 'personal', pay: 'conta' },
-  { id: 5, m: '2026-08', d: '08/08', cat: 'assin', desc: 'Apps do mês', amount: 129.9, scope: 'personal', pay: 'nubank' },
+  { id: 5, m: '2026-08', d: '05/08', cat: 'assin', desc: 'Spotify', item: 'Spotify', amount: 40.90, scope: 'personal', pay: 'nubank' },
+  { id: 51, m: '2026-08', d: '08/08', cat: 'assin', desc: 'Seguro Itaú', item: 'Seguro Itaú', amount: 34.00, scope: 'personal', pay: 'nubank' },
+  { id: 52, m: '2026-08', d: '12/08', cat: 'assin', desc: 'Google AI', item: 'Google AI', amount: 24.99, scope: 'personal', pay: 'nubank' },
+  { id: 53, m: '2026-08', d: '18/08', cat: 'assin', desc: 'Assinatura Dif', item: 'Assinatura Dif', amount: 20.11, scope: 'personal', pay: 'nubank' },
+  { id: 54, m: '2026-08', d: '20/08', cat: 'assin', desc: 'Celular', item: 'Celular', amount: 10.00, scope: 'personal', pay: 'nubank' },
   { id: 6, m: '2026-08', d: '05/08', cat: 'academia', amount: 295, scope: 'personal', pay: 'conta' },
   { id: 7, m: '2026-08', d: '10/08', cat: 'compras', desc: 'Celular', amount: 250, scope: 'personal', pay: 'nubank', inst: { no: 1, of: 10 } },
   { id: 8, m: '2026-08', d: '15/08', cat: 'compras', desc: 'Tênis corrida', amount: 289.9, scope: 'personal', pay: 'nubank' },
@@ -1966,12 +2158,17 @@ let entries = [
   { id: 11, m: '2026-09', d: '01/09', cat: 'salario', amount: 11250, scope: 'personal', type: 'income', pay: 'conta', expId: 'sal1' },
   { id: 12, m: '2026-09', d: '05/09', cat: 'moradia', desc: 'Apto Piqueri', amount: 1200, scope: 'personal', pay: 'conta' },
   { id: 13, m: '2026-09', d: '05/09', cat: 'cond-p', desc: 'Cond Piqueri', amount: 420, scope: 'personal', pay: 'conta' },
-  { id: 14, m: '2026-09', d: '08/09', cat: 'assin', desc: 'Apps do mês', amount: 129.9, scope: 'personal', pay: 'nubank' },
+  { id: 14, m: '2026-09', d: '05/09', cat: 'assin', desc: 'Spotify', item: 'Spotify', amount: 40.90, scope: 'personal', pay: 'nubank' },
+  { id: 141, m: '2026-09', d: '08/09', cat: 'assin', desc: 'Seguro Itaú', item: 'Seguro Itaú', amount: 34.00, scope: 'personal', pay: 'nubank' },
+  { id: 142, m: '2026-09', d: '12/09', cat: 'assin', desc: 'Google AI', item: 'Google AI', amount: 24.99, scope: 'personal', pay: 'nubank' },
+  { id: 143, m: '2026-09', d: '18/09', cat: 'assin', desc: 'Assinatura Dif', item: 'Assinatura Dif', amount: 20.11, scope: 'personal', pay: 'nubank' },
   // (Luz Piqueri and Academia still unpaid → they show as "a vencer")
   { id: 15, m: '2026-09', d: '05/09', cat: 'condominio', amount: 1125, scope: 'couple', pay: 'conta', paidBy: 'split' },
   { id: 16, m: '2026-09', d: '08/09', cat: 'luz', desc: 'Enel', amount: 236.8, scope: 'couple', pay: 'conta', paidBy: 'F' },
   { id: 17, m: '2026-09', d: '06/09', cat: 'internet', desc: 'Vivo Fibra', amount: 200, scope: 'couple', pay: 'conta', paidBy: 'R' },
-  { id: 18, m: '2026-09', d: '07/09', cat: 'streaming', desc: 'HBO + Disney + ML', amount: 120.64, scope: 'couple', pay: 'nubank', paidBy: 'split' },
+  { id: 18, m: '2026-09', d: '03/09', cat: 'streaming', desc: 'HBO', item: 'HBO', amount: 55.86, scope: 'couple', pay: 'nubank', paidBy: 'split' },
+  { id: 181, m: '2026-09', d: '09/09', cat: 'streaming', desc: 'Disney/Star/ML', item: 'Disney/Star/ML', amount: 39.80, scope: 'couple', pay: 'nubank', paidBy: 'split' },
+  { id: 182, m: '2026-09', d: '14/09', cat: 'streaming', desc: 'Assinaturas Dif', item: 'Assinaturas Dif', amount: 24.98, scope: 'couple', pay: 'nubank', paidBy: 'split' },
   { id: 19, m: '2026-09', d: '05/09', cat: 'mercado', desc: 'Assaí', amount: 618.4, scope: 'couple', pay: 'nubank', paidBy: 'F' },
   { id: 20, m: '2026-09', d: '16/09', cat: 'mercado', desc: 'Padaria', amount: 96.7, scope: 'couple', pay: 'vr', paidBy: 'F' },
   { id: 21, m: '2026-09', d: '06/09', cat: 'transporte', desc: 'Uber', amount: 24.9, scope: 'couple', pay: 'inter', paidBy: 'F' },
@@ -2031,6 +2228,9 @@ let reserves = [ // monthly = Fernando's share (from the spreadsheet); totals ar
   { id: 'vet', name: 'Caixa Vet', icon: '🐾', monthly: 150, total: 1200, sc: 'couple' },
   { id: 'gatos', name: 'Caixa Cuidados Gatos', icon: '🐈', monthly: 350, total: 2800, sc: 'couple' },
   { id: 'viagem', name: 'Cx Viagem', icon: '✈️', monthly: 1000, total: 6000, sc: 'couple' },
+  // Fed by whatever a ceiling leaves over, never by a fixed aporte: monthly 0
+  // means it reserves nothing from the month, it only grows when money is spare.
+  { id: 'cx-assin', name: 'Cx Assinaturas anuais', icon: '🎁', monthly: 0, total: 150.64, sc: 'personal' },
 ];
 const reservesTotal = () => reserves.reduce((s, r) => s + r.monthly, 0);
 // What could not be dropped if the income stopped — the base for the emergency reserve.
@@ -2077,11 +2277,31 @@ const monthEntries = m => [...projectedFor(m), ...entries.filter(e => e.m === m)
 function faturaMonthOf(e) {
   const card = instById(e.pay);
   const day = parseInt(e.d, 10) || 1;
-  return (day <= card.close ? e.m : mAdd(e.m, 1)) || e.m;
+  const guess = (day <= card.close ? e.m : mAdd(e.m, 1)) || e.m;
+  // The closing day is a guess, not a fact: a purchase made on or around it
+  // settles a day or two later and the card may push it either way. cycleShift
+  // is the correction, kept on the entry so the bill it lands on is explicit.
+  return e.cycleShift ? (mAdd(guess, e.cycleShift) || guess) : guess;
 }
-function faturaOpen(cardId, m) { // the bill whose cycle month is m
-  return entries.filter(e => !e.type && e.pay === cardId && faturaMonthOf(e) === m)
+function faturaOpen(cardId, m) { // what is still open on the bill whose cycle month is m
+  const charged = entries.filter(e => !e.type && !e.fromReserve && e.pay === cardId && faturaMonthOf(e) === m)
     .reduce((s, e) => s + myOutlay(e), 0);
+  return charged - paidOnBill(cardId, m);
+}
+// Payments already applied to one bill. A bill is a balance now, not just the sum
+// of its purchases — which is what lets it reach zero.
+function paidOnBill(cardId, m) {
+  return entries.filter(e => e.type === 'payment' && e.card === cardId && e.cycle === m)
+    .reduce((s, e) => s + e.amount, 0);
+}
+// The bill that money should go to first: the oldest one still open. Paying a
+// later bill while an earlier one is unpaid is not something a bank allows.
+function oldestOpenBill(cardId) {
+  for (const m of MONTHS) {
+    if (m > CUR) break;
+    if (faturaOpen(cardId, m) > 0.005) return m;
+  }
+  return null;
 }
 function benefitBalance(bId, m) { // prepaid balance: start + recharges − spends, cumulative
   const b = instById(bId);
@@ -2093,13 +2313,19 @@ function benefitBalance(bId, m) { // prepaid balance: start + recharges − spen
 function contaMonth(m) { // month view of the account: income − reserves − account outlays − bills due
   const list = monthEntries(m);
   const income = list.filter(e => e.type === 'income').reduce((s, e) => s + e.amount, 0);
-  const outConta = list.filter(e => !e.type && instById(e.pay).type === 'conta')
+  const outConta = list.filter(e => !e.type && !e.fromReserve && instById(e.pay).type === 'conta')
     .reduce((s, e) => s + myOutlay(e), 0);   // every account, not one privileged row
+  // Bill payments are real cash leaving the account, on top of the outlays above.
+  const paid = list.filter(e => e.type === 'payment').reduce((s, e) => s + e.amount, 0);
   const prev = mAdd(m, -1);
+  // The previous cycle's bill is assumed paid this month — so it is subtracted
+  // whether or not you recorded the payment. faturaOpen() already nets out what
+  // was paid, so recording one moves money from this term into `paid` above and
+  // the total does not budge. The assumption simply becomes a fact.
   const billsDue = prev ? credits().reduce((s, c) => s + faturaOpen(c.id, prev), 0) : 0;
   const settle = settlements.filter(x => x.m === m)
     .reduce((s, x) => s + (x.from === 'R' ? x.amount : -x.amount), 0);
-  return income - reservesTotal() - outConta - billsDue + settle;
+  return income - reservesTotal() - outConta - paid - billsDue + settle;
 }
 function expectedAt(id, m) {
   const i = instById(id);
@@ -2138,9 +2364,36 @@ function cardHeadroom(m) { // Σ remaining budget of variable categories — the
 // What the ceilings still hold back. Clamped per category: a blown ceiling
 // reserves nothing more — spending inside a ceiling moves nothing (reserved
 // becomes spent), and blowing it drops the leftover by exactly the overspend.
+// A conhecido is settled once an entry in the month points at it by name.
+function knownDone(c, i, m) {
+  return monthEntries(m).some(e => e.cat === c.id && e.item === i.name && !e.type);
+}
+// A conhecido of a couple category is written as the couple's total, like every
+// other couple figure. My part is the split — the item's own, when it has one,
+// and the standing rule when it does not.
+function itemShare(c, i) {
+  if (!CATS.couple.includes(c)) return i.amount;
+  return i.amount * ((i.splitF ?? SPLIT_F) / 100);
+}
+function knownTotal(c) { return (c.items || []).reduce((s, i) => s + itemShare(c, i), 0); }
+function knownToCome(c, m) {
+  return (c.items || []).filter(i => !knownDone(c, i, m)).reduce((s, i) => s + itemShare(c, i), 0);
+}
+// Spending in the category that is NOT one of the conhecidos — the free part.
+function freeSpentIn(c, m) {
+  return monthEntries(m).filter(e => e.cat === c.id && !e.type && !e.item && !e.fromReserve)
+    .reduce((s, e) => s + (e.scope === 'couple' ? share(e) : e.amount), 0);
+}
+// The free slice of a ceiling: what is left after the conhecidos are accounted for.
+function freeBudget(c) { return Math.max(0, c.budget - knownTotal(c)); }
+function freeLeft(c, m) { return Math.max(0, freeBudget(c) - freeSpentIn(c, m)); }
+// What a ceiling still holds back. One rule for both halves: the conhecidos that
+// have not landed yet, plus whatever is left of the free slice. A conhecido that
+// comes in cheaper than expected therefore hands the difference back — the
+// reserve drops by the expected amount while the cash drops by the real one.
 function reservedByCeilings(m) {
   return [...CATS.personal, ...CATS.couple].filter(c => !c.fixed)
-    .reduce((s, c) => s + Math.max(0, c.budget - spentIn(c.id, m)), 0);
+    .reduce((s, c) => s + knownToCome(c, m) + freeLeft(c, m), 0);
 }
 function upcomingFixed(m) { // this month's fixed bills not (fully) entered yet
   if (m !== CUR) return { total: 0, items: [] };
@@ -2153,18 +2406,30 @@ function upcomingFixed(m) { // this month's fixed bills not (fully) entered yet
   });
   return { total: items.reduce((s, x) => s + x.left, 0), items };
 }
+// A bill with an expected value — a fixed category or a known charge — never
+// tilts the seesaw: it is resolved on the spot, one sending their share to the
+// other who pays the whole thing. Only free spending under a ceiling (Lazer,
+// Mercado, the cats) rides the seesaw and gets evened out by turn-taking.
+function isExpectedBill(e) {
+  const c = catById(e.cat);
+  return !!(e.item || (c && c.fixedAmount));
+}
 function seesaw(m) { // cumulative up to month m; + = Fernando ahead
-  const fromE = entries.filter(e => e.scope === 'couple' && !e.type && e.m <= m)
+  const fromE = entries.filter(e => e.scope === 'couple' && !e.type && e.m <= m && !isExpectedBill(e))
     .reduce((s, e) => s + (myOutlay(e) - share(e)), 0);
-  const fromS = settlements.filter(x => x.m <= m)
+  const fromS = settlements.filter(x => x.m <= m && !x.bill)
     .reduce((s, x) => s + (x.from === 'R' ? -x.amount : x.amount), 0);
   return fromE + fromS;
 }
 function spentIn(catId, m) {
-  return monthEntries(m).filter(e => e.cat === catId && !e.type)
+  // An expense bankrolled by a caixinha consumes neither the account nor the
+  // teto: the money left the account months ago, as the aporte, and saving up
+  // for twelve months was precisely so this charge would not blow the month.
+  return monthEntries(m).filter(e => e.cat === catId && !e.type && !e.fromReserve)
     .reduce((s, e) => s + (e.scope === 'couple' ? share(e) : e.amount), 0);
 }
-const usage = catId => entries.filter(e => e.cat === catId).length;
+const usage = catId => entries.reduce((s, e) =>
+  s + (e.cat === catId ? (e.m >= CUR ? 3 : 1) : 0), 0);
 const usageInst = id => entries.filter(e => e.pay === id && !e.type).length;
 function descSugs(catId, limit = 3) { // most frequent recent descriptions of a category
   const freq = {};
@@ -2177,7 +2442,9 @@ function descSugs(catId, limit = 3) { // most frequent recent descriptions of a 
 const $ = id => document.getElementById(id);
 
 function entryRow(e) {
-  const cat = catById(e.cat);
+  // A bill payment belongs to no category — it moves money from the account to
+  // a card, so it borrows the card's identity instead of a category's.
+  const cat = catById(e.cat) || { name: e.desc || 'Pagamento', icon: '💳' };
   const title = e.desc || cat.name;
   // Meta is one ellipsized line — keep it short: no category when a description already says it
   const paidMeta = e.scope === 'couple' && !e.type && !e.projected
@@ -2186,12 +2453,16 @@ function entryRow(e) {
   const i = instById(e.pay);
   // The meta line ellipsizes, so the instrument used to vanish exactly on the rows that
   // needed it. It gets its own tag, colour-coded and shrink-proof.
-  const showPay = !e.type && !e.projected;
+  const showPay = (!e.type || e.type === 'payment') && !e.projected;
   const payTag = showPay ? `<span class="pay-meta"> · ${i.name}${instTag}</span>` : '';
   const payChip = showPay
     ? `<span class="pay-tag ${i.type}" style="--c:${i.color || 'var(--txt4)'}"><i></i>${i.name}${instTag}</span>`
     : '';
   const catMeta = e.desc ? '' : ` · ${cat.name}`;
+  const rsvMeta = e.fromReserve
+    ? ` · bancado pela ${reserves.find(r => r.id === e.fromReserve)?.name ?? 'caixinha'}` : '';
+  // Months later, a purchase sitting on an odd bill needs to explain itself.
+  const shiftMeta = e.cycleShift ? ' · fatura movida à mão' : '';
   const projMeta = e.projected ? ' · previsto, toca pra lançar' : '';
   const inner = `
     <div class="entry${e.projected ? ' projected' : ''}">
@@ -2199,7 +2470,7 @@ function entryRow(e) {
       <div class="rowline">
         <div class="stack">
           <span class="who">${title}</span>
-          <span class="meta">${e.d}${catMeta}${paidMeta}${payTag}${projMeta}</span>
+          <span class="meta">${e.d}${catMeta}${rsvMeta}${shiftMeta}${paidMeta}${payTag}${projMeta}</span>
         </div>
         <span class="row-end">${payChip}<span class="val money ${e.type === 'income' ? 'in' : ''}">${e.type === 'income' ? '+' : '−'} ${fmt(e.amount)}</span></span>
       </div>
@@ -2211,6 +2482,38 @@ function entryRow(e) {
         <div class="swipe-bg del">Excluir 🗑</div>${inner}</div>`;
 }
 // desktop replaces the swipe with visible actions on hover, and a click that informs
+// A settlement is money between the two seats and nothing else, so all there
+// is to fix is the amount and which way it went — and reverting deletes it.
+function attachSettlementTaps(container) {
+  container.querySelectorAll('[data-settle]').forEach(row => row.onclick = () => {
+    const x = settlements[+row.dataset.settle];
+    if (!x) return;
+    sheetHTML('🤝 Acerto', `
+      <div class="seg" id="stl-dir">
+        <button class="${x.from === 'F' ? 'sel' : ''}" data-d="F">Fernando enviou</button>
+        <button class="${x.from === 'R' ? 'sel' : ''}" data-d="R">Rayra enviou</button>
+      </div>
+      <input type="text" inputmode="numeric" id="stl-amount" class="desc-input" value="${x.amount.toFixed(2).replace('.', ',')}">
+      <button class="btn-primary" id="stl-save">Salvar</button>
+      <button class="btn-mini danger" id="stl-del">Reverter este acerto</button>`,
+      host => {
+        host.querySelectorAll('[data-d]').forEach(b => b.onclick = () => {
+          x.from = b.dataset.d;
+          host.querySelectorAll('[data-d]').forEach(o => o.classList.toggle('sel', o === b));
+        });
+        host.querySelector('#stl-save').onclick = () => {
+          const v = parseAmount(host.querySelector('#stl-amount').value);
+          if (v > 0) x.amount = v;
+          closeSimpleSheet(); renderAll(); showToast('Acerto ajustado ✓');
+        };
+        host.querySelector('#stl-del').onclick = () => {
+          settlements.splice(settlements.indexOf(x), 1);
+          closeSimpleSheet(); renderAll(); showToast('Acerto revertido');
+        };
+      });
+  });
+}
+
 function attachRowActions(container) {
   container.querySelectorAll('.swipe-row[data-id]').forEach(row => {
     const id = +row.dataset.id;
@@ -2234,7 +2537,8 @@ function attachRowActions(container) {
 // Settlements are transfers: they show as in/out rows, tagged so nobody reads them as income.
 function settlementRow(x) {
   const incoming = x.from === 'R'; // Fernando's view
-  return `<div class="swipe-row"><div class="entry"><div class="dot">🤝</div>
+  // Tappable like any movement: a settlement can be adjusted or reverted.
+  return `<div class="swipe-row" data-settle="${settlements.indexOf(x)}" style="cursor:pointer"><div class="entry"><div class="dot">🤝</div>
     <div class="rowline"><div class="stack">
       <span class="who">${incoming ? 'Transferência da Rayra' : 'Transferência pra Rayra'}</span>
       <span class="meta">${x.d || ''} · acerto · <span class="scope-tag couple">casal</span> · transferência</span></div>
@@ -2321,7 +2625,9 @@ function renderMiniGrid(m) {
     return `<div class="idiff warn">${fmt(Math.abs(u))} ${(kind === 'credito' ? u > 0 : u < 0) ? (kind === 'credito' ? 'a mais' : 'a menos') : (kind === 'credito' ? 'a menos' : 'a mais')} — sem lançamento</div>`;
   };
   const instRow = (i, val, u, kind, sub) => `
-    <div class="inst-row">
+    <div class="inst-row" ${u !== null && Math.abs(u) >= 0.01
+      ? `data-launch-missing="${i.id}" data-missing="${u}" style="cursor:pointer"`
+      : (kind === 'credito' ? `data-bill="${i.id}" style="cursor:pointer"` : '')}>
       <span class="cdot" style="background:${i.color}"></span>
       <div>
         <div>
@@ -2335,6 +2641,10 @@ function renderMiniGrid(m) {
       </div>
     </div>`;
   let rows = '';
+  accounts().forEach(acc => {
+    const a = at(acc.id);
+    rows += instRow(acc, a.val, a.u, 'conta', 'corrente');
+  });
   credits().forEach(c => {
     const a = at(c.id);
     rows += instRow(c, a.val, a.u, 'credito',
@@ -2345,6 +2655,24 @@ function renderMiniGrid(m) {
     rows += instRow(b, a.val, a.u, 'beneficio', `recarga ${fmt(b.recharge)} dia ${b.day}`);
   });
   $('inst-rows').innerHTML = rows;
+  $('inst-rows').querySelectorAll('[data-bill]').forEach(el =>
+    el.onclick = () => openBillSheet(el.dataset.bill));
+  // "Falta lançar" names the work; the tap starts it, amount prefilled with the
+  // gap. A conta holding more than the app knows is a missing income; anything
+  // else is a missing expense.
+  $('inst-rows').querySelectorAll('[data-launch-missing]').forEach(el => el.onclick = () => {
+    const inst = instById(el.dataset.launchMissing);
+    const missing = parseFloat(el.dataset.missing);
+    editingId = null;
+    entryType = inst.type === 'conta' && missing > 0 ? 'income' : 'expense';
+    entryScope = 'personal'; entryPay = inst.type === 'conta' ? inst.id : inst.id;
+    entryInst = 1; entryPaid = 'F'; payTouched = true; entrySettled = false;
+    $('entry-amount').value = Math.abs(missing).toFixed(2).replace('.', ',');
+    $('entry-desc').value = '';
+    setEntryDate(TODAY);
+    syncEntryForm();
+    document.querySelector('.tab[data-scr="entry"]').click();
+  });
 }
 
 // ============ "Precisa de você" — everything waiting on a decision, ranked ============
@@ -2513,7 +2841,83 @@ function renderExtrato() {
   ];
   $('extrato-entries').innerHTML = rows.length ? rows.join('') : '<div class="empty-note">nada lançado neste mês</div>';
   attachSwipes($('extrato-entries'));
+  attachSettlementTaps($('extrato-entries'));
   attachProjectedTaps($('extrato-entries'));
+  renderFlow(m);
+}
+
+// ============ Cash flow: what is still going to leave the account, and when ====
+//
+// Only movement that actually touches the account. A card purchase is deliberately
+// absent on the day it was made — the cash goes out on the day the bill is paid,
+// which is what makes this column agree with the bank statement.
+function flowRows(m) {
+  const day = n => String(n).padStart(2, '0');
+  const today = +TODAY.slice(8, 10);
+  const rows = [];
+
+  // Conhecidos and fixed bills that come out of the account and have no entry yet.
+  [...CATS.personal, ...CATS.couple].forEach(c => {
+    (c.items || []).forEach(i => {
+      if (knownDone(c, i, m)) return;
+      if ((i.pay || 'conta') !== 'conta') return; // a card item leaves via the bill
+      const share = CATS.couple.includes(c) ? i.amount : i.amount;
+      rows.push({ d: Math.max(i.day, today), icon: c.icon, name: i.name,
+        sub: i.day < today ? 'vencido, não lançado' : 'previsto', delta: -share });
+    });
+  });
+  upcomingFixed(m).items.forEach(i => {
+    const c = [...CATS.personal, ...CATS.couple].find(x => x.name === i.name);
+    rows.push({ d: Math.max(5, today), icon: c ? c.icon : '📌', name: i.name,
+      sub: 'previsto', delta: -i.left });
+  });
+  // Income still to land.
+  expectationsIn(m).forEach(r => {
+    if (r.st === 'got') return;
+    // An expected date already past means late, not gone: it still has to land,
+    // so it belongs at today rather than behind it.
+    const d = +r.s.when.slice(8, 10);
+    rows.push({ d: Math.max(d, today), icon: '💰', name: r.x.name,
+      sub: d < today ? 'atrasado' : 'previsto', delta: r.x.amount });
+  });
+  // Each card's bill, on its due day, net of what was already paid to it.
+  credits().forEach(card => {
+    const cyc = mAdd(m, -1);
+    const owed = cyc ? faturaOpen(card.id, cyc) : 0;
+    if (owed > 0.005) rows.push({ d: Math.max(card.due, today), icon: '💳', name: `Fatura ${card.name}`,
+      sub: card.due < today ? `venceu dia ${card.due}` : `vence dia ${card.due}`, delta: -owed });
+  });
+
+  // Filter before chaining, never after: a row dropped from the list must not
+  // have moved the running balance on its way out.
+  const ahead = rows.filter(r => r.d >= today);
+  ahead.sort((a, b) => a.d - b.d || b.delta - a.delta); // money in lands before money out
+  let bal = anchoredOf('conta').val;
+  ahead.forEach(r => { bal = Math.round((bal + r.delta) * 100) / 100; r.bal = bal; });
+  return ahead;
+}
+function renderFlow(m) {
+  const host = $('extrato-flow');
+  if (m !== CUR) { host.innerHTML = ''; return; }
+  const rows = flowRows(m);
+  if (!rows.length) { host.innerHTML = ''; return; }
+  // Today's balance is part of the window, so the low can never come out above
+  // what is actually in the account right now.
+  const now = { d: +TODAY.slice(8, 10), bal: anchoredOf('conta').val };
+  const low = [now, ...rows].reduce((lo, r) => (r.bal < lo.bal ? r : lo), now);
+  host.innerHTML = `
+    <p>Em conta hoje <strong>${fmt(now.bal)}</strong> · menor saldo até o fim do mês
+      <strong style="color:${low.bal < 0 ? 'var(--crit)' : 'var(--gold)'}">${fmt(low.bal)}</strong>${
+      low === now ? ' (é hoje)' : ` no dia ${low.d}`}</p>
+    <div class="label" style="padding:0 2px 4px">Ainda vai mexer na conta</div>
+    ${[...rows].reverse().map(r => `
+      <div class="flow-row">
+        <span class="st">${r.delta > 0 ? '↑' : '↓'}</span>
+        <span class="nm"><b>${r.icon} ${r.name}</b><em>dia ${r.d} · ${r.sub}</em></span>
+        <span class="vl money" ${r.delta > 0 ? 'style="color:var(--good)"' : ''}>${r.delta > 0 ? '+' : '−'} ${fmt(Math.abs(r.delta))}</span>
+        <span class="bl money">${fmt(r.bal)}</span>
+      </div>`).join('')}
+    <div class="label" style="padding:14px 2px 4px">Já aconteceu</div>`;
 }
 
 // ============ Reconciliation sheet: one saved row per instrument ============
@@ -2555,6 +2959,11 @@ function openReconSheet() {
 let entryType = 'expense', entryScope = 'personal', entryCat = null, entryPaid = 'F';
 let entryExpId = null; // set when the entry is confirming an expected income
 let entryPay = 'nubank', entryInst = 1, payTouched = false, entrySettled = false;
+let entryItem = null;      // name of the conhecido this entry settles, when it settles one
+let entryReserve = null;   // caixinha bankrolling it — then no cash and no teto move
+let rsvExpanded = false;   // "outras…" opens the full caixinha list
+let entryCycleShift = 0;   // bills moved by hand, when the card disagrees with the closing day
+let entrySplitF = null;    // a conhecido's own split; null follows the standing rule
 let catsExpanded = false, instsExpanded = false;
 const CATS_VISIBLE = 4;
 const TODAY = '2026-09-18'; // prototype "today"
@@ -2603,18 +3012,53 @@ function currentCatList() {
   const list = entryType === 'income' ? CATS.income : CATS[entryScope];
   return [...list].sort((a, b) => usage(b.id) - usage(a.id)); // most used first
 }
+let catSearch = '';
+const deaccent = x => x.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 function renderEntryCats() {
   const list = currentCatList();
   if (!list.find(c => c.id === entryCat)) entryCat = list[0].id;
-  const shown = catsExpanded ? list : list.slice(0, CATS_VISIBLE);
-  const more = !catsExpanded && list.length > CATS_VISIBLE;
-  $('entry-cats').innerHTML = shown.map(c =>
+  // The resting state is three sure shots: the most used category, then the
+  // two touched most recently — habit plus context covers almost every launch.
+  // Everything else is reached by typing in the field above them, and a query
+  // that matches nothing offers to create a category with that very name.
+  const lastUsed = id => entries.reduce((t, e, i) => (e.cat === id ? i : t), -1);
+  const q = deaccent(catSearch);
+  let shown, noMatch = false;
+  if (q) {
+    shown = list.filter(c => deaccent(c.name).includes(q));
+    noMatch = shown.length === 0;
+  } else if (catsExpanded) {
+    shown = list;
+  } else {
+    const recents = [...list].sort((a, b) => lastUsed(b.id) - lastUsed(a.id));
+    shown = [list[0], ...recents.filter(c => c !== list[0])].slice(0, 3);
+    const sel = list.find(c => c.id === entryCat);
+    if (sel && !shown.includes(sel)) shown = [sel, ...shown].slice(0, 3);
+  }
+  $('entry-cats').classList.remove('hrow');
+  $('entry-cats').innerHTML =
+    `<input class="field" id="cat-search" placeholder="🔎 outra categoria…" value="${catSearch}"
+       style="flex:1 0 100%;padding:9px 12px;font-size:14px">`
+    + shown.map(c =>
     `<button class="chip ${c.id === entryCat ? 'sel' : ''}" data-cat="${c.id}">${c.icon} ${c.name}</button>`).join('')
-    + (more ? `<button class="chip more" data-morecats>mais…</button>` : '')
-    + (entryType !== 'income' ? `<button class="chip more" data-newcat>＋ nova</button>` : '');
+    + (!q && !catsExpanded && list.length > 3 ? `<button class="chip more" data-morecats>todas…</button>` : '')
+    + (noMatch ? `<button class="chip more" data-newcat>＋ criar «${catSearch}»</button>`
+       : catsExpanded && entryType !== 'income' ? `<button class="chip more" data-newcat>＋ nova</button>` : '');
+  const searchEl = $('entry-cats').querySelector('#cat-search');
+  searchEl.oninput = () => { catSearch = searchEl.value; catsExpanded = false; renderEntryCats();
+    const el = $('entry-cats').querySelector('#cat-search');
+    el.focus(); el.setSelectionRange(el.value.length, el.value.length); };
+  // Enter takes the first match — type three letters, confirm, done.
+  searchEl.onkeydown = ev => {
+    if (ev.key === 'Enter') {
+      const first = $('entry-cats').querySelector('.chip[data-cat]');
+      if (first) first.click();
+    }
+  };
   $('entry-cats').querySelectorAll('.chip[data-cat]').forEach(b =>
     b.onclick = () => {
       entryCat = b.dataset.cat;
+      catSearch = ''; catsExpanded = false; // picked: the field and the grid rest
       // benefit hint: market categories default to VR unless the user picked a payment
       if (!payTouched && ['mercado', 'refeicao'].includes(entryCat) && instById(entryPay)?.type === 'credito') {
         entryPay = 'vr'; entryInst = 1;
@@ -2625,7 +3069,7 @@ function renderEntryCats() {
   const moreBtn = $('entry-cats').querySelector('[data-morecats]');
   if (moreBtn) moreBtn.onclick = () => { catsExpanded = true; renderEntryCats(); };
   const newBtn = $('entry-cats').querySelector('[data-newcat]');
-  if (newBtn) newBtn.onclick = () => openCatEdit(null, entryScope, 'entry');
+  if (newBtn) newBtn.onclick = () => openCatEdit(null, entryScope, 'entry', catSearch.trim());
 
   const isIncome = entryType === 'income';
   $('scope-seg').style.display = isIncome ? 'none' : 'flex';
@@ -2680,9 +3124,87 @@ function renderInstChips() {
   else if (entryInst > 1) note.textContent = v > 0
     ? `${entryInst}x de ${fmt(v / entryInst)} — cai nas próximas ${entryInst - 1} faturas também`
     : 'as parcelas caem uma por fatura, a partir desta';
-  else note.textContent = `entra na fatura do ${inst.name}`;
+  else {
+    // Which bill this lands on, said out loud, named by its due date — "fatura de
+    // outubro" is ambiguous in a way that "vence 03/10" is not.
+    const fake = { pay: entryPay, m: entryMonth(), d: entryDayOf(), cycleShift: entryCycleShift };
+    const dueOf = c => `${String(inst.due).padStart(2, '0')}/${(mAdd(c, 1) || c).slice(5, 7)}`;
+    const cyc = faturaMonthOf(fake);
+    // Around the closing day the guess is unreliable in both directions: a
+    // purchase settles a day or two after it is made, so the card can push it
+    // forward — and a back-dated one can land on the bill that already closed.
+    const near = Math.abs(+entryDayOf() - inst.close) <= 1;
+    note.innerHTML = `
+      ${entryCycleShift ? 'você moveu à mão: entra na' : 'entra na'} fatura que
+      <strong>vence ${dueOf(cyc)}</strong>
+      ${near && !entryCycleShift
+        ? `<br><span style="color:var(--gold)">o ${inst.name} fecha dia ${inst.close} — compra de hoje pode cair na seguinte</span>`
+        : ''}
+      <br><span data-shift="-1" style="color:var(--accent);font-weight:600;cursor:pointer">‹ anterior (${dueOf(mAdd(cyc, -1) || cyc)})</span>
+      ${entryCycleShift ? '<span data-shift="0" style="color:var(--accent);font-weight:600;cursor:pointer"> · voltar ao automático</span>' : ''}
+      <span data-shift="1" style="color:var(--accent);font-weight:600;cursor:pointer"> · seguinte (${dueOf(mAdd(cyc, 1) || cyc)}) ›</span>`;
+    note.querySelectorAll('[data-shift]').forEach(b => b.onclick = () => {
+      const d = +b.dataset.shift;
+      entryCycleShift = d === 0 ? 0 : entryCycleShift + d;
+      renderInstChips();
+    });
+  }
+  const rsvRow = $('entry-reserve-row');
+  if (rsvRow) renderReserveToggle();
 }
+// The month and day the entry form is currently pointed at. The date lives in
+// entryDate (a pill, not an input) — reading a field would always miss it.
+function entryMonth() { return (entryDate || TODAY).slice(0, 7); }
+function entryDayOf() { return (entryDate || TODAY).slice(8, 10); }
+
+// "Bancar pelo caixinha" — only offered when the caixinha covers the whole
+// amount. Half from the caixinha and half from the account would produce a
+// number nobody can explain later.
+function renderReserveToggle() {
+  const row = $('entry-reserve-row');
+  const v = parseAmount($('entry-amount').value);
+  const able = reserves.filter(r => r.total >= v && v > 0);
+  if (entryType === 'income' || able.length === 0) {
+    row.style.display = 'none'; entryReserve = null; return;
+  }
+  row.style.display = 'block';
+  if (entryReserve && !able.some(r => r.id === entryReserve)) entryReserve = null;
+  // Nine caixinhas listed in full is noise. The one this category actually saves
+  // into comes first, then the fullest ones — the rest stay behind "outras…".
+  const linked = catById(entryCat)?.fundedBy;
+  const ranked = [...able].sort((a, b) =>
+    (b.id === linked) - (a.id === linked) || (b.id === entryReserve) - (a.id === entryReserve) || b.total - a.total);
+  const shown = rsvExpanded ? ranked : ranked.slice(0, 3);
+  row.innerHTML = `<div class="label">Bancar pelo caixinha</div>
+    <div class="chips hrow">
+      <button class="chip ${entryReserve === null ? 'sel' : ''}" data-rsv="">não</button>
+      ${shown.map(r => `<button class="chip ${entryReserve === r.id ? 'sel' : ''}" data-rsv="${r.id}">${r.icon} ${r.name} · ${fmt(r.total)}</button>`).join('')}
+      ${rsvExpanded || ranked.length <= 3 ? '' : '<button class="chip more" data-rsvmore>outras…</button>'}
+    </div>
+    <div class="chips-note">${entryReserve
+      ? 'sai do caixinha: a conta não se mexe e o teto da categoria não é consumido'
+      : 'só aparece caixinha que cobre o valor inteiro'}</div>`;
+  row.querySelectorAll('[data-rsv]').forEach(b => b.onclick = () => {
+    entryReserve = b.dataset.rsv || null; renderReserveToggle();
+  });
+  const more = row.querySelector('[data-rsvmore]');
+  if (more) more.onclick = () => { rsvExpanded = true; renderReserveToggle(); };
+}
+// The first question everyone asks a shared bill: do I type the whole thing or
+// my half? The answer, at the field itself, before the split preview further down.
+function renderAmountNote() {
+  const el = $('amount-total-note');
+  if (!el) return;
+  if (entryScope !== 'couple' || entryType !== 'expense') { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  const v = parseAmount($('entry-amount').value);
+  el.innerHTML = v > 0
+    ? `valor <strong>total</strong> da conta — sua parte ${fmt(myShareOf(v))} · Rayra ${fmt(v - myShareOf(v))}`
+    : `digite o valor <strong>total</strong> da conta — o rateio divide sozinho`;
+}
+
 function renderSplitPreview() {
+  renderAmountNote();
   $('pay-label').textContent = t(entryScope === 'couple' && entryPaid === 'split' ? 'entry.myPayment' : 'entry.payment');
   const v = parseAmount($('entry-amount').value);
   const rule = `${SPLIT_F}/${100 - SPLIT_F}`;
@@ -2698,12 +3220,39 @@ function renderBudget() {
   const row = (c, spent, scope) => {
     const pct = Math.min(100, (spent / c.budget) * 100);
     const cls = spent > c.budget ? 'over' : pct > 85 ? 'near' : '';
+    // A ceiling with conhecidos inside shows a third, hatched slice: what is
+    // already committed this month but has not landed yet.
+    const toCome = knownToCome(c, m);
+    const comingPct = Math.min(100 - pct, (toCome / c.budget) * 100);
     const left = spent > c.budget ? `estourou ${fmt(spent - c.budget)}` : `sobra ${fmt(c.budget - spent)}`;
+    const known = (c.items || []).length;
     return `<div class="budget-row${density === 'lean' ? ' lean' : ''}" data-bcat="${c.id}" data-bscope="${scope}">
       <div class="row spread"><span class="name"><span class="txt">${c.icon} ${c.name}</span>${c.fixed ? '<span class="pay-tag">fixa</span>' : ''}</span>
         <span class="row" style="gap:8px"><span class="nums money">${density === 'lean' ? left : `${fmt(spent)} / ${fmt(c.budget)}`}</span>
           <button class="add-mini" data-badd="${c.id}" data-baddscope="${scope}" aria-label="lançar em ${c.name}">＋</button></span></div>
-      <div class="bar${density === 'lean' ? ' thin' : ''}"><i class="${cls}" style="width:${pct}%"></i></div>
+      <div class="bar${density === 'lean' ? ' thin' : ''}"><i class="${cls}" style="width:${pct}%"></i>${
+        toCome > 0 ? `<i class="coming" style="width:${comingPct}%"></i>` : ''}</div>
+      ${known ? `<div class="blegend">
+        <span><s class="sp"></s>gasto <b>${fmt(spent)}</b></span>
+        ${toCome > 0 ? `<span><s class="kn"></s>a vir <b>${fmt(toCome)}</b></span>` : ''}
+        ${spent > c.budget
+          ? `<span class="over">estourou <b>${fmt(spent - c.budget)}</b></span>`
+          : `<span><s class="fr"></s>livre <b>${fmt(freeLeft(c, m))}</b></span>`}
+      </div>
+      <div class="knowns">${c.items.map(i => {
+        const done = knownDone(c, i, m);
+        const late = !done && i.day < +TODAY.slice(8, 10) && m === CUR;
+        return `<button class="kn-row ${done ? 'done' : ''}" data-kn="${c.id}" data-knname="${i.name}" data-knscope="${scope}">
+          <span class="st">${done ? '✓' : late ? '⏰' : i.auto ? '🔁' : '·'}</span>
+          <span class="nm">${i.name} <em>dia ${i.day}${
+            CATS.couple.includes(c) ? ` · sua parte ${fmt(itemShare(c, i))}` : ''}</em></span>
+          <span class="vl money">${fmt(i.amount)}</span>
+          <span class="ed" data-knpencil title="editar">✎</span></button>`;
+      }).join('')}</div>
+      ${c.leftoverTo && freeLeft(c, m) > 0.005
+        ? `<button class="kn-save" data-knsave="${c.id}">Sobra ${fmt(freeLeft(c, m))} — guardar na ${reserves.find(r => r.id === c.leftoverTo).name} ›</button>`
+        : ''}` : ''}
+      <button class="rec-add" data-recadd="${c.id}" data-recaddscope="${scope}">＋ conta recorrente</button>
       ${density === 'lean' ? '' : `<div class="row spread" style="margin-top:6px"><span class="nums">${left}</span></div>`}
       </div>`;
   };
@@ -2715,6 +3264,32 @@ function renderBudget() {
   document.querySelectorAll('[data-badd]').forEach(el => el.onclick = ev => {
     ev.stopPropagation();
     launchInto(el.dataset.badd, el.dataset.baddscope);
+  });
+  // Tapping a conhecido launches it directly; the row behind opens the
+  // drill-down, so the event must stop here.
+  document.querySelectorAll('[data-kn]').forEach(el => el.onclick = ev => {
+    ev.stopPropagation();
+    const c = catById(el.dataset.kn);
+    const i = c.items.find(x => x.name === el.dataset.knname);
+    if (knownDone(c, i, m)) return openKnownForm(c.id, el.dataset.knscope, i.name);
+    launchKnown(c.id, el.dataset.knscope, i, m);
+  });
+  // The row launches; the pencil edits. Without it, editing a subscription
+  // meant knowing to go through Ajustes.
+  document.querySelectorAll('[data-kn] [data-knpencil]').forEach(el => el.onclick = ev => {
+    ev.stopPropagation();
+    const b = el.closest('[data-kn]');
+    openKnownForm(b.dataset.kn, b.dataset.knscope, b.dataset.knname);
+  });
+  // Without this the feature is invisible: nothing said a category could hold
+  // recurring charges at all.
+  document.querySelectorAll('[data-recadd]').forEach(el => el.onclick = ev => {
+    ev.stopPropagation();
+    openKnownForm(el.dataset.recadd, el.dataset.recaddscope);
+  });
+  document.querySelectorAll('[data-knsave]').forEach(el => el.onclick = ev => {
+    ev.stopPropagation();
+    saveLeftover(catById(el.dataset.knsave), m);
   });
   renderFixedChecklist(m);
   renderIncomeChecklist(m);
@@ -2842,6 +3417,223 @@ function launchFixedEntry(catId, scope, m) {
   document.querySelector('.tab[data-scr="entry"]').click();
 }
 
+// A conhecido arrives with its expected amount filled in — and the entry keeps a
+// link back to it, so the ceiling knows which slice was settled.
+function launchKnown(catId, scope, item, m) {
+  $('cat-backdrop').classList.remove('show');
+  editingId = null;
+  entryType = 'expense'; entryScope = scope; entryCat = catId;
+  entryPay = item.pay || 'conta'; entryInst = 1; entryPaid = 'split';
+  payTouched = true; catsExpanded = true; entrySettled = false;
+  entryItem = item.name;
+  entrySplitF = item.splitF ?? null;
+  $('entry-amount').value = item.amount.toFixed(2).replace('.', ',');
+  $('entry-desc').value = item.name;
+  setEntryDate(m === CUR ? TODAY : `${m}-${String(item.day).padStart(2, '0')}`);
+  syncEntryForm();
+  document.querySelector('.tab[data-scr="entry"]').click();
+}
+// The leftover of a ceiling, moved into its caixinha. It consumes the teto and
+// leaves the account, and the two cancel — so "disponível" does not move. Saving
+// money is not the same as getting poorer.
+function saveLeftover(c, m) {
+  const amount = freeLeft(c, m);
+  if (amount <= 0.005) return;
+  const r = reserves.find(x => x.id === c.leftoverTo);
+  entries.push({ id: nextId++, m, d: TODAY.slice(8, 10) + '/' + TODAY.slice(5, 7),
+    cat: c.id, desc: `Sobra → ${r.name}`, scope: 'personal', pay: 'conta', amount });
+  r.total += amount;
+  showToast(`${fmt(amount)} guardado — o disponível não muda`);
+  renderAll();
+}
+
+// ============ Conhecido editor ============
+// A recurring charge lives inside a category, never as a category of its own —
+// that is the whole point of the model. Everything it needs is here: how much,
+// when, where it lands, and (for a couple category) whether it splits like the
+// rest or has its own rule.
+let kf = null; // { catId, scope, name } while editing, name null when new
+function openKnownForm(catId, scope, name) {
+  const c = catById(catId);
+  const i = name ? c.items.find(x => x.name === name) : null;
+  kf = { catId, scope, name: name || null, auto: i ? !!i.auto : true,
+    kind: i && i.kind === 'est' ? 'est' : 'exact', day: i ? i.day : 5,
+    pay: i ? (i.pay || 'conta') : 'conta', every: i ? (i.every || 1) : 1,
+    splitF: i ? (i.splitF ?? null) : null };
+  $('kf-name').value = i ? i.name : '';
+  $('kf-amount').value = i ? i.amount.toFixed(2).replace('.', ',') : '';
+  renderKnownForm();
+  $('known-backdrop').classList.add('show');
+}
+function renderKnownForm() {
+  if (!kf) return;
+  const c = catById(kf.catId);
+  const isCouple = CATS.couple.includes(c);
+  $('kf-title').textContent = kf.name ? `${c.icon} ${kf.name}` : '＋ Nova conta recorrente';
+  $('kf-where').textContent = `dentro de ${c.name} — teto ${fmt(c.budget)}, ${fmt(knownTotal(c))} já conhecidos`;
+  $('kf-kind').querySelectorAll('[data-kk]').forEach(b =>
+    b.classList.toggle('sel', b.dataset.kk === kf.kind));
+  $('kf-kind-note').textContent = kf.kind === 'est'
+    ? 'o valor varia — o app usa este como previsão e você corrige ao lançar'
+    : 'sempre o mesmo valor, como uma assinatura';
+  $('kf-days').innerHTML = [1, 3, 5, 8, 10, 12, 15, 18, 20, 25, 28].map(d =>
+    `<button class="chip ${kf.day === d ? 'sel' : ''}" data-kd="${d}">${d}</button>`).join('');
+  $('kf-pay').innerHTML = instruments.map(i =>
+    `<button class="chip ${kf.pay === i.id ? 'sel' : ''}" data-kp="${i.id}">${i.icon} ${i.name}</button>`).join('');
+  // Its own row: in the scrolling instrument strip this chip fell off the edge,
+  // which hid the only control for the setting.
+  $('kf-auto').innerHTML = `<button class="chip ${kf.auto ? 'sel' : ''}" data-kauto>🔁 cobrado automaticamente</button>`;
+  $('kf-auto-note').textContent = kf.auto
+    ? 'cai sozinho no dia — o app assume que aconteceu e te pede pra confirmar'
+    : 'você lança quando pagar';
+  $('kf-every').innerHTML = [[1, 'todo mês'], [3, 'trimestral'], [6, 'semestral'], [12, 'anual']].map(([n, l]) =>
+    `<button class="chip ${kf.every === n ? 'sel' : ''}" data-ke="${n}">${l}</button>`).join('');
+  const v = parseAmount($('kf-amount').value);
+  $('kf-every-note').textContent = kf.every > 1 && v > 0
+    ? `guardando ${fmt(v / kf.every)} por mês numa caixinha, a cobrança não vira susto`
+    : (kf.every > 1 ? 'uma caixinha pode ir juntando 1/' + kf.every + ' por mês' : '');
+  $('kf-split-block').style.display = isCouple ? 'block' : 'none';
+  if (isCouple) {
+    // Follows the standing rule unless this one charge is genuinely different —
+    // internet paid whole by whoever works from home, say.
+    $('kf-split').innerHTML = [[null, `segue o rateio (${SPLIT_F}/${100 - SPLIT_F})`], [100, 'só minha'], [0, 'só da Rayra']]
+      .map(([n, l]) => `<button class="chip ${kf.splitF === n ? 'sel' : ''}" data-ks="${n === null ? '' : n}">${l}</button>`).join('');
+    $('kf-split-note').textContent = kf.splitF === null
+      ? 'muda junto se vocês mudarem o rateio'
+      : `sua parte fica ${fmt(v * (kf.splitF / 100))} de ${fmt(v)}`;
+  }
+  $('kf-del').style.display = kf.name ? 'block' : 'none';
+
+  $('kf-kind').querySelectorAll('[data-kk]').forEach(b => b.onclick = () => { kf.kind = b.dataset.kk; renderKnownForm(); });
+  $('kf-days').querySelectorAll('[data-kd]').forEach(b => b.onclick = () => { kf.day = +b.dataset.kd; renderKnownForm(); });
+  $('kf-pay').querySelectorAll('[data-kp]').forEach(b => b.onclick = () => { kf.pay = b.dataset.kp; renderKnownForm(); });
+  $('kf-auto').querySelector('[data-kauto]').onclick = () => { kf.auto = !kf.auto; renderKnownForm(); };
+  $('kf-every').querySelectorAll('[data-ke]').forEach(b => b.onclick = () => { kf.every = +b.dataset.ke; renderKnownForm(); });
+  if (isCouple) $('kf-split').querySelectorAll('[data-ks]').forEach(b =>
+    b.onclick = () => { kf.splitF = b.dataset.ks === '' ? null : +b.dataset.ks; renderKnownForm(); });
+  $('kf-amount').oninput = () => renderKnownForm();
+}
+$('kf-save').onclick = () => {
+  const c = catById(kf.catId);
+  const name = $('kf-name').value.trim();
+  const amount = parseAmount($('kf-amount').value);
+  if (!name) return showToast('Dá um nome pra ele');
+  if (amount <= 0) return showToast('Digite um valor');
+  const item = { name, amount, day: kf.day, pay: kf.pay,
+    ...(kf.kind === 'est' ? { kind: 'est' } : {}),
+    ...(kf.auto ? { auto: true } : {}),
+    ...(kf.every > 1 ? { every: kf.every } : {}),
+    ...(kf.splitF !== null ? { splitF: kf.splitF } : {}) };
+  c.items = c.items || [];
+  const at = kf.name ? c.items.findIndex(x => x.name === kf.name) : -1;
+  if (at >= 0) c.items[at] = item; else c.items.push(item);
+  c.items.sort((a, b) => a.day - b.day);
+  // The ceiling has to hold everything it now knows about.
+  const known = knownTotal(c);
+  if (known > c.budget) {
+    c.budget = Math.round(known * 100) / 100;
+    showToast(`Salvo · teto subiu para ${fmt(c.budget)} pra caber os conhecidos`);
+  } else {
+    showToast('Salvo ✓');
+  }
+  kf = null; $('known-backdrop').classList.remove('show');
+  renderAll();
+};
+$('kf-del').onclick = () => {
+  const c = catById(kf.catId);
+  c.items = c.items.filter(x => x.name !== kf.name);
+  kf = null; $('known-backdrop').classList.remove('show');
+  showToast('Conhecido excluído');
+  renderAll();
+};
+$('known-backdrop').onclick = e => {
+  if (e.target === $('known-backdrop')) { kf = null; $('known-backdrop').classList.remove('show'); }
+};
+
+// ============ Card bills: a balance you can pay down, not just a sum ============
+let billSheet = null; // { cardId, mode: null | 'pay' | 'advance' }
+function openBillSheet(cardId) {
+  billSheet = { cardId, mode: null };
+  renderBillSheet();
+  $('bill-backdrop').classList.add('show');
+}
+function renderBillSheet() {
+  if (!billSheet) return;
+  const card = instById(billSheet.cardId);
+  const oldest = oldestOpenBill(card.id);
+  const openCycle = CUR;                       // the cycle still accumulating
+  const dueOf = c => `${String(card.due).padStart(2, '0')}/${(mAdd(c, 1) || c).slice(5, 7)}`;
+  $('bill-title').innerHTML = `${card.icon} ${card.name} — fecha dia ${card.close}
+    <button class="back-btn" data-bill-edit style="float:right;font-size:14.5px">Editar</button>`;
+  $('bill-title').querySelector('[data-bill-edit]').onclick = () => {
+    billSheet = null; $('bill-backdrop').classList.remove('show');
+    openInstEdit(card.id);
+  };
+
+  let tiles = '';
+  if (oldest && oldest !== openCycle) {
+    tiles += `<div class="bill-tile due"><div class="tag">Fatura a pagar</div>
+      <div class="amt money">${fmt(faturaOpen(card.id, oldest))}</div>
+      <div class="when">fechou dia ${card.close} · vence <strong>${dueOf(oldest)}</strong></div>
+      <div class="acts"><button class="btn-mini" data-bill-pay>Pagar</button></div></div>`;
+  }
+  // Only the oldest open bill is payable. Paying a later one while an earlier is
+  // still open is not something a bank allows, so the app does not offer it.
+  const openVal = faturaOpen(card.id, openCycle);
+  tiles += `<div class="bill-tile open"><div class="tag">Fatura aberta</div>
+    <div class="amt money">${fmt(openVal)}</div>
+    <div class="when">fecha dia ${card.close} · vence ${dueOf(openCycle)} · acumulando</div>
+    <div class="acts">${oldest === openCycle
+      ? '<button class="btn-mini" data-bill-pay>Pagar</button>'
+      : '<button class="btn-mini" data-bill-adv>Adiantar</button>'}</div></div>`;
+  if (card.limit > 0) {
+    const owed = MONTHS.filter(m => m <= CUR).reduce((t, m) => t + Math.max(0, faturaOpen(card.id, m)), 0);
+    tiles += `<p>Limite ${fmt(card.limit - owed)} livre de ${fmt(card.limit)} — cabe um parcelado
+      de até ${fmt(card.limit - owed)}, em 10x de ${fmt((card.limit - owed) / 10)}.</p>`;
+  }
+  $('bill-tiles').innerHTML = tiles;
+  const pay = $('bill-tiles').querySelector('[data-bill-pay]');
+  if (pay) pay.onclick = () => { billSheet.mode = 'pay'; renderBillForm(oldest); };
+  const adv = $('bill-tiles').querySelector('[data-bill-adv]');
+  if (adv) adv.onclick = () => { billSheet.mode = 'advance'; renderBillForm(openCycle); };
+  if (billSheet.mode) renderBillForm(billSheet.mode === 'pay' ? oldest : openCycle);
+  else $('bill-form').style.display = 'none';
+}
+function renderBillForm(cycle) {
+  const card = instById(billSheet.cardId);
+  const total = faturaOpen(card.id, cycle);
+  const paying = billSheet.mode === 'pay';
+  $('bill-form').style.display = 'block';
+  $('bill-form-label').textContent = paying ? 'Quanto pagar' : 'Quanto adiantar';
+  if (!$('bill-amount').value) $('bill-amount').value = total.toFixed(2).replace('.', ',');
+  $('bill-note').innerHTML = paying
+    ? `total ${fmt(total)} — pagar menos deixa o resto <strong>em aberto</strong>, e ele entra no
+       disponível do mês seguinte como dívida a pagar. Sem juros de rotativo.`
+    : `total ${fmt(total)} — adiantar é jogar dinheiro numa fatura que ainda acumula. Não
+       substitui pagar a anterior.`;
+  $('bill-confirm').textContent = paying ? 'Pagar' : 'Adiantar';
+  $('bill-confirm').onclick = () => {
+    const v = parseAmount($('bill-amount').value);
+    if (v <= 0) return showToast('Digite um valor');
+    if (v > total + 0.005) return showToast(`Mais do que a fatura (${fmt(total)})`);
+    entries.push({ id: nextId++, m: CUR, d: TODAY.slice(8, 10) + '/' + TODAY.slice(5, 7),
+      type: 'payment', card: card.id, cycle, pay: 'conta', amount: v,
+      cat: null, scope: 'personal', desc: `${paying ? 'Pagamento' : 'Adiantamento'} ${card.name}` });
+    $('bill-amount').value = '';
+    billSheet.mode = null;
+    showToast(paying
+      ? (faturaOpen(card.id, cycle) > 0.005
+          ? `Pago · ${fmt(faturaOpen(card.id, cycle))} ficam em aberto`
+          : 'Fatura zerada ✓ — o disponível não muda')
+      : 'Adiantado ✓');
+    renderAll();
+    renderBillSheet();
+  };
+}
+$('bill-backdrop').onclick = e => {
+  if (e.target === $('bill-backdrop')) { billSheet = null; $('bill-backdrop').classList.remove('show'); }
+};
+
 // Open the entry screen already pointed at a category (the discrete "+")
 function launchInto(catId, scope) {
   $('cat-backdrop').classList.remove('show');
@@ -2865,6 +3657,31 @@ function renderCatSheet() {
   $('cat-title').textContent = `${c.icon} ${c.name} — ${mLabel(m)}`;
   $('cat-summary').textContent =
     `${fmt(spent)} de ${fmt(c.budget)} · ${spent > c.budget ? `estourou ${fmt(spent - c.budget)}` : `sobra ${fmt(c.budget - spent)}`}`;
+  // The conhecidos are already listed on the Orçamento screen, inside the
+  // category's own card — repeating them here would say the same thing twice.
+  // This sheet is about what was actually recorded, so it keeps only the summary.
+  const items = c.items || [];
+  $('cat-known').innerHTML = items.length === 0 ? '' : `
+    <p style="margin:0 2px 10px">${items.length} conhecidos somam ${fmt(knownTotal(c))} · a vir
+      ${fmt(knownToCome(c, m))} · livre ${fmt(freeLeft(c, m))} do teto de ${fmt(c.budget)}${
+      c.leftoverTo && freeLeft(c, m) > 0.005
+        ? ` — <span data-savefree style="color:var(--accent);font-weight:600;cursor:pointer">guardar a sobra na ${reserves.find(r => r.id === c.leftoverTo).name}</span>`
+        : ''}</p>
+    <div class="knowns" style="border-top:none">${items.map(i => {
+      const done = knownDone(c, i, m);
+      return `<button class="kn-row ${done ? 'done' : ''}" data-knedit="${i.name}">
+        <span class="st">${done ? '✓' : i.auto ? '🔁' : '·'}</span>
+        <span class="nm">${i.name} <em>dia ${i.day}</em></span>
+        <span class="vl money">${fmt(i.amount)}</span></button>`;
+    }).join('')}</div>
+    <div class="chips-note" style="margin:0 2px 12px">toca num conhecido pra editar · pra lançar, use o card no Orçamento</div>`;
+  $('cat-known').querySelectorAll('[data-knedit]').forEach(b => b.onclick = () => {
+    catSheet = null; $('cat-backdrop').classList.remove('show');
+    openKnownForm(c.id, CATS.couple.includes(c) ? 'couple' : 'personal', b.dataset.knedit);
+  });
+  const saveBtn = $('cat-known').querySelector('[data-savefree]');
+  if (saveBtn) saveBtn.onclick = () => saveLeftover(c, m);
+
   const rows = monthEntries(m).filter(e => e.cat === c.id && !e.type).reverse();
   $('cat-entries').innerHTML = rows.length ? rows.map(entryRow).join('')
     : '<div class="empty-note">nada lançado aqui neste mês</div>';
@@ -2872,10 +3689,90 @@ function renderCatSheet() {
   attachProjectedTaps($('cat-entries'));
   $('cat-add').textContent = `＋ Lançar em ${c.name}`;
   $('cat-add').onclick = () => launchInto(catSheet.id, catSheet.scope);
+  $('cat-known-add').textContent = `＋ Nova conta recorrente em ${c.name}`;
+  $('cat-known-add').onclick = () => {
+    catSheet = null; $('cat-backdrop').classList.remove('show');
+    openKnownForm(c.id, c.income ? 'personal' : (CATS.couple.includes(c) ? 'couple' : 'personal'));
+  };
 }
 $('cat-backdrop').onclick = e => {
   if (e.target === $('cat-backdrop')) { catSheet = null; $('cat-backdrop').classList.remove('show'); }
 };
+
+// Expected bills one person fronted whose share has not been sent yet. Each is
+// resolved on the spot — the other sends their part — so each is its own
+// pendency, unlike free spending, which rides the seesaw as one figure.
+function billsAwaitingShare(m) {
+  // partSent accumulates what was already sent: a send below the share leaves
+  // the difference pending until it is paid too.
+  return monthEntries(m).filter(e =>
+    e.scope === 'couple' && !e.type && !e.projected && e.paidBy && e.paidBy !== 'split' &&
+    isExpectedBill(e) && shareOwed(e) > 0.005);
+}
+// Nothing money-shaped happens on a bare tap: sending goes through a
+// confirmation sheet — which bills, who sends what, a Confirm. One bill keeps
+// the amount editable, because what was actually sent is sometimes not exactly
+// the share; several confirm at their computed shares, one settlement each.
+let sendSheet = null; // { ids: [entry.id, ...] }
+const shareOwed = e => (e.paidBy === 'F' ? e.amount - share(e) : share(e)) - (e.partSent || 0);
+const shareOwer = e => e.paidBy === 'F' ? 'R' : 'F';
+let selShares = new Set(); // multi-select on the Falta resolver share rows
+function openSendSheet(ids) {
+  sendSheet = { ids };
+  renderSendSheet();
+  $('send-backdrop').classList.add('show');
+}
+function renderSendSheet() {
+  const items = sendSheet.ids.map(id => entries.find(x => x.id === id));
+  const single = items.length === 1 ? items[0] : null;
+  const total = items.reduce((t, e) => t + shareOwed(e), 0);
+  $('send-sheet').innerHTML = `
+    <h3>🤝 Confirmar envio</h3>
+    <div>${items.map(e => `
+      <div class="kn-row"><span class="nm">${e.desc || catById(e.cat).name}
+        <em>${e.paidBy === 'F' ? 'Fernando' : 'Rayra'} pagou o total</em></span>
+        <span class="vl money">${fmt(shareOwed(e))}</span></div>`).join('')}</div>
+    ${single ? `
+      <p style="margin:6px 2px 4px">${shareOwer(single) === 'R' ? 'Rayra' : 'Fernando'} manda</p>
+      <input type="text" inputmode="numeric" id="send-amount" value="${fmt(shareOwed(single)).replace('R$ ', '')}">`
+    : `<p style="margin:6px 2px 4px">${items.length} contas · uma transferência por conta</p>`}
+    <button class="btn-primary" id="send-confirm">Confirmar · ${fmt(total)}</button>
+    <p>O envio abate a parte — o que faltar continua em aberto. Não mexe na gangorra: a conta nunca entrou nela.</p>`;
+  const amt = $('send-amount');
+  if (amt) { maskEl(amt); amt.focus(); }
+  $('send-confirm').onclick = () => {
+    const items2 = sendSheet.ids.map(id => entries.find(x => x.id === id));
+    const one = items2.length === 1;
+    if (one && parseAmount($('send-amount').value) <= 0) { showToast('Digite um valor'); return; }
+    items2.forEach(e => {
+      const owed = one ? parseAmount($('send-amount').value) : shareOwed(e);
+      // Marked as a bill's share: the bill never rode the seesaw, so the
+      // transfer that evens it out must not tilt it either.
+      settlements.push({ amount: Math.round(owed * 100) / 100, from: shareOwer(e), m: e.m,
+        d: TODAY.slice(10 - 2, 10) + '/' + TODAY.slice(5, 7), bill: true });
+      e.partSent = (e.partSent || 0) + owed;
+    });
+    selShares.clear();
+    sendSheet = null; $('send-backdrop').classList.remove('show');
+    showToast(items2.length === 1
+      ? `${shareOwer(items2[0]) === 'R' ? 'Rayra' : 'Fernando'} mandou ${fmt(total)} 🤝`
+      : `${items2.length} envios registrados 🤝`);
+    renderAll();
+  };
+}
+$('send-backdrop').onclick = e => {
+  if (e.target === $('send-backdrop')) { sendSheet = null; $('send-backdrop').classList.remove('show'); }
+};
+
+// Full couple values, never "my share": one screen answers "how much do I still
+// have", this one answers "how are WE doing".
+function coupleFull(c) {
+  return c.fixedAmount ?? (c.budget * 100 / SPLIT_F);
+}
+function coupleSpentFull(catId, m) {
+  return monthEntries(m).filter(e => e.cat === catId && !e.type && !e.fromReserve)
+    .reduce((s, e) => s + e.amount, 0);
+}
 
 function renderCouple() {
   const m = view();
@@ -2893,15 +3790,109 @@ function renderCouple() {
   $('seesaw-exact').textContent =
     `Fernando pagou ${fmt(Math.abs(s))} ${s > 0 ? 'além' : 'aquém'} da parte dele até ${mLabel(m)}`;
 
+  // ---- Falta resolver: what is pending, and who resolves it ----
+  const todos = [];
+  if (m === CUR) {
+    // Household knowns and fixed bills nobody has logged yet — anyone can.
+    CATS.couple.forEach(c => {
+      (c.items || []).forEach(i => {
+        if (knownDone(c, i, m)) return;
+        todos.push({ icon: c.icon, title: `${i.name} ${i.day < +TODAY.slice(8, 10) ? 'está atrasado' : 'vence dia ' + i.day}`,
+          sub: `previsto ${fmt(i.amount)} · qualquer um lança`,
+          go: () => launchKnown(c.id, 'couple', i, m) });
+      });
+      if (c.fixedAmount && !(c.items || []).length &&
+          !entries.some(e => e.m === m && e.cat === c.id && !e.type)) {
+        todos.push({ icon: c.icon, title: `${c.name} ainda não lançado`,
+          sub: `previsto ${fmt(c.fixedAmount)} · qualquer um lança`,
+          go: () => launchFixedEntry(c.id, 'couple', m) });
+      }
+    });
+    // Fronted expected bills: each one is settled on the spot by the other
+    // sending their share, so each is its own pendency with its own action.
+    billsAwaitingShare(m).forEach(e => {
+      const ower = e.paidBy === 'F' ? 'Rayra' : 'Fernando';
+      todos.push({ icon: '🤝', shareId: e.id,
+        title: `${e.desc || catById(e.cat).name}: ${ower} manda ${fmt(shareOwed(e))}`,
+        sub: `${e.paidBy === 'F' ? 'Fernando' : 'Rayra'} pagou o total${
+          e.partSent ? ` · já mandou ${fmt(e.partSent)}, falta o resto` : ' · toca pra confirmar o envio'}`,
+        go: () => openSendSheet([e.id]) });
+    });
+    // Free spending rides the seesaw as one figure — resolved by turn-taking,
+    // never listed bill by bill.
+    if (!balanced) {
+      todos.push({ icon: '⚖️', title: s > 0 ? 'Vez da Rayra pagar a próxima' : 'Vez do Fernando pagar a próxima',
+        sub: `ou registrar um acerto de ${fmt(Math.abs(s))}`,
+        go: () => $('settle-open').click() });
+    }
+  }
+  // The selection only ever holds shares still pending — a confirmed send
+  // must not linger checked under a row that no longer exists.
+  const pendingShares = billsAwaitingShare(m);
+  selShares.forEach(id => { if (!pendingShares.some(e => e.id === id)) selShares.delete(id); });
+  const selItems = pendingShares.filter(e => selShares.has(e.id));
+  const selSum = selItems.reduce((t, e) => t + shareOwed(e), 0);
+  $('couple-todo-card').style.display = todos.length ? '' : 'none';
+  $('couple-todo-count').textContent = todos.length ? `${todos.length}` : '';
+  $('couple-todo').innerHTML = todos.map((x, i) => `
+    <div class="swipe-row" data-ctodo="${i}" style="cursor:pointer"><div class="entry">
+      ${x.shareId
+        ? `<span class="share-check ${selShares.has(x.shareId) ? 'on' : ''}" data-sharecheck="${x.shareId}">✓</span>`
+        : `<div class="dot couple">${x.icon}</div>`}
+      <div class="rowline"><div class="stack">
+        <span class="who">${x.title}</span>
+        <span class="meta">${x.sub}</span></div>
+      <span class="chev">›</span></div>
+    </div></div>`).join('') + (selItems.length ? `
+    <button class="btn-primary" id="send-selected" style="margin-top:10px">
+      Mandar ${selItems.length} selecionada${selItems.length > 1 ? 's' : ''} · ${fmt(selSum)}</button>` : '');
+  $('couple-todo').querySelectorAll('[data-ctodo]').forEach(el => el.onclick = () => todos[+el.dataset.ctodo].go());
+  $('couple-todo').querySelectorAll('[data-sharecheck]').forEach(el => el.onclick = ev => {
+    ev.stopPropagation();
+    const id = +el.dataset.sharecheck;
+    selShares.has(id) ? selShares.delete(id) : selShares.add(id);
+    renderCouple();
+  });
+  const sendSel = $('couple-todo').querySelector('#send-selected');
+  if (sendSel) sendSel.onclick = () => openSendSheet(selItems.map(e => e.id));
+
+  // ---- Orçamentos da casa: the couple ceilings at full value ----
+  $('couple-budgets').innerHTML = CATS.couple.map(c => {
+    const cap = coupleFull(c);
+    const spent = coupleSpentFull(c.id, m);
+    const toCome = (c.items || []).filter(i => !knownDone(c, i, m)).reduce((t, i) => t + i.amount, 0)
+      + (c.fixedAmount && !(c.items || []).length && !entries.some(e => e.m === m && e.cat === c.id && !e.type) ? c.fixedAmount : 0);
+    const pct = Math.min(100, (spent / cap) * 100);
+    const comingPct = Math.min(100 - pct, (toCome / cap) * 100);
+    const over = spent > cap;
+    const free = Math.max(0, cap - spent - toCome);
+    return `<div class="budget-row" data-bcat="${c.id}" data-bscope="couple">
+      <div class="row spread">
+        <span class="name"><span class="txt">${c.icon} ${c.name}</span></span>
+        <span class="nums money">${over ? `estourou ${fmt(spent - cap)}` : `livre ${fmt(free)}`}</span></div>
+      <div class="bar"><i class="${over ? 'over' : pct > 85 ? 'near' : ''}" style="width:${pct}%"></i>${
+        toCome > 0 ? `<i class="coming" style="width:${comingPct}%"></i>` : ''}</div>
+      <div class="row spread" style="margin-top:5px"><span class="nums">gasto ${fmt(spent)}${
+        toCome > 0 ? ` · a vir ${fmt(toCome)}` : ''} · teto ${fmt(cap)}</span></div>
+      </div>`;
+  }).join('');
+  $('couple-budgets').querySelectorAll('[data-bcat]').forEach(el =>
+    el.onclick = () => openCatSheet(el.dataset.bcat, el.dataset.bscope));
+
   const rows = monthEntries(m).filter(e => e.scope === 'couple').map(entryRow);
   const settleRows = settlements.filter(x => x.m === m).map(settlementRow);
   const all = [...rows, ...settleRows].reverse();
   $('couple-entries').innerHTML = all.length ? all.join('') : '<div class="empty-note">nada do casal neste mês</div>';
   attachSwipes($('couple-entries'));
+  attachSettlementTaps($('couple-entries'));
   attachProjectedTaps($('couple-entries'));
 }
 
-function renderAll() { renderMonthNav(); renderHome(); renderBudget(); renderCouple(); renderDeskToolbar(); if (catSheet) renderCatSheet(); }
+function renderAll() {
+  renderMonthNav(); renderHome(); renderBudget(); renderCouple(); renderDeskToolbar();
+  if (catSheet) renderCatSheet();
+  if (billSheet) renderBillSheet();
+}
 
 // ============ Swipe (Gmail-style): drag right = edit, drag left = delete + undo ============
 function attachSwipes(container) {
@@ -3006,6 +3997,8 @@ function openEdit(id) {
   document.querySelector('.tab[data-scr="entry"]').click();
 }
 function resetEntryForm() {
+  entryItem = null; entryReserve = null; rsvExpanded = false;
+  entryCycleShift = 0; entrySplitF = null;
   setKeypad(false);
   editingId = null;
   $('entry-amount').value = ''; $('entry-desc').value = '';
@@ -3165,14 +4158,23 @@ function maskEl(el) {
 
 // ============ Interactions ============
 let lastScreen = 'home'; // where the back arrow on the entry screen returns to
+// A sheet floats over the screen it was opened from, so leaving that screen has
+// to take it with us — otherwise the next screen opens behind the glass, visible
+// and unreachable.
+function closeAllSheets() {
+  catSheet = null; billSheet = null; kf = null; sendSheet = null;
+  document.querySelectorAll('.sheet-backdrop.show').forEach(el => el.classList.remove('show'));
+}
+
 document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+  closeAllSheets();
   if (t.dataset.scr !== 'entry') lastScreen = t.dataset.scr;
   document.querySelectorAll('.tab').forEach(x => x.classList.toggle('sel', x === t));
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 'scr-' + t.dataset.scr));
   syncChrome();
   document.querySelector('.screens').scrollTop = 0;
   // arriving at the entry screen means one thing: type the amount
-  if (t.dataset.scr === 'entry' && isDesk() && !parseAmount($('entry-amount').value)) {
+  if (t.dataset.scr === 'entry' && isDesk()) {
     requestAnimationFrame(() => $('entry-amount').focus());
   }
 });
@@ -3300,9 +4302,16 @@ $('entry-save').onclick = () => {
         id: nextId++, m, d: i === 1 ? dd : '10/' + m.slice(5, 7),
         cat: entryCat, desc, scope: entryScope, pay: entryPay,
         amount: i === 1 ? first : per,
-        ...(entryScope === 'couple' ? { paidBy: entryPaid, splitF: SPLIT_F } : {}),
+        ...(entryScope === 'couple' ? { paidBy: entryPaid, splitF: entrySplitF ?? SPLIT_F } : {}),
+        ...(entryCycleShift ? { cycleShift: entryCycleShift } : {}),
         ...(n > 1 ? { inst: { no: i, of: n } } : {}),
+        ...(entryItem && i === 1 ? { item: entryItem } : {}),
+        ...(entryReserve ? { fromReserve: entryReserve } : {}),
       });
+      if (entryReserve && i === 1) {
+        const r = reserves.find(x => x.id === entryReserve);
+        r.total = Math.round((r.total - (i === 1 ? first : per)) * 100) / 100;
+      }
       created++;
     }
     // "share already sent" — creates the linked transfer in the same save
@@ -3669,7 +4678,7 @@ $('ie-save').onclick = () => {
 // Category editor (also the quick-create from the entry screen)
 let catEdit = null; // {id, scope} | {new: true, scope}; return: 'settings' | 'entry' | null
 let ceScope = 'personal', ceFixed = false, ceEssential = false;
-function openCatEdit(id, scope, ret) {
+function openCatEdit(id, scope, ret, presetName) {
   ceScope = scope || 'personal';
   if (id) {
     const c = catById(id);
@@ -3682,7 +4691,7 @@ function openCatEdit(id, scope, ret) {
     catEdit = { new: true, scope: ceScope, ret };
     ceFixed = false; ceEssential = false;
     $('ce-title').textContent = '＋ Nova categoria';
-    $('ce-icon').value = ''; $('ce-name').value = ''; $('ce-budget').value = '';
+    $('ce-icon').value = ''; $('ce-name').value = presetName || ''; $('ce-budget').value = '';
   }
   if (!hasPartner) ceScope = 'personal';
   syncCatEdit(); syncScopePickers();
@@ -3735,7 +4744,32 @@ $('ce-save').onclick = () => {
   showToast('Categoria salva ✓');
 };
 $('var-add').onclick = () => openCatEdit(null, budgetTab === 'var' ? 'personal' : 'personal', 'settings');
-$('fix-add').onclick = () => { openCatEdit(null, 'couple', 'settings'); ceFixed = true; syncCatEdit(); };
+// "Nova fixa" used to create a whole category for one bill. It now adds a
+// conhecido inside a category that already exists — the bill stops being a
+// category and becomes a line in one.
+$('fix-add').onclick = () => openKnownPicker();
+// Which ceiling does this charge belong to? Asked once, before the form.
+function openKnownPicker() {
+  const hosts = [...CATS.personal, ...CATS.couple].filter(c => !c.fixed);
+  sheetHTML('Onde essa conta mora?',
+    `<p>Uma conta recorrente vive dentro de uma categoria — é ela que segura o dinheiro no mês.</p>
+     <div class="chips">${hosts.map(c =>
+       `<button class="chip" data-kh="${c.id}">${c.icon} ${c.name}</button>`).join('')}</div>`,
+    host => host.querySelectorAll('[data-kh]').forEach(b => b.onclick = () => {
+      closeSimpleSheet();
+      const c = catById(b.dataset.kh);
+      openKnownForm(c.id, CATS.couple.includes(c) ? 'couple' : 'personal');
+    }));
+}
+// A throwaway sheet for one-off questions, so a new flow does not need new markup.
+function sheetHTML(title, body, wire) {
+  const el = $('simple-backdrop');
+  el.querySelector('.sheet').innerHTML = `<h3>${title}</h3>${body}`;
+  el.classList.add('show');
+  if (wire) wire(el);
+}
+function closeSimpleSheet() { $('simple-backdrop').classList.remove('show'); }
+$('simple-backdrop').onclick = e => { if (e.target === $('simple-backdrop')) closeSimpleSheet(); };
 
 // Reserve editor
 let rsvEdit = null; // {id} | {new: true}
